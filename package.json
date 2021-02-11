@@ -1,0 +1,96 @@
+{
+  "name": "apisuite-be",
+  "version": "1.4.0",
+  "description": "APISuite backend core API",
+  "main": "app.js",
+  "scripts": {
+    "lint": "npx eslint \"**/*.js\"",
+    "local": "node app.js | pino-pretty",
+    "test-psql": "node util/test-psql.js \"postgres://$POSTGRES_USERNAME:$POSTGRES_PASSWORD@$POSTGRES_ADDRESS:$POSTGRES_PORT_INTERNAL/$POSTGRES_DB\"",
+    "migrate": "npx sequelize-cli db:migrate --url \"postgres://$POSTGRES_USERNAME:$POSTGRES_PASSWORD@$POSTGRES_ADDRESS:$POSTGRES_PORT_INTERNAL/$POSTGRES_DB\"",
+    "migrate:undo:all": "npx sequelize-cli db:migrate:undo:all --url \"postgres://$POSTGRES_USERNAME:$POSTGRES_PASSWORD@$POSTGRES_ADDRESS:$POSTGRES_PORT_INTERNAL/$POSTGRES_DB\"",
+    "start": "node app.js",
+    "test": "NODE_ENV=test mocha {routes,controllers,services}/**/*.spec.js --inspect=7000 --exit",
+    "integrationTest": "NODE_ENV=test mocha test/**/*.spec.js --inspect=7000 --exit"
+  },
+  "pre-commit": [
+    "audit",
+    "lint"
+  ],
+  "author": "APISuite",
+  "license": "MPL-2",
+  "dependencies": {
+    "@apidevtools/swagger-parser": "9.0.1",
+    "@awaitjs/express": "0.6.1",
+    "@sendgrid/mail": "7.2.6",
+    "accesscontrol": "2.2.1",
+    "amqp-connection-manager": "3.2.1",
+    "amqplib": "0.6.0",
+    "bcrypt": "5.0.0",
+    "convict": "6.0.0",
+    "cookie-parser": "1.4.5",
+    "cors": "2.8.5",
+    "deepmerge": "^4.2.2",
+    "dotenv": "8.2.0",
+    "express": "4.17.1",
+    "form-data": "3.0.0",
+    "formidable": "1.2.2",
+    "handlebars": "4.7.6",
+    "http-status-codes": "1.4.0",
+    "joi": "17.2.1",
+    "jsonwebtoken": "8.5.1",
+    "jwks-rsa": "1.12.0",
+    "moment": "2.29.0",
+    "morgan": "1.10.0",
+    "node-fetch": "2.6.1",
+    "pg": "8.3.3",
+    "pino": "6.6.1",
+    "sequelize": "6.3.5",
+    "swagger-jsdoc": "5.0.0",
+    "swagger2openapi": "6.0.3",
+    "url": "0.11.0",
+    "uuid": "8.3.0"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "chai-http": "^4.3.0",
+    "chance": "^1.1.6",
+    "eslint": "^6.8.0",
+    "eslint-config-standard": "^14.1.1",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "mocha": "^8.1.1",
+    "mock-req-res": "^1.2.0",
+    "pino-pretty": "3.5.0",
+    "sequelize": "6.3.4",
+    "sequelize-cli": "6.2.0",
+    "sinon": "^9.0.2"
+  },
+  "release": {
+    "branches": [
+      "main"
+    ],
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/release-notes-generator",
+      [
+        "@semantic-release/npm",
+        {
+          "npmPublish": false
+        }
+      ],
+      [
+        "@semantic-release/git",
+        {
+          "assets": [
+            "package.json"
+          ],
+          "message": "chore(release): ${nextRelease.version} [ci skip]"
+        }
+      ],
+      "@semantic-release/github"
+    ]
+  }
+}

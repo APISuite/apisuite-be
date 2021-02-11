@@ -1,0 +1,7 @@
+.env
+node_modules
+.compose-utils/db/data
+.compose-utils/rabbitmq/data
+
+.idea
+.vscode
