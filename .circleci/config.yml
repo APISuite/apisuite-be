@@ -8,7 +8,7 @@ jobs:
       - checkout
       - run: npm install
       - run: npm test
-      - run: cp ../.ssh/known_hosts .
+      - run: cp -r ../.ssh/ .
       - persist_to_workspace:
           root: ~/
           paths:
@@ -20,7 +20,7 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/
-      - run: mv known_hosts ../.ssh
+      - run: cp -r .ssh ../.ssh && rm -rf .ssh
       - run: GH_TOKEN=$GH_TOKEN npx semantic-release --dry-run
       - persist_to_workspace:
           root: ~/
