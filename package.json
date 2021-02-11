@@ -72,11 +72,6 @@
     "branches": [
       {
         "name": "production"
-      },
-      {
-        "name": "staging",
-        "channel": "rc",
-        "prerelease": "rc"
       }
     ],
     "plugins": [
