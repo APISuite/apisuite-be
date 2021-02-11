@@ -8,7 +8,7 @@ COPY . /usr/src/app/
 
 RUN apk update \
     && apk --no-cache add --virtual build-dependencies build-base python \
-    && npm install \
+    && npm install --only=prod \
     && npm rebuild bcrypt --build-from-source \
     && apk del build-dependencies
 
