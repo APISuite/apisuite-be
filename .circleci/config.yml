@@ -49,13 +49,13 @@ workflows:
                 - production
           requires:
             - test
-#      - build:
-#          context: docker
-#          filters:
-#            branches:
-#              only:
-#                - develop
-#                - staging
-#                - production
-#          requires:
-#            - release
+      - build:
+          context: docker
+          filters:
+            branches:
+              only:
+                - develop
+                - staging
+                - production
+          requires:
+            - release
