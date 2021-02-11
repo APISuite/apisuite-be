@@ -8,6 +8,7 @@ jobs:
       - checkout
       - run: npm install
       - run: npm test
+      - run: cp ../.ssh/known_hosts .
       - persist_to_workspace:
           root: ~/
           paths:
@@ -17,7 +18,7 @@ jobs:
     docker:
       - image: cimg/node:12.20.1
     steps:
-      - add_ssh_keys
+      - run: mv known_hosts ../.ssh
       - attach_workspace:
           at: ~/
       - run: GH_TOKEN=$GH_TOKEN npx semantic-release --dry-run
