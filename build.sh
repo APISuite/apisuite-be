@@ -7,11 +7,11 @@ HASH=$(git rev-parse --short HEAD)
 LATEST=latest
 
 if [ "$CIRCLE_BRANCH" = "staging" ]; then
-  $LATEST=stg-latest
+  LATEST=stg-latest
 fi
 
 if [ "$CIRCLE_BRANCH" = "develop" ]; then
-  $LATEST=dev-latest
+  LATEST=dev-latest
 fi
 
 docker build \
