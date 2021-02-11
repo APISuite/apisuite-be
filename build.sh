@@ -4,7 +4,7 @@ echo ${DOCKER_PASS} | docker login --username ${DOCKER_USER} --password-stdin
 
 HASH=$(git rev-parse --short HEAD)
 
-$LATEST=latest
+LATEST=latest
 
 if [ "$CIRCLE_BRANCH" = "staging" ]; then
   $LATEST=stg-latest
