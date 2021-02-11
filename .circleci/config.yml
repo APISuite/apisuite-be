@@ -6,7 +6,6 @@ jobs:
       - image: cimg/node:12.20.1
     steps:
       - checkout
-      - run: ls -la
       - run: npm install
       - run: npm test
       - persist_to_workspace:
@@ -18,11 +17,9 @@ jobs:
     docker:
       - image: cimg/node:12.20.1
     steps:
+      - add_ssh_keys
       - attach_workspace:
           at: ~/
-      - run: ls -la
-#      - checkout
-#      - run: npm install
       - run: GH_TOKEN=$GH_TOKEN npx semantic-release --dry-run
       - persist_to_workspace:
           root: ~/
