@@ -6,7 +6,6 @@
   "scripts": {
     "lint": "npx eslint \"**/*.js\"",
     "local": "node app.js | pino-pretty",
-    "test-psql": "node util/test-psql.js \"postgres://$POSTGRES_USERNAME:$POSTGRES_PASSWORD@$POSTGRES_ADDRESS:$POSTGRES_PORT_INTERNAL/$POSTGRES_DB\"",
     "migrate": "npx sequelize-cli db:migrate --url \"postgres://$POSTGRES_USERNAME:$POSTGRES_PASSWORD@$POSTGRES_ADDRESS:$POSTGRES_PORT_INTERNAL/$POSTGRES_DB\"",
     "migrate:undo:all": "npx sequelize-cli db:migrate:undo:all --url \"postgres://$POSTGRES_USERNAME:$POSTGRES_PASSWORD@$POSTGRES_ADDRESS:$POSTGRES_PORT_INTERNAL/$POSTGRES_DB\"",
     "start": "node app.js",
@@ -64,13 +63,13 @@
     "mocha": "^8.1.1",
     "mock-req-res": "^1.2.0",
     "pino-pretty": "3.5.0",
-    "sequelize": "6.3.4",
     "sequelize-cli": "6.2.0",
     "sinon": "^9.0.2"
   },
   "release": {
     "branches": [
-      "main"
+      { "name": "production" },
+      { "name": "staging", "channel": "rc", "prerelease": "rc" }
     ],
     "plugins": [
       "@semantic-release/commit-analyzer",
