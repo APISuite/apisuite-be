@@ -9,24 +9,23 @@ jobs:
       - run: npm install
       - run: npm test
       - persist_to_workspace:
-          root: ~/
+          root: /
           paths:
-            - project
+            - /
 
   release:
     docker:
       - image: cimg/node:12.20.1
     steps:
-#      - attach_workspace:
-#          at: ~/
-      - checkout
-      - run: npm install
-      - run: npm test
-      - run: GH_TOKEN=$GH_TOKEN npx semantic-release
-      - persist_to_workspace:
-          root: ~/
-          paths:
-            - project
+      - attach_workspace:
+          at: /
+#      - checkout
+#      - run: npm install
+      - run: GH_TOKEN=$GH_TOKEN npx semantic-release --dry-run
+#      - persist_to_workspace:
+#          root: ~/
+#          paths:
+#            - project
 
   build:
     docker:
@@ -50,13 +49,13 @@ workflows:
                 - production
           requires:
             - test
-      - build:
-          context: docker
-          filters:
-            branches:
-              only:
-                - develop
-                - staging
-                - production
-          requires:
-            - release
+#      - build:
+#          context: docker
+#          filters:
+#            branches:
+#              only:
+#                - develop
+#                - staging
+#                - production
+#          requires:
+#            - release
