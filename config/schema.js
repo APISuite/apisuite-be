@@ -78,28 +78,6 @@ const schema = {
       default: 'strict',
       env: 'APISUITE_AUTH_COOKIE_SAME_SITE',
     },
-    sso: {
-      keycloak: {
-        clientID: {
-          doc: 'Keycloak client ID for OIDC auth',
-          format: String,
-          default: '',
-          env: 'APISUITE_SSO_KEYCLOAK_CLIENT_ID',
-        },
-        clientSecret: {
-          doc: 'Keycloak client secret for OIDC auth',
-          format: String,
-          default: '',
-          env: 'APISUITE_SSO_KEYCLOAK_CLIENT_SECRET',
-        },
-        discoveryURL: {
-          doc: 'OIDC Discovery endpoint',
-          format: String,
-          default: '',
-          env: 'APISUITE_SSO_KEYCLOAK_OIDC_DISCOVERY_URL',
-        },
-      },
-    },
   },
   db: {
     host: {

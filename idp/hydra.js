@@ -66,15 +66,8 @@ class Hydra extends IdP {
     return ans
   }
 
-  async deleteClient (clientID) {
+  async deleteClient (clientID, clientData) {
     if (!clientID) return
-
-    const app = await models.App.findByClientID(clientID)
-
-    if (!app || app.idpProvider !== idpProviders.INTERNAL) {
-      log.error(`[DELETE HYDRA CLIENT] could not find app with clientID ${clientID}`)
-      return
-    }
 
     const r = await fetch(`${this.config.configuration.clientsURL}/${clientID}`, {
       method: 'DELETE',

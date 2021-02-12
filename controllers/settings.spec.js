@@ -2,12 +2,16 @@ const sinon = require('sinon')
 const HTTPStatus = require('http-status-codes')
 const { mockRequest, mockResponse } = require('mock-req-res')
 const helpers = require('../test/helpers')
+const enums = require('../util/enums')
 const { models, sequelize } = require('../models')
 const msgBroker = require('../services/msg-broker')
 const Setting = models.Setting
+const SSOClient = models.SSOClient
+const Idp = require('../idp')
 const {
   get,
   upsert,
+  getIdp,
 } = require('./settings')
 
 describe('Settings', () => {
@@ -17,7 +21,9 @@ describe('Settings', () => {
     beforeEach(() => {
       stubs = {
         findOne: sinon.stub(Setting, 'findOne'),
+        SSOClient_findOne: sinon.stub(SSOClient, 'findOne'),
         create: sinon.stub(Setting, 'create'),
+        idp_getIdP: sinon.stub(Idp, 'getIdP'),
       }
     })
 
@@ -27,28 +33,42 @@ describe('Settings', () => {
 
     it('should return 200 and the settings', async () => {
       const mockData = {
-        values: {
-          portalName: 'test',
-        },
+        get: () => ({
+          values: {
+            portalName: 'test',
+          },
+        }),
       }
+      stubs.idp_getIdP.resolves({
+        getProvider: () => enums.idpProviders.INTERNAL,
+      })
+      stubs.SSOClient_findOne.resolves(null)
+
       const req = mockRequest()
       const res = mockResponse()
       stubs.findOne.resolves(mockData)
 
       await get(req, res)
       sinon.assert.calledWith(res.status, HTTPStatus.OK)
-      sinon.assert.calledWith(res.send, { portalName: 'test' })
+      sinon.assert.calledWith(res.send, { portalName: 'test', sso: [] })
     })
 
     it('should return 200 and the settings when no settings exist yet', async () => {
       const req = mockRequest()
       const res = mockResponse()
       stubs.findOne.resolves(null)
-      stubs.create.resolves({ values: {} })
+      stubs.create.resolves({
+        get: () => ({
+          values: {},
+        }),
+      })
+      stubs.idp_getIdP.resolves({
+        getProvider: () => enums.idpProviders.INTERNAL,
+      })
 
       await get(req, res)
       sinon.assert.calledWith(res.status, HTTPStatus.OK)
-      sinon.assert.calledWith(res.send, {})
+      sinon.assert.calledWith(res.send, { sso: [] })
     })
 
     it('should return 500 and errors when something fails', async () => {
@@ -154,7 +174,7 @@ describe('Settings', () => {
       const res = mockResponse()
       stubs.findOne.resolves({ values: {} })
 
-      await get(req, res)
+      await getIdp(req, res)
       sinon.assert.calledWith(res.status, HTTPStatus.OK)
       sinon.assert.calledWith(res.send, {})
     })
@@ -164,7 +184,7 @@ describe('Settings', () => {
       const res = mockResponse({ sendInternalError: sinon.spy(() => undefined) })
       stubs.findOne.rejects()
 
-      await get(req, res)
+      await getIdp(req, res)
       sinon.assert.called(res.sendInternalError)
     })
   })
@@ -197,14 +217,14 @@ describe('Settings', () => {
 
     const mockReq = {
       body: {
-        provider: 'Internal',
+        provider: 'internal',
         configuration: {},
       },
     }
 
     const mockData = {
       values: {
-        provider: 'Internal',
+        provider: 'internal',
         configuration: {},
       },
     }

@@ -117,7 +117,7 @@ router.getAsync('/oidc/:provider',
  *           type: string
  *           enum: [keycloak]
  *     requestBody:
- *       description: User credentials
+ *       description: Auth code
  *       required: true
  *       content:
  *         application/json:

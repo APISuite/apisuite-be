@@ -74,6 +74,9 @@
  *         clientRegistrationURL:
  *           type: string
  *           format: uri
+ *         discoveryURL:
+ *           type: string
+ *           format: uri
  *         initialAccessToken:
  *           type: string
  *         ssoEnabled:
