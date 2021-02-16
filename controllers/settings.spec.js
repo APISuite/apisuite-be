@@ -156,7 +156,7 @@ describe('Settings', () => {
     })
   })
 
-  describe('getIdp', () => {
+  describe.only('getIdp', () => {
     let stubs = {}
 
     beforeEach(() => {

@@ -58,7 +58,6 @@ const get = async (req, res) => {
 
     return res.status(HTTPStatus.OK).send(settings.values)
   } catch (error) {
-    console.log(error)
     log.error(error, '[SETTINGS get]')
     return res.sendInternalError()
   }
@@ -124,7 +123,6 @@ const getIdp = async (req, res) => {
 
     return res.status(HTTPStatus.OK).send(cleanInternalConfig(settings.values))
   } catch (error) {
-    console.log(error)
     log.error(error, '[SETTINGS getIdp]')
     return res.sendInternalError()
   }
