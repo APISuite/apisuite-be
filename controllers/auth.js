@@ -228,7 +228,7 @@ const oidcToken = async (req, res) => {
     return res.sendInternalError()
   }
 
-  const idp = await getIdP()
+  const idp = await Idp.getIdP()
   const ssoClient = await models.SSOClient.findOne({
     where: { provider: idp.getProvider() },
   })

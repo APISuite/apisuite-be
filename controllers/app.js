@@ -288,7 +288,7 @@ const updateApp = async (req, res) => {
 const createDraftApp = async (req, res) => {
   const transaction = await sequelize.transaction()
   try {
-    const idp = await getIdP()
+    const idp = await Idp.getIdP()
 
     const app = await models.App.create(
       {
@@ -363,7 +363,7 @@ const requestAccess = async (req, res) => {
   const subscriptionModel = await getSubscriptionModel()
   switch (subscriptionModel) {
     case subscriptionModels.SIMPLIFIED: {
-      const idp = await getIdP()
+      const idp = await Idp.getIdP()
       const client = await idp.createClient({
         clientName: app.name,
         redirectURIs: [app.redirect_url],
@@ -397,7 +397,7 @@ const requestAccess = async (req, res) => {
 const createApp = async (req, res) => {
   const transaction = await sequelize.transaction()
   try {
-    const idp = await getIdP()
+    const idp = await Idp.getIdP()
     const client = await idp.createClient({
       clientName: req.body.name,
       redirectURIs: [req.body.redirect_url],

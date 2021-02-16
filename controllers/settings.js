@@ -251,7 +251,7 @@ const cleanInternalConfig = (settings) => {
 }
 
 const toggleSSO = async (enable) => {
-  const idp = await getIdP()
+  const idp = await Idp.getIdP()
 
   if (idp.getProvider() === idpProviders.INTERNAL) {
     throw new Error('Internal IDP does not support SSO')

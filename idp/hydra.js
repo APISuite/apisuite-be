@@ -1,8 +1,6 @@
 const HTTPStatus = require('http-status-codes')
 const { v4: uuidv4 } = require('uuid')
 const fetch = require('node-fetch')
-const { models } = require('../models')
-const { idpProviders } = require('../util/enums')
 const log = require('../util/logger')
 const IdP = require('./idp')
 
