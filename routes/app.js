@@ -101,6 +101,52 @@ router.postAsync('/',
 
 /**
  * @openapi
+ * /apps/{id}:
+ *   put:
+ *     description: Update app
+ *     tags: [App (v2)]
+ *     parameters:
+ *       - name: id
+ *         description: The app id.
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: number
+ *     requestBody:
+ *       description: App object to update
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: "#/components/schemas/AppDraft"
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: The updated App
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/AppV2'
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ *       500:
+ *         $ref: '#/components/responses/Internal'
+ */
+router.putAsync('/update/:id',
+  loggedIn,
+  validateAppBody,
+  accessControl(actions.UPDATE, possessions.OWN, resources.APP),
+  controllers.app.updateApp)
+
+/**
+ * @openapi
  * /apps/:id/request:
  *   post:
  *     description: Submit an access request for an application
@@ -231,6 +277,7 @@ router.postAsync('/create',
  * @openapi
  * /app/update/{id}:
  *   put:
+ *     deprecated: true
  *     description: Update app
  *     tags: [App]
  *     parameters:
@@ -265,7 +312,7 @@ router.postAsync('/create',
  *       500:
  *         $ref: '#/components/responses/Internal'
  */
-router.putAsync('/update/:id',
+router.putAsync('/:id',
   loggedIn,
   validateAppBody,
   accessControl(actions.UPDATE, possessions.OWN, resources.APP),

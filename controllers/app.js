@@ -195,8 +195,14 @@ const updateApp = async (req, res) => {
       {
         name: req.body.name,
         description: req.body.description,
-        redirect_url: req.body.redirect_url,
+        shortDescription: req.body.shortDescription,
+        redirect_url: req.body.redirectUrl || req.body.redirect_url,
         logo: req.body.logo,
+        tosUrl: req.body.tosUrl,
+        privacyUrl: req.body.privacyUrl,
+        youtubeUrl: req.body.youtubeUrl,
+        websiteUrl: req.body.websiteUrl,
+        supportUrl: req.body.supportUrl,
       },
       {
         transaction,
