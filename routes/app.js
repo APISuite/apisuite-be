@@ -11,7 +11,7 @@ const { validateAppBody, validateSubscriptionBody } = require('./validation_sche
  *   get:
  *     summary: Get list of apps
  *     description: Get list of apps in the context of the user's current organization
- *     tags: [App]
+ *     tags: [App (v2)]
  *     security:
  *       - cookieAuth: []
  *     responses:
@@ -22,7 +22,7 @@ const { validateAppBody, validateSubscriptionBody } = require('./validation_sche
  *             schema:
  *               type: array
  *               items:
- *                 $ref: '#/components/schemas/AppHeader'
+ *                 $ref: '#/components/schemas/AppV2'
  *       400:
  *         $ref: '#/components/responses/BadRequest'
  *       401:
@@ -40,7 +40,7 @@ router.getAsync('/',
  * /apps/:id:
  *   get:
  *     description: Get details of an application
- *     tags: [App]
+ *     tags: [App (v2)]
  *     security:
  *       - cookieAuth: []
  *     responses:
@@ -51,7 +51,7 @@ router.getAsync('/',
  *             schema:
  *               type: array
  *               items:
- *                 $ref: '#/components/schemas/App'
+ *                 $ref: '#/components/schemas/AppV2'
  *       400:
  *         $ref: '#/components/responses/BadRequest'
  *       401:
@@ -69,7 +69,7 @@ router.getAsync('/:id',
  * /apps:
  *   post:
  *     description: Create new draft app
- *     tags: [App]
+ *     tags: [App (v2)]
  *     security:
  *       - cookieAuth: []
  *     requestBody:
@@ -104,7 +104,7 @@ router.postAsync('/',
  * /apps/:id/request:
  *   post:
  *     description: Submit an access request for an application
- *     tags: [App]
+ *     tags: [App (v2)]
  *     security:
  *       - cookieAuth: []
  *     responses:

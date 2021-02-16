@@ -4,14 +4,49 @@
  * @openapi
  * components:
  *   schemas:
- *     AppHeader:
+ *     AppV2:
  *       type: object
  *       properties:
  *         id:
  *           type: number
+ *         orgId:
+ *           type: number
  *         name:
  *           type: string
+ *         shortDescription:
+ *           type: string
  *         description:
+ *           type: string
+ *         redirectUrl:
+ *           type: string
+ *           format: uri
+ *         clientId:
+ *           type: string
+ *         clientSecret:
+ *           type: string
+ *         subscriptions:
+ *           type: array
+ *           items:
+ *             type: number
+ *             minimum: 0
+ *         tosUrl:
+ *           type: string
+ *           format: uri
+ *         privacyUrl:
+ *           type: string
+ *           format: uri
+ *         youtubeUrl:
+ *           type: string
+ *           format: uri
+ *         websiteUrl:
+ *           type: string
+ *           format: uri
+ *         supportUrl:
+ *           type: string
+ *           format: uri
+ *         created_at:
+ *           type: string
+ *         updated_at:
  *           type: string
  */
 
