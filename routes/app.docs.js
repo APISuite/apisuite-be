@@ -17,6 +17,9 @@
  *           type: string
  *         description:
  *           type: string
+ *         logo:
+ *           type: string
+ *           format: uri
  *         redirectUrl:
  *           type: string
  *           format: uri
@@ -48,6 +51,37 @@
  *           type: string
  *         updated_at:
  *           type: string
+ *
+ *     AppDraft:
+ *       type: object
+ *       properties:
+ *         name:
+ *           type: string
+ *         shortDescription:
+ *           type: string
+ *         description:
+ *           type: string
+ *         logo:
+ *           type: string
+ *           format: uri
+ *         redirectUrl:
+ *           type: string
+ *           format: uri
+ *         tosUrl:
+ *           type: string
+ *           format: uri
+ *         privacyUrl:
+ *           type: string
+ *           format: uri
+ *         youtubeUrl:
+ *           type: string
+ *           format: uri
+ *         websiteUrl:
+ *           type: string
+ *           format: uri
+ *         supportUrl:
+ *           type: string
+ *           format: uri
  */
 
 /**

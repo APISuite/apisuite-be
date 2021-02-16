@@ -13,7 +13,10 @@ const appAttributes = {
     ['redirect_url', 'redirectUrl'],
     ['org_id', 'orgId'],
   ],
-  exclude: ['client_data'],
+  exclude: [
+    'client_data',
+    'enable',
+  ],
 }
 
 const includes = () => [
@@ -295,30 +298,21 @@ const createDraftApp = async (req, res) => {
   try {
     const idp = await Idp()
 
-    const app = await models.App.create(
-      {
-        name: req.body.name,
-        description: req.body.description,
-        redirect_url: req.body.redirect_url,
-        logo: req.body.logo,
-        enable: true,
-        org_id: req.user.org.id,
-        idpProvider: idp.getProvider(),
-        state: appStates.DRAFT,
-        tosUrl: req.body.tosUrl,
-        privacyUrl: req.body.privacyUrl,
-        youtubeUrl: req.body.youtubeUrl,
-        websiteUrl: req.body.websiteUrl,
-        supportUrl: req.body.supportUrl,
-      },
-      {
-        transaction,
-        include: [
-          ...includes(),
-        ],
-        attributes: appAttributes,
-      },
-    )
+    let app = await models.App.create({
+      name: req.body.name,
+      description: req.body.description,
+      redirect_url: req.body.redirectUrl || req.body.redirect_url,
+      logo: req.body.logo,
+      enable: true,
+      org_id: req.user.org.id,
+      idpProvider: idp.getProvider(),
+      state: appStates.DRAFT,
+      tosUrl: req.body.tosUrl,
+      privacyUrl: req.body.privacyUrl,
+      youtubeUrl: req.body.youtubeUrl,
+      websiteUrl: req.body.websiteUrl,
+      supportUrl: req.body.supportUrl,
+    }, { transaction })
 
     if (typeof req.body.pub_urls !== 'undefined') {
       const data = []
@@ -336,6 +330,11 @@ const createDraftApp = async (req, res) => {
       }
     }
     await transaction.commit()
+
+    app = await models.App.findByPk(app.id, {
+      attributes: appAttributes,
+      include: includes(),
+    })
 
     publishEvent(routingKeys.APP_CREATED, {
       user_id: req.user.id,
