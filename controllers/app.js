@@ -9,6 +9,10 @@ const { settingTypes, subscriptionModels, appStates } = require('../util/enums')
 const Idp = require('../idp')
 
 const appAttributes = {
+  include: [
+    ['redirect_url', 'redirectUrl'],
+    ['org_id', 'orgId'],
+  ],
   exclude: ['client_data'],
 }
 

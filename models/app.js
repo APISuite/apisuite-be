@@ -16,6 +16,9 @@ const app = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
+    shortDescription: {
+      type: DataTypes.STRING,
+    },
     visibility: {
       type: DataTypes.STRING,
       allowNull: true,
