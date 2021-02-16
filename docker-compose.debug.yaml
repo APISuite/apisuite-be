@@ -34,7 +34,7 @@ services:
     stdin_open: true
     tty: true
     ports:
-      - "${POSTGRES_PORT_INTERNAL}"
+      - "5432:${POSTGRES_PORT_INTERNAL}"
     volumes:
       - ./.compose-utils/db/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
       - ./.compose-utils/db/data:/var/lib/postgresql/data

@@ -252,56 +252,26 @@ const oidcToken = async (req, res) => {
     return res.status(HTTPStatus.UNAUTHORIZED).send({ errors: ['OIDC: user email is required'] })
   }
 
-  const user = await models.User.findByLogin(verified.email)
-  if (user) {
-    if (!user.oidcProvider) {
-      return res.status(HTTPStatus.UNAUTHORIZED).send({ success: false, errors: ['Account not linked to an ID provider'] })
-    }
-    if (user.oidcProvider && user.oidcProvider !== req.params.provider) {
-      return res.status(HTTPStatus.UNAUTHORIZED).send({ success: false, errors: ['Account already linked to another ID provider'] })
-    }
-
-    const transaction = await sequelize.transaction()
-    try {
-      const { accessToken, refreshToken } = await jwt.generateTokenSet(user.id)
-
-      user.last_login = Date.now()
-      await user.save({ transaction })
-
-      await models.RefreshToken.create({
-        token: refreshToken.token,
-        userId: user.id,
-        expiresAt: refreshToken.expiresAt,
-      }, { transaction })
-
-      await transaction.commit()
-
-      return res.status(HTTPStatus.OK).send({
-        accessToken,
-        refreshToken: refreshToken.token,
-      })
-    } catch (err) {
-      await transaction.rollback()
-      log.error(err, '[AUTH LOGIN]')
-      return res.sendInternalError()
-    }
-  }
-
   const transaction = await sequelize.transaction()
   try {
-    const newUser = await models.User.create({
-      name: verified.name || verified.email,
-      email: verified.email,
-      last_login: Date.now(),
-      oidcProvider: req.params.provider,
-      oidcId: verified.sub,
-    })
+    let user = await models.User.findByOIDC(verified.sub, idp.getProvider(), transaction)
+    if (!user) {
+      user = await models.User.build({
+        oidcProvider: idp.getProvider(),
+        oidcId: verified.sub,
+      })
+    }
 
-    const { accessToken, refreshToken } = await jwt.generateTokenSet(newUser.id)
+    user.name = verified.name || verified.email
+    user.email = verified.email
+    user.last_login = Date.now()
+    await user.save({ transaction })
+
+    const { accessToken, refreshToken } = await jwt.generateTokenSet(user.id)
 
     await models.RefreshToken.create({
       token: refreshToken.token,
-      userId: newUser.id,
+      userId: user.id,
       expiresAt: refreshToken.expiresAt,
     }, { transaction })
 

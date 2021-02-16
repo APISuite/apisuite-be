@@ -77,6 +77,16 @@ const user = (sequelize, DataTypes) => {
     })
   }
 
+  User.findByOIDC = (id, provider, transaction) => {
+    return User.findOne({
+      where: {
+        oidcId: id,
+        oidcProvider: provider,
+      },
+      transaction,
+    })
+  }
+
   User.findByActivationToken = (token) => {
     return User.findOne({
       where: { activationToken: token },
