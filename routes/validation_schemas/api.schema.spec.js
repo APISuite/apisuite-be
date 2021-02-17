@@ -6,7 +6,7 @@ const {
   validateApiVersionPatchBody,
   validateAPIversionBody,
 } = require('./api.schema')
-const helpers = require('../../test/helpers')
+const helpers = require('../../util/test-helpers')
 
 describe('API Validations', () => {
   describe('validateAPIBody', () => {

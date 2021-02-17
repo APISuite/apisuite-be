@@ -9,8 +9,7 @@
     "migrate": "npx sequelize-cli db:migrate --url \"postgres://$POSTGRES_USERNAME:$POSTGRES_PASSWORD@$POSTGRES_ADDRESS:$POSTGRES_PORT_INTERNAL/$POSTGRES_DB\"",
     "migrate:undo:all": "npx sequelize-cli db:migrate:undo:all --url \"postgres://$POSTGRES_USERNAME:$POSTGRES_PASSWORD@$POSTGRES_ADDRESS:$POSTGRES_PORT_INTERNAL/$POSTGRES_DB\"",
     "start": "node app.js",
-    "test": "NODE_ENV=test mocha {routes,controllers,services}/**/*.spec.js --inspect=7000 --exit",
-    "integrationTest": "NODE_ENV=test mocha test/**/*.spec.js --inspect=7000 --exit"
+    "test": "NODE_ENV=test mocha {routes,controllers,services}/**/*.spec.js --inspect=7000 --exit"
   },
   "pre-commit": [
     "audit",

@@ -2,7 +2,7 @@ const sinon = require('sinon')
 const HTTPStatus = require('http-status-codes')
 const { mockRequest, mockResponse } = require('mock-req-res')
 const { validateSettingsBody, validateIdPSettingsBody } = require('./settings.schema')
-const helpers = require('../../test/helpers')
+const helpers = require('../../util/test-helpers')
 
 describe('Settings Validations', () => {
   describe('validateSettingsPatch', () => {
