@@ -54,6 +54,13 @@ const get = async (req, res) => {
     })
     if (ssoClient) {
       settings.values.sso = [ssoClient.provider]
+
+      const idpSettings = await models.Setting.findOne({
+        where: { type: settingTypes.IDP },
+      })
+      if (idpSettings && idpSettings.values.configuration.providerSignupURL) {
+        settings.values.providerSignupURL = idpSettings.values.configuration.providerSignupURL
+      }
     }
 
     return res.status(HTTPStatus.OK).send(settings.values)

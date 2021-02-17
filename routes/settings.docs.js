@@ -43,6 +43,9 @@
  *           items:
  *             type: string
  *             enum: [keycloak]
+ *         providerSignupURL:
+ *           type: string
+ *           format: uri
  *
  *     IdPSettings:
  *       type: object
@@ -81,6 +84,9 @@
  *           type: string
  *         ssoEnabled:
  *           type: boolean
+ *         providerSignupURL:
+ *           type: string
+ *           format: uri
  *
  *     GatewaySettings:
  *       type: object
