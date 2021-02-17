@@ -8,7 +8,7 @@ const appSchema = Joi.object({
   redirectUrl: Joi.string().uri({ scheme: ['http', 'https'] }).optional(),
   redirect_url: Joi.string().uri({ scheme: ['http', 'https'] }).optional(),
   visibility: Joi.string().valid('public', 'private').optional(),
-  logo: Joi.string().optional().allow(null),
+  logo: Joi.string().optional().allow(null, ''),
   pub_urls: Joi.array().items(
     Joi.object({
       url: Joi.alternatives().try(
@@ -19,11 +19,11 @@ const appSchema = Joi.object({
     }).optional(),
   ).optional().allow(null),
   subscriptions: Joi.array().items(Joi.number().min(0).optional()).optional().allow(null),
-  tosUrl: Joi.string().optional().allow(null),
-  privacyUrl: Joi.string().optional().allow(null),
-  youtubeUrl: Joi.string().optional().allow(null),
-  websiteUrl: Joi.string().optional().allow(null),
-  supportUrl: Joi.string().optional().allow(null),
+  tosUrl: Joi.string().optional().allow(null, ''),
+  privacyUrl: Joi.string().optional().allow(null, ''),
+  youtubeUrl: Joi.string().optional().allow(null, ''),
+  websiteUrl: Joi.string().optional().allow(null, ''),
+  supportUrl: Joi.string().optional().allow(null, ''),
 })
 
 const subscriptionSchema = Joi.object({
