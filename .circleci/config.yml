@@ -35,6 +35,18 @@ jobs:
           at: ~/
       - setup_remote_docker
       - run: ./build.sh
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - project
+
+  deploy:
+    docker:
+      - image: cimg/base:2020.01
+    steps:
+      - attach_workspace:
+          at: ~/
+      - run: ./deploy.sh
 
 workflows:
   version: 2
@@ -61,3 +73,13 @@ workflows:
                 - production
           requires:
             - release
+      - deploy:
+          context: vmachines
+          filters:
+            branches:
+              only:
+                - develop
+                - staging
+                - production
+          requires:
+            - build
