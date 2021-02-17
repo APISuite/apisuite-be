@@ -170,7 +170,7 @@ router.postAsync('/:id/request',
 
 /**
  * @openapi
- * /{id}:
+ * /apps/{id}:
  *   delete:
  *     description: Delete app
  *     tags: [App (v2)]
