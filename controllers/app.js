@@ -306,6 +306,7 @@ const createDraftApp = async (req, res) => {
     let app = await models.App.create({
       name: req.body.name,
       description: req.body.description,
+      shortDescription: req.body.shortDescription,
       redirect_url: req.body.redirectUrl || req.body.redirect_url,
       logo: req.body.logo,
       enable: true,
