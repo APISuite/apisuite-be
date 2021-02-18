@@ -2,8 +2,10 @@ const Joi = require('joi')
 const validator = require('./validator')
 const { validatePassword } = require('./user.schema')
 
+const emailSchema = Joi.string().email().required()
+
 const forgotPasswordSchema = Joi.object({
-  email: Joi.string().email().required(),
+  email: emailSchema,
 })
 
 const recoverPasswordSchema = Joi.object({
@@ -17,7 +19,7 @@ const recoverPasswordExtraValidator = (body) => {
 }
 
 const loginSchema = Joi.object({
-  email: Joi.string().required(),
+  email: emailSchema,
   password: Joi.string().required(),
 })
 

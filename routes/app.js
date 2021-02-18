@@ -11,7 +11,7 @@ const { validateAppBody, validateSubscriptionBody } = require('./validation_sche
  *   get:
  *     summary: Get list of apps
  *     description: Get list of apps in the context of the user's current organization
- *     tags: [App]
+ *     tags: [App (v2)]
  *     security:
  *       - cookieAuth: []
  *     responses:
@@ -22,7 +22,7 @@ const { validateAppBody, validateSubscriptionBody } = require('./validation_sche
  *             schema:
  *               type: array
  *               items:
- *                 $ref: '#/components/schemas/AppHeader'
+ *                 $ref: '#/components/schemas/AppV2'
  *       400:
  *         $ref: '#/components/responses/BadRequest'
  *       401:
@@ -40,7 +40,7 @@ router.getAsync('/',
  * /apps/:id:
  *   get:
  *     description: Get details of an application
- *     tags: [App]
+ *     tags: [App (v2)]
  *     security:
  *       - cookieAuth: []
  *     responses:
@@ -51,7 +51,7 @@ router.getAsync('/',
  *             schema:
  *               type: array
  *               items:
- *                 $ref: '#/components/schemas/App'
+ *                 $ref: '#/components/schemas/AppV2'
  *       400:
  *         $ref: '#/components/responses/BadRequest'
  *       401:
@@ -69,7 +69,7 @@ router.getAsync('/:id',
  * /apps:
  *   post:
  *     description: Create new draft app
- *     tags: [App]
+ *     tags: [App (v2)]
  *     security:
  *       - cookieAuth: []
  *     requestBody:
@@ -78,14 +78,14 @@ router.getAsync('/:id',
  *       content:
  *         application/json:
  *           schema:
- *             $ref: "#/components/schemas/App"
+ *             $ref: "#/components/schemas/AppDraft"
  *     responses:
  *       201:
  *         description: The created App
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/App'
+ *               $ref: '#/components/schemas/AppV2'
  *       400:
  *         $ref: '#/components/responses/BadRequest'
  *       401:
@@ -101,10 +101,56 @@ router.postAsync('/',
 
 /**
  * @openapi
+ * /apps/{id}:
+ *   put:
+ *     description: Update app
+ *     tags: [App (v2)]
+ *     parameters:
+ *       - name: id
+ *         description: The app id.
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: number
+ *     requestBody:
+ *       description: App object to update
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: "#/components/schemas/AppDraft"
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: The updated App
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/AppV2'
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ *       500:
+ *         $ref: '#/components/responses/Internal'
+ */
+router.putAsync('/update/:id',
+  loggedIn,
+  validateAppBody,
+  accessControl(actions.UPDATE, possessions.OWN, resources.APP),
+  controllers.app.updateApp)
+
+/**
+ * @openapi
  * /apps/:id/request:
  *   post:
  *     description: Submit an access request for an application
- *     tags: [App]
+ *     tags: [App (v2)]
  *     security:
  *       - cookieAuth: []
  *     responses:
@@ -124,8 +170,41 @@ router.postAsync('/:id/request',
 
 /**
  * @openapi
+ * /apps/{id}:
+ *   delete:
+ *     description: Delete app
+ *     tags: [App (v2)]
+ *     parameters:
+ *       - name: id
+ *         description: The app id.
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: number
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       204:
+ *         description: No Content
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ *       500:
+ *         $ref: '#/components/responses/Internal'
+ */
+router.deleteAsync('/:id',
+  loggedIn,
+  accessControl(actions.DELETE, possessions.OWN, resources.APP),
+  controllers.app.deleteApp)
+
+/**
+ * @openapi
  * /app/list/:userId:
  *   get:
+ *     deprecated: true
  *     description: Get list of user apps
  *     tags: [App]
  *     parameters:
@@ -162,6 +241,7 @@ router.getAsync('/list/:userId',
  * @openapi
  * /app/create:
  *   post:
+ *     deprecated: true
  *     description: Create new app
  *     tags: [App]
  *     security:
@@ -197,6 +277,7 @@ router.postAsync('/create',
  * @openapi
  * /app/update/{id}:
  *   put:
+ *     deprecated: true
  *     description: Update app
  *     tags: [App]
  *     parameters:
@@ -231,7 +312,7 @@ router.postAsync('/create',
  *       500:
  *         $ref: '#/components/responses/Internal'
  */
-router.putAsync('/update/:id',
+router.putAsync('/:id',
   loggedIn,
   validateAppBody,
   accessControl(actions.UPDATE, possessions.OWN, resources.APP),
@@ -241,6 +322,7 @@ router.putAsync('/update/:id',
  * @openapi
  * /app/delete/{id}:
  *   delete:
+ *     deprecated: true
  *     description: Delete app
  *     tags: [App]
  *     parameters:

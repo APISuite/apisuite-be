@@ -1,7 +1,7 @@
 const sinon = require('sinon')
 const HTTPStatus = require('http-status-codes')
 const { mockRequest, mockResponse } = require('mock-req-res')
-const helpers = require('../test/helpers')
+const helpers = require('../util/test-helpers')
 const { models, sequelize } = require('../models')
 const emailService = require('./email')
 const User = models.User
