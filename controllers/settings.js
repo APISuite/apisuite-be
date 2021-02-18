@@ -136,6 +136,7 @@ const getIdp = async (req, res) => {
 }
 
 const updateIdp = async (req, res) => {
+  req.body.provider = req.body.provider.toLowerCase()
   const transaction = await sequelize.transaction()
   try {
     let ssoEnabled = false

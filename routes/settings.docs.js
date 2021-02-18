@@ -56,8 +56,8 @@
  *         provider:
  *           type: string
  *           enum:
- *             - Internal
- *             - Keycloak
+ *             - internal
+ *             - keycloak
  *         configuration:
  *           oneOf:
  *             - $ref: '#/components/schemas/Internal'
