@@ -7,6 +7,7 @@ const log = require('../util/logger')
 const emailService = require('./email')
 const { models, sequelize } = require('../models')
 const jwt = require('../jwt')
+const Idp = require('../idp')
 const { settingTypes } = require('../util/enums')
 const config = require('../config')
 
@@ -186,30 +187,29 @@ const refresh = async (req, res) => {
 
 const oidcAuth = async (req, res) => {
   const settings = await models.Setting.findOne({
-    where: { type: settingTypes.ACCOUNT },
+    where: { type: settingTypes.IDP },
   })
 
-  if (!settings || !settings.values.sso) {
-    log.error('OIDC Auth: missing SSO account settings')
+  if (!settings) {
+    log.error('OIDC Auth: missing SSO settings')
     return res.sendInternalError()
   }
 
-  if (!settings.values.sso.includes(req.params.provider)) {
-    return res.status(HTTPStatus.BAD_REQUEST).send({ errors: ['Disabled provider'] })
+  const idp = await Idp.getIdP()
+  if (req.params.provider !== idp.getProvider()) {
+    return res.status(HTTPStatus.BAD_REQUEST).send({ errors: ['SSO provider not configured'] })
+  }
+  const ssoClient = await models.SSOClient.findOne({
+    where: { provider: idp.getProvider() },
+  })
+  if (!ssoClient) {
+    return res.status(HTTPStatus.BAD_REQUEST).send({ errors: ['SSO provider not configured'] })
   }
 
-  let providerConfig
-  try {
-    providerConfig = config.get(`auth.sso.${req.params.provider}`)
-  } catch (err) {
-    log.error('OIDC Auth: SSO provider enabled but missing config')
-    return res.sendInternalError()
-  }
-
-  const discoveryData = await oidcDiscovery(providerConfig.discoveryURL)
+  const discoveryData = await oidcDiscovery(settings.values.configuration.discoveryURL)
 
   const authURL = new URL(discoveryData.authorization_endpoint)
-  authURL.searchParams.append('client_id', providerConfig.clientID)
+  authURL.searchParams.append('client_id', ssoClient.clientId)
   authURL.searchParams.append('scope', 'openid email')
   authURL.searchParams.append('state', req.query.state)
   authURL.searchParams.append('response_type', 'code')
@@ -219,22 +219,31 @@ const oidcAuth = async (req, res) => {
 }
 
 const oidcToken = async (req, res) => {
-  let providerConfig
-  try {
-    providerConfig = config.get(`auth.sso.${req.params.provider}`)
-  } catch (err) {
-    log.error('OIDC Auth: SSO provider enabled but missing config')
+  const settings = await models.Setting.findOne({
+    where: { type: settingTypes.IDP },
+  })
+
+  if (!settings) {
+    log.error('OIDC Auth: missing SSO settings')
     return res.sendInternalError()
   }
 
-  const discoveryData = await oidcDiscovery(providerConfig.discoveryURL)
+  const idp = await Idp.getIdP()
+  const ssoClient = await models.SSOClient.findOne({
+    where: { provider: idp.getProvider() },
+  })
+  if (!ssoClient) {
+    return res.status(HTTPStatus.BAD_REQUEST).send({ errors: ['SSO provider not configured'] })
+  }
 
-  const tokens = await exchangeCode(req.body.code, providerConfig, discoveryData)
+  const discoveryData = await oidcDiscovery(settings.values.configuration.discoveryURL)
+
+  const tokens = await exchangeCode(req.body.code, ssoClient, discoveryData)
   if (!tokens) {
     return res.status(HTTPStatus.UNAUTHORIZED).send({ errors: ['OIDC: could not authenticate'] })
   }
 
-  const verified = await tokenVerifier(tokens.id_token, providerConfig.clientID, discoveryData)
+  const verified = await tokenVerifier(tokens.id_token, ssoClient.clientId, discoveryData)
   if (!verified) {
     return res.status(HTTPStatus.UNAUTHORIZED).send({ errors: ['OIDC: invalid id token'] })
   }
@@ -243,56 +252,26 @@ const oidcToken = async (req, res) => {
     return res.status(HTTPStatus.UNAUTHORIZED).send({ errors: ['OIDC: user email is required'] })
   }
 
-  const user = await models.User.findByLogin(verified.email)
-  if (user) {
-    if (!user.oidcProvider) {
-      return res.status(HTTPStatus.UNAUTHORIZED).send({ success: false, errors: ['Account not linked to an ID provider'] })
-    }
-    if (user.oidcProvider && user.oidcProvider !== req.params.provider) {
-      return res.status(HTTPStatus.UNAUTHORIZED).send({ success: false, errors: ['Account already linked to another ID provider'] })
-    }
-
-    const transaction = await sequelize.transaction()
-    try {
-      const { accessToken, refreshToken } = await jwt.generateTokenSet(user.id)
-
-      user.last_login = Date.now()
-      await user.save({ transaction })
-
-      await models.RefreshToken.create({
-        token: refreshToken.token,
-        userId: user.id,
-        expiresAt: refreshToken.expiresAt,
-      }, { transaction })
-
-      await transaction.commit()
-
-      return res.status(HTTPStatus.OK).send({
-        accessToken,
-        refreshToken: refreshToken.token,
-      })
-    } catch (err) {
-      await transaction.rollback()
-      log.error(err, '[AUTH LOGIN]')
-      return res.sendInternalError()
-    }
-  }
-
   const transaction = await sequelize.transaction()
   try {
-    const newUser = await models.User.create({
-      name: verified.name || verified.email,
-      email: verified.email,
-      last_login: Date.now(),
-      oidcProvider: req.params.provider,
-      oidcId: verified.sub,
-    })
+    let user = await models.User.findByOIDC(verified.sub, idp.getProvider(), transaction)
+    if (!user) {
+      user = await models.User.build({
+        oidcProvider: idp.getProvider(),
+        oidcId: verified.sub,
+      })
+    }
 
-    const { accessToken, refreshToken } = await jwt.generateTokenSet(newUser.id)
+    user.name = verified.name || verified.email
+    user.email = verified.email
+    user.last_login = Date.now()
+    await user.save({ transaction })
+
+    const { accessToken, refreshToken } = await jwt.generateTokenSet(user.id)
 
     await models.RefreshToken.create({
       token: refreshToken.token,
-      userId: newUser.id,
+      userId: user.id,
       expiresAt: refreshToken.expiresAt,
     }, { transaction })
 
@@ -324,17 +303,17 @@ const oidcDiscovery = async (discoveryURL) => {
 /**
  * Exchanges the authorization code for the access/ID tokens.
  * @param {string} code
- * @param {string} providerConfig
+ * @param {object} ssoClient
  * @param {object} discoveryData - Object with the data returned from OIDC discovery endpoint
  * @returns {Promise<null|object>} - Returns an object with the set of tokens obtained in code exchange
  * */
-const exchangeCode = async (code, providerConfig, discoveryData) => {
+const exchangeCode = async (code, ssoClient, discoveryData) => {
   const params = new URLSearchParams()
   params.append('grant_type', 'authorization_code')
   params.append('code', code)
   params.append('redirect_uri', `${config.get('appURL')}/sso/auth`)
-  params.append('client_id', providerConfig.clientID)
-  params.append('client_secret', providerConfig.clientSecret)
+  params.append('client_id', ssoClient.clientId)
+  params.append('client_secret', ssoClient.clientSecret)
 
   const tokenRes = await fetch(discoveryData.token_endpoint, {
     method: 'POST',

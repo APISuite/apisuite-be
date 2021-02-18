@@ -43,6 +43,9 @@
  *           items:
  *             type: string
  *             enum: [keycloak]
+ *         providerSignupURL:
+ *           type: string
+ *           format: uri
  *
  *     IdPSettings:
  *       type: object
@@ -53,8 +56,8 @@
  *         provider:
  *           type: string
  *           enum:
- *             - Internal
- *             - Keycloak
+ *             - internal
+ *             - keycloak
  *         configuration:
  *           oneOf:
  *             - $ref: '#/components/schemas/Internal'
@@ -74,10 +77,16 @@
  *         clientRegistrationURL:
  *           type: string
  *           format: uri
+ *         discoveryURL:
+ *           type: string
+ *           format: uri
  *         initialAccessToken:
  *           type: string
  *         ssoEnabled:
  *           type: boolean
+ *         providerSignupURL:
+ *           type: string
+ *           format: uri
  *
  *     GatewaySettings:
  *       type: object

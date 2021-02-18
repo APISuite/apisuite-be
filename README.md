@@ -49,6 +49,8 @@ When the server is running, API documentation is served on `/api-docs`.
   (example: renaming a column can be done in 2 steps: create new column; change code to start using new column; delete old column when code no longer references it) 
 - Node.js version is kept in `.nvmrc`. Running `nvm use` in the terminal should give you the right version
 - Remember to run linter (`npm run lint`) and tests (`npm test`) before committing or creating a pull request
+- `docker-compose.debug.yml` contains all the core backend components except the core API, 
+  which can be used to start all backend dependencies and run the API in a debugger
 
 ### History
 

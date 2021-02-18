@@ -14,7 +14,7 @@ class IdP {
   }
 
   getProvider () {
-    return this.config.provider
+    return this.config.provider.toLowerCase()
   }
 
   getAuthenticationEnabled () {
@@ -54,10 +54,11 @@ class IdP {
   /**
    * @abstract
    * @param {string} clientID
+   * @param {object} clientData
    * @returns {Promise<void>}
    * @throws will throw an error if client deletion fails
    * */
-  async deleteClient (clientID) {
+  async deleteClient (clientID, clientData) {
     throw new Error('IdP.deleteClient should not be called directly')
   }
 }

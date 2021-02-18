@@ -5,7 +5,6 @@ const { models, sequelize } = require('../models')
 const Gateway = require('../util/gateway')
 const { publishEvent, routingKeys } = require('../services/msg-broker')
 const { settingTypes, subscriptionModels, appStates } = require('../util/enums')
-
 const Idp = require('../idp')
 
 const appAttributes = {
@@ -161,8 +160,8 @@ const deleteApp = async (req, res) => {
       return res.status(HTTPStatus.NOT_FOUND).send({ errors: 'App not found' })
     }
 
-    const idp = await Idp()
-    await idp.deleteClient(updated.clientId)
+    const idp = await Idp.getIdP()
+    await idp.deleteClient(updated.clientId, updated.client_data)
 
     try {
       const gateway = await Gateway()
@@ -302,7 +301,7 @@ const updateApp = async (req, res) => {
 const createDraftApp = async (req, res) => {
   const transaction = await sequelize.transaction()
   try {
-    const idp = await Idp()
+    const idp = await Idp.getIdP()
 
     let app = await models.App.create({
       name: req.body.name,
@@ -373,7 +372,7 @@ const requestAccess = async (req, res) => {
   const subscriptionModel = await getSubscriptionModel()
   switch (subscriptionModel) {
     case subscriptionModels.SIMPLIFIED: {
-      const idp = await Idp()
+      const idp = await Idp.getIdP()
       const client = await idp.createClient({
         clientName: app.name,
         redirectURIs: [app.redirect_url],
@@ -407,7 +406,7 @@ const requestAccess = async (req, res) => {
 const createApp = async (req, res) => {
   const transaction = await sequelize.transaction()
   try {
-    const idp = await Idp()
+    const idp = await Idp.getIdP()
     const client = await idp.createClient({
       clientName: req.body.name,
       redirectURIs: [req.body.redirect_url],
