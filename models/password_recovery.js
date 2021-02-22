@@ -13,7 +13,7 @@ const passwordRecovery = (sequelize, DataTypes) => {
       },
     },
   }, {
-    timestamp: true,
+    timestamps: true,
     underscored: true,
     freezeTableName: true,
   })

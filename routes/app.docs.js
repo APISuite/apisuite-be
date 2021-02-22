@@ -47,9 +47,9 @@
  *         supportUrl:
  *           type: string
  *           format: uri
- *         created_at:
+ *         createdAt:
  *           type: string
- *         updated_at:
+ *         updatedAt:
  *           type: string
  *
  *     AppDraft:

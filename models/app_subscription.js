@@ -18,7 +18,7 @@ const AppSubscription = (sequelize, DataTypes) => {
     indexes: [
       { unique: true, fields: ['app_id', 'api_id'] },
     ],
-    timestamp: true,
+    timestamps: true,
     underscored: true,
     freezeTableName: true,
   })

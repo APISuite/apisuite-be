@@ -29,7 +29,7 @@ const userOrganization = (sequelize, DataTypes) => {
       defaultValue: false,
     },
   }, {
-    timestamp: true,
+    timestamps: true,
     underscored: true,
     freezeTableName: true,
   })

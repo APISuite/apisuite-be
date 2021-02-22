@@ -39,7 +39,7 @@ const inviteOrganization = (sequelize, DataTypes) => {
       allowNull: true,
     },
   }, {
-    timestamp: true,
+    timestamps: true,
     underscored: true,
     freezeTableName: true,
   })

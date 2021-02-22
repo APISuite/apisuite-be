@@ -28,7 +28,7 @@ const apiVersion = (sequelize, DataTypes) => {
     },
   }, {
     tableName: 'api_versions',
-    timestamp: true,
+    timestamps: true,
     underscored: true,
     freezeTableName: true,
   })
