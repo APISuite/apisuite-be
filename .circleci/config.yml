@@ -31,9 +31,6 @@ jobs:
     docker:
       - image: cimg/base:2020.01
     steps:
-      - add_ssh_keys:
-          fingerprints:
-            - 31:96:89:eb:aa:ee:09:68:3a:6b:10:ad:d0:95:81:80
       - attach_workspace:
           at: ~/
       - setup_remote_docker
@@ -47,6 +44,9 @@ jobs:
     docker:
       - image: cimg/base:2020.01
     steps:
+      - add_ssh_keys:
+          fingerprints:
+            - 31:96:89:eb:aa:ee:09:68:3a:6b:10:ad:d0:95:81:80
       - attach_workspace:
           at: ~/
       - run: ./deploy.sh
