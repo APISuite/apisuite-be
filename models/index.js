@@ -32,6 +32,7 @@ const models = {
   RefreshToken: importModel('./refresh_token'),
   Role: importModel('./role'),
   Setting: importModel('./setting'),
+  SSOClient: importModel('./sso_client'),
   User: importModel('./user'),
   UserOrganization: importModel('./user_organization'),
   UserRegistration: importModel('./user_registration'),

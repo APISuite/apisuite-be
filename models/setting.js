@@ -12,7 +12,7 @@ const setting = (sequelize, DataTypes) => {
       allowNull: false,
     },
   }, {
-    timestamp: true,
+    timestamps: true,
     underscored: true,
     freezeTableName: true,
   })

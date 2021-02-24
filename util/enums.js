@@ -6,8 +6,8 @@ const settingTypes = {
 }
 
 const idpProviders = {
-  INTERNAL: 'Internal',
-  KEYCLOAK: 'Keycloak',
+  INTERNAL: 'internal',
+  KEYCLOAK: 'keycloak',
 }
 
 const gatewayProviders = {

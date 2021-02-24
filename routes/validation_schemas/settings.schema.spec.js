@@ -2,7 +2,7 @@ const sinon = require('sinon')
 const HTTPStatus = require('http-status-codes')
 const { mockRequest, mockResponse } = require('mock-req-res')
 const { validateSettingsBody, validateIdPSettingsBody } = require('./settings.schema')
-const helpers = require('../../test/helpers')
+const helpers = require('../../util/test-helpers')
 
 describe('Settings Validations', () => {
   describe('validateSettingsPatch', () => {
@@ -61,10 +61,10 @@ describe('Settings Validations', () => {
   describe('validateIdPSettingsBody', () => {
     describe('test valid payloads', () => {
       const testData = [
-        { body: { provider: 'Internal', configuration: {} } },
+        { body: { provider: 'internal', configuration: {} } },
         {
           body: {
-            provider: 'Keycloak',
+            provider: 'keycloak',
             configuration: {
               clientRegistrationURL: 'https://myurl/clients',
               initialAccessToken: 'alsdhgfajkhdgf',
@@ -87,11 +87,11 @@ describe('Settings Validations', () => {
 
     describe('test invalid payloads', () => {
       const testData = [
-        { body: { provider: 'Internal', configuration: { prop: 123 } } },
-        { body: { provider: 'Keycloak', configuration: {} } },
+        { body: { provider: 'internal', configuration: { prop: 123 } } },
+        { body: { provider: 'keycloak', configuration: {} } },
         {
           body: {
-            provider: 'Keycloak',
+            provider: 'keycloak',
             configuration: {
               clientRegistrationURL: 'ftp://myurl/clients',
               initialAccessToken: 'alsdhgfajkhdgf',
@@ -100,7 +100,7 @@ describe('Settings Validations', () => {
         },
         {
           body: {
-            provider: 'Keycloak',
+            provider: 'keycloak',
             configuration: {
               clientRegistrationURL: 'https://myurl/clients',
               initialAccessToken: '',

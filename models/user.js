@@ -52,7 +52,7 @@ const user = (sequelize, DataTypes) => {
       allowNull: true,
     },
   }, {
-    timestamp: true,
+    timestamps: true,
     underscored: true,
     freezeTableName: true,
   })
@@ -74,6 +74,16 @@ const user = (sequelize, DataTypes) => {
   User.findByLogin = (login) => {
     return User.findOne({
       where: { email: sequelize.fn('lower', login) },
+    })
+  }
+
+  User.findByOIDC = (id, provider, transaction) => {
+    return User.findOne({
+      where: {
+        oidcId: id,
+        oidcProvider: provider,
+      },
+      transaction,
     })
   }
 

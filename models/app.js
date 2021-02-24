@@ -16,6 +16,9 @@ const app = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
+    shortDescription: {
+      type: DataTypes.STRING,
+    },
     visibility: {
       type: DataTypes.STRING,
       allowNull: true,
@@ -85,7 +88,7 @@ const app = (sequelize, DataTypes) => {
       allowNull: true,
     },
   }, {
-    timestamp: true,
+    timestamps: true,
     underscored: true,
     freezeTableName: true,
   })
