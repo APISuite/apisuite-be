@@ -49,17 +49,19 @@ const get = async (req, res) => {
     settings.values.sso = []
 
     const idp = await Idp.getIdP()
-    const ssoClient = await models.SSOClient.findOne({
-      where: { provider: idp.getProvider() },
-    })
-    if (ssoClient) {
-      settings.values.sso = [ssoClient.provider]
-
-      const idpSettings = await models.Setting.findOne({
-        where: { type: settingTypes.IDP },
+    if (idp.getProvider() !== idpProviders.INTERNAL) {
+      const ssoClient = await models.SSOClient.findOne({
+        where: { provider: idp.getProvider() },
       })
-      if (idpSettings && idpSettings.values.configuration.providerSignupURL) {
-        settings.values.providerSignupURL = idpSettings.values.configuration.providerSignupURL
+      if (ssoClient) {
+        settings.values.sso = [ssoClient.provider]
+
+        const idpSettings = await models.Setting.findOne({
+          where: { type: settingTypes.IDP },
+        })
+        if (idpSettings && idpSettings.values.configuration.providerSignupURL) {
+          settings.values.providerSignupURL = idpSettings.values.configuration.providerSignupURL
+        }
       }
     }
 
