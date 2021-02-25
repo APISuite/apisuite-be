@@ -10,6 +10,7 @@ const jwt = require('../jwt')
 const Idp = require('../idp')
 const { settingTypes } = require('../util/enums')
 const config = require('../config')
+const { oidcDiscovery } = require('../util/oidc')
 
 // TODO move to configs
 const RECOVERY_INTERVAL = 5 // minutes
@@ -289,15 +290,6 @@ const oidcToken = async (req, res) => {
     log.error(err, '[AUTH LOGIN]')
     return res.sendInternalError()
   }
-}
-
-const oidcDiscovery = async (discoveryURL) => {
-  const discovery = await fetch(discoveryURL)
-  if (!discovery.ok || discovery.status !== HTTPStatus.OK) {
-    throw new Error('could not get discovery')
-  }
-
-  return discovery.json()
 }
 
 /**
