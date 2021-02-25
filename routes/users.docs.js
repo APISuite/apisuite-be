@@ -62,6 +62,8 @@
  *         last_login:
  *           type: string
  *           format: date-time
+ *         oidcProvider:
+ *           type: string
  */
 
 /** @openapi
