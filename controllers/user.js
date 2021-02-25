@@ -356,71 +356,60 @@ const profileUpdate = async (req, res) => {
 }
 
 const profile = async (req, res) => {
-  const errorMsg = 'Failed to get user profile'
-
   const profile = {
     user: {},
     orgs_member: [],
     current_org: {},
   }
 
-  try {
-    let user = await models.User.findOne(
-      {
-        where: {
-          id: req.user.id,
-        },
-        attributes: ['id', 'name', 'bio', 'email', 'mobile', 'avatar', 'last_login'],
-      },
-    )
+  const user = await models.User.findOne({
+    where: {
+      id: req.user.id,
+    },
+    attributes: [
+      'id',
+      'name',
+      'bio',
+      'email',
+      'mobile',
+      'avatar',
+      'last_login',
+      'oidcProvider',
+    ],
+  })
 
-    user = user.get({ plain: true })
+  if (!user) {
+    return res.status(HTTPStatus.NOT_FOUND).send({ errors: ['User not found'] })
+  }
 
-    if (!user) {
-      return res.status(HTTPStatus.BAD_REQUEST).send({ errors: [errorMsg] })
+  profile.user = user.get({ plain: true })
+
+  const orgs = await models.UserOrganization.findAll({
+    where: { user_id: user.id },
+    attributes: ['org_id', 'current_org', 'created_at'],
+    include: [{
+      model: models.Role,
+      as: 'Role',
+      attributes: ['name', 'id'],
+    }, {
+      model: models.Organization,
+      as: 'Organization',
+      attributes: ['name', 'id'],
+    }],
+  })
+
+  for (const org of orgs) {
+    if (org.dataValues.current_org) {
+      profile.current_org = org.dataValues.Organization.dataValues
+      profile.current_org.member_since = org.dataValues.created_at
+      profile.current_org.role = org.dataValues.Role.dataValues
     }
 
-    profile.user = user
-
-    const orgs = await models.UserOrganization.findAll({
-      where: { user_id: user.id },
-      attributes: ['org_id', 'current_org', 'created_at'],
-      include: [{
-        model: models.Role,
-        as: 'Role',
-        attributes: ['name', 'id'],
-      },
-      {
-        model: models.Organization,
-        as: 'Organization',
-        attributes: ['name', 'id'],
-      }],
-    })
-
-    if (!orgs) {
-      return res.status(HTTPStatus.BAD_REQUEST).send({ errors: [errorMsg] })
+    const orgsMember = {
+      id: org.dataValues.Organization.dataValues.id,
+      name: org.dataValues.Organization.dataValues.name,
     }
-
-    for await (const org of orgs) {
-      if (org.dataValues.current_org) {
-        profile.current_org = org.dataValues.Organization.dataValues
-        profile.current_org.member_since = org.dataValues.created_at
-        profile.current_org.role = org.dataValues.Role.dataValues
-      }
-
-      const orgsMember = {
-        id: org.dataValues.Organization.dataValues.id,
-        name: org.dataValues.Organization.dataValues.name,
-      }
-      profile.orgs_member.push(orgsMember)
-    }
-
-    if (!user) {
-      return res.status(HTTPStatus.BAD_REQUEST).send({ errors: ['Failed to update Profile data'] })
-    }
-  } catch (error) {
-    log.error(error, '[USERS profile]')
-    return res.status(HTTPStatus.INTERNAL_SERVER_ERROR).send({ errors: [errorMsg] })
+    profile.orgs_member.push(orgsMember)
   }
 
   return res.status(HTTPStatus.OK).send(profile)

@@ -121,7 +121,6 @@ router.putAsync('/password',
  */
 router.getAsync('/profile',
   loggedIn,
-  accessControl(actions.READ, possessions.OWN, resources.PROFILE),
   controllers.user.profile)
 
 /**
