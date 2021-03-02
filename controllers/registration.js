@@ -92,26 +92,24 @@ const completeRegistration = async (req, res) => {
   let wasInvited = false
   let invite = null
   try {
+    // TODO deprecated - remove when new invite flow is implemented
     invite = await models.InviteOrganization.findByConfirmationToken(req.body.registrationToken)
     wasInvited = !!(invite && invite.email)
   } catch (error) {
     wasInvited = false
   }
 
-  let transaction
   registration = registration.get({ plain: true })
+
+  const transaction = await sequelize.transaction()
   try {
-    transaction = await sequelize.transaction()
-
-    const activationToken = uuidv4()
-
     let organization = {}
 
     if (wasInvited) {
       organization = {
         id: invite.org_id,
       }
-    } else {
+    } else if (registration.organizationName && registration.organizationName.length) {
       organization = await models.Organization.create({
         name: registration.organizationName,
         vat: registration.organizationVat,
@@ -126,6 +124,8 @@ const completeRegistration = async (req, res) => {
     })
     if (!defaultRole) throw new Error('missing organizationOwner role')
 
+    const activationToken = uuidv4()
+
     const user = await models.User.create({
       name: registration.name,
       email: registration.email.toLowerCase(),
@@ -137,12 +137,14 @@ const completeRegistration = async (req, res) => {
       role_id: wasInvited ? invite.role_id : defaultRole.id,
     }, { transaction })
 
-    await models.UserOrganization.create({
-      user_id: user.id,
-      org_id: organization.id,
-      role_id: user.role_id,
-      current_org: true,
-    }, { transaction })
+    if (organization.id) {
+      await models.UserOrganization.create({
+        user_id: user.id,
+        org_id: organization.id,
+        role_id: user.role_id,
+        current_org: true,
+      }, { transaction })
+    }
 
     await models.UserRegistration.destroy({
       where: { id: registration.id },
