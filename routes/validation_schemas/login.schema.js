@@ -6,11 +6,6 @@ const loginSchema = Joi.object({
   password: Joi.string().required(),
 })
 
-const lastLoginSchema = Joi.object({
-  user_id: Joi.number().integer().required(),
-})
-
 module.exports = {
   validateLoginBody: validator(loginSchema),
-  validateLastLoginBody: validator(lastLoginSchema),
 }

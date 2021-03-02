@@ -483,49 +483,6 @@ router.postAsync('/login',
 
 /**
  * @openapi
- * /users/login/lastlogin:
- *   put:
- *     description: Update user last login date.
- *     tags: [User]
- *     requestBody:
- *       description: User id.
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - user_id
- *             properties:
- *               user_id:
- *                 type: number
- *     security:
- *       - x_internal_token: []
- *     responses:
- *       200:
- *         description: Successful update.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 id:
- *                   type: number
- *                 last_login:
- *                   type: string
- *                   format: date-time
- *       400:
- *         $ref: '#/components/responses/BadRequest'
- *       401:
- *         $ref: '#/components/responses/Unauthorized'
- */
-router.putAsync('/login/lastlogin',
-  isInternalRequest,
-  validateLastLoginBody,
-  controllers.user.updateLastLogin)
-
-/**
- * @openapi
  * /users/setup:
  *   post:
  *     summary: Creates an initial user and main organization

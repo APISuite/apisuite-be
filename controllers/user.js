@@ -137,29 +137,6 @@ const deleteUser = async (req, res) => {
   }
 }
 
-const updateLastLogin = async (req, res) => {
-  try {
-    const user = await models.User.update(
-      {
-        last_login: Date.now(),
-      },
-      {
-        where: { id: req.body.user_id },
-        attributes: ['id', 'last_login'],
-      },
-    )
-
-    if (!user) {
-      return res.status(HTTPStatus.BAD_REQUEST).send({ errors: ['Failed to update last date time login'] })
-    }
-
-    return res.status(HTTPStatus.OK).send(user)
-  } catch (e) {
-    log.error(e, '[USERS updateLastLogin]')
-    return res.status(HTTPStatus.UNAUTHORIZED).send({ errors: ['Failed to upated last login.'] })
-  }
-}
-
 const checkPassword = async (reqPassword, foundPassword) => {
   return new Promise((resolve, reject) =>
     bcrypt.compare(reqPassword, foundPassword, (err, res) => {
