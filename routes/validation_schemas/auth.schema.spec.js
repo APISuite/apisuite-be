@@ -85,7 +85,6 @@ describe('Auth Validations', () => {
         { body: { token: chance.guid({ version: 4 }), password: '_aValidPassword1234' } },
         { body: { token: chance.guid({ version: 4 }), password: '?!!!2Up3rm4n' } },
       ]
-      console.log(testData)
 
       testData.forEach((mockReq) => {
         it('should validate and call next', () => {
