@@ -34,12 +34,11 @@ const userSetupSchema = Joi.object({
 })
 
 /**
- *
- * @param {*} pwd
- * @param {*} options
+ * Password validation.
+ * @param {string} password
  */
-const validatePassword = (pwd, options) => {
-  const complexity = options || {
+const validatePassword = (password) => {
+  const complexity = {
     min: 12,
     max: 200,
     lowerCase: 1,
@@ -49,19 +48,18 @@ const validatePassword = (pwd, options) => {
 
   const errors = []
 
-  const lower = pwd.match(/[a-z]/g)
-  const upper = pwd.match(/[A-Z]/g)
-  const symbol = pwd.match(/[^a-zA-Z0-9]/g)
+  const lower = password.match(/[a-z]/g)
+  const upper = password.match(/[A-Z]/g)
+  const symbol = password.match(/[^a-zA-Z0-9]/g)
 
-  if (pwd.length < (complexity.min || 0)) errors.push(`Password must have at least ${complexity.min} characters`)
-  if (pwd.length > (complexity.max || 200)) errors.push(`Password must have a maximum of ${complexity.max} characters`)
+  if (password.length < (complexity.min || 0)) errors.push(`Password must have at least ${complexity.min} characters`)
+  if (password.length > (complexity.max || 200)) errors.push(`Password must have a maximum of ${complexity.max} characters`)
   if (!lower || lower.length < (complexity.lowerCase || 0)) errors.push(`Password must have at least ${complexity.lowerCase} lower case characters`)
   if (!upper || upper.length < (complexity.upperCase || 0)) errors.push(`Password must have at least ${complexity.upperCase} upper case characters`)
   if (!symbol || symbol.length < (complexity.symbols || 0)) errors.push(`Password must have at least ${complexity.symbols} symbols`)
 
   return {
     valid: !errors.length,
-    error: errors,
     errors,
   }
 }
