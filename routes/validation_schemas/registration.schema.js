@@ -9,13 +9,13 @@ const userDetailsSchema = Joi.object({
 })
 
 const organizationDetailsSchema = Joi.object({
-  registrationToken: Joi.string().required(),
+  registrationToken: Joi.string().guid({ version: 'uuidv4' }).required(),
   name: Joi.string().required(),
   website: Joi.string().optional().allow('', null),
 })
 
 const securityDetailsSchema = Joi.object({
-  registrationToken: Joi.string().required(),
+  registrationToken: Joi.string().guid({ version: 'uuidv4' }).required(),
   password: Joi.string().required(),
 })
 
