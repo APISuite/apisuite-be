@@ -5,6 +5,8 @@ const HTTPStatus = require('http-status-codes')
 const { mockRequest, mockResponse } = require('mock-req-res')
 const {
   validatePassword,
+  validateRegisterBody,
+  validateProfileUpdateBody,
 } = require('./user.schema')
 const helpers = require('../../util/test-helpers')
 const Chance = require('chance')
@@ -48,6 +50,99 @@ describe('User Validations', () => {
           assert.isArray(res.errors)
           assert.isTrue(res.valid)
           assert.equal(res.errors.length, 0)
+        })
+      })
+    })
+  })
+
+  describe('validateRegisterBody', () => {
+    describe('test invalid payloads', () => {
+      const testData = [
+        { body: { } },
+        { body: { email: 12341 } },
+        { body: { email: null } },
+        { body: { email: '' } },
+        { body: { email: 'imnotanemail.com' } },
+        { body: { email: chance.email(), name: 1234 } },
+        { body: { email: chance.email(), password: null } },
+        { body: { email: chance.email(), name: null, password: 76253 } },
+        { body: { email: chance.email(), name: chance.string(), password: 'invalidpassword' } },
+      ]
+
+      testData.forEach((mockReq) => {
+        it('should not validate and return 400', () => {
+          const req = mockRequest(mockReq)
+          const res = mockResponse()
+          const next = sinon.spy()
+
+          validateRegisterBody(req, res, next)
+          sinon.assert.notCalled(next)
+          sinon.assert.calledWith(res.status, HTTPStatus.BAD_REQUEST)
+          helpers.calledWithErrors(res.send)
+        })
+      })
+    })
+
+    describe('test valid payloads', () => {
+      const testData = [
+        { body: { email: chance.email(), name: chance.string(), password: 'Sup3rPassw0rd!@$#' } },
+      ]
+
+      testData.forEach((mockReq) => {
+        it('should validate and call next', () => {
+          const req = mockRequest(mockReq)
+          const res = mockResponse()
+          const next = sinon.spy()
+
+          validateRegisterBody(req, res, next)
+          sinon.assert.called(next)
+        })
+      })
+    })
+  })
+
+  describe('validateProfileUpdateBody', () => {
+    describe('test invalid payloads', () => {
+      const testData = [
+        { body: { } },
+        { body: { name: 12341 } },
+        { body: { name: chance.string(), bio: {}, org_id: [], avatar: 1234, mobile: 87 } },
+        { body: { name: chance.string(), bio: chance.string(), org_id: [], avatar: 1234, mobile: 87 } },
+        { body: { name: chance.string(), bio: chance.string(), org_id: chance.string(), avatar: 1234, mobile: 87 } },
+        { body: { name: chance.string(), bio: chance.string(), org_id: chance.string(), avatar: chance.string(), mobile: 87 } },
+      ]
+
+      testData.forEach((mockReq) => {
+        it('should not validate and return 400', () => {
+          const req = mockRequest(mockReq)
+          const res = mockResponse()
+          const next = sinon.spy()
+
+          validateProfileUpdateBody(req, res, next)
+          sinon.assert.notCalled(next)
+          sinon.assert.calledWith(res.status, HTTPStatus.BAD_REQUEST)
+          helpers.calledWithErrors(res.send)
+        })
+      })
+    })
+
+    describe('test valid payloads', () => {
+      const testData = [
+        { body: { name: chance.string() } },
+        { body: { name: chance.string(), bio: chance.string() } },
+        { body: { name: chance.string(), bio: chance.string(), org_id: chance.string() } },
+        { body: { name: chance.string(), bio: chance.string(), org_id: chance.string(), avatar: chance.string() } },
+        { body: { name: chance.string(), bio: chance.string(), org_id: chance.string(), avatar: chance.string(), mobile: chance.string() } },
+      ]
+
+      testData.forEach((mockReq) => {
+        it('should validate and call next', () => {
+          const req = mockRequest(mockReq)
+          const res = mockResponse()
+          const next = sinon.spy()
+
+          validateProfileUpdateBody(req, res, next)
+          sinon.assert.called(next)
         })
       })
     })

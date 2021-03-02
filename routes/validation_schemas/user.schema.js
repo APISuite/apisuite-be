@@ -9,10 +9,10 @@ const userSchema = Joi.object({
 
 const userProfileSchema = Joi.object({
   name: Joi.string().required(),
-  bio: Joi.string().allow('', null).optional(),
-  org_id: Joi.string().allow('', null),
-  avatar: Joi.string().allow('', null),
-  mobile: Joi.string().required(),
+  bio: Joi.string().optional().allow('', null),
+  org_id: Joi.string().optional().allow('', null),
+  avatar: Joi.string().optional().allow('', null),
+  mobile: Joi.string().optional().allow('', null),
 })
 
 const userChangePasswordSchema = Joi.object({
