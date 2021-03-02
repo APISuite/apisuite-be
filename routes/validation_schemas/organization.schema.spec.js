@@ -70,9 +70,16 @@ describe('Organzation Validations', () => {
     describe('test invalid payloads', () => {
       const testData = [
         { body: { } },
-        { body: { someprop: chance.string() } },
         { body: { name: chance.integer() } },
-        { body: { name: { } } },
+        { body: { name: chance.integer(), description: chance.integer() } },
+        { body: { name: chance.string(), description: chance.integer() } },
+        { body: { name: chance.string(), vat: chance.integer() } },
+        { body: { name: chance.string(), logo: chance.integer() } },
+        { body: { name: chance.string(), tosUrl: chance.integer() } },
+        { body: { name: chance.string(), privacyUrl: chance.integer() } },
+        { body: { name: chance.string(), youtubeUrl: chance.integer() } },
+        { body: { name: chance.string(), websiteUrl: chance.integer() } },
+        { body: { name: chance.string(), supportUrl: chance.integer() } },
       ]
 
       testData.forEach((mockReq) => {
@@ -91,8 +98,16 @@ describe('Organzation Validations', () => {
 
     describe('test valid payloads', () => {
       const testData = [
-        { body: { name: chance.string() } },
-        { body: { name: chance.string(), extra: '' } },
+        { body: { name: chance.string(), description: chance.string() } },
+        { body: { name: chance.string(), description: '' } },
+        { body: { name: chance.string(), description: null } },
+        { body: { name: chance.string(), vat: '' } },
+        { body: { name: chance.string(), logo: '' } },
+        { body: { name: chance.string(), tosUrl: '' } },
+        { body: { name: chance.string(), privacyUrl: '' } },
+        { body: { name: chance.string(), youtubeUrl: '' } },
+        { body: { name: chance.string(), websiteUrl: '' } },
+        { body: { name: chance.string(), supportUrl: '' } },
       ]
 
       testData.forEach((mockReq) => {

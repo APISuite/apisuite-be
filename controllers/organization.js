@@ -61,6 +61,11 @@ const addOrg = async (req, res) => {
       terms: req.body.terms,
       logo: req.body.logo,
       org_code: uuidv4(),
+      tosUrl: req.body.tosUrl,
+      privacyUrl: req.body.privacyUrl,
+      youtubeUrl: req.body.youtubeUrl,
+      websiteUrl: req.body.websiteUrl,
+      supportUrl: req.body.supportUrl,
     }, { transaction })
 
     await models.UserOrganization.create({
