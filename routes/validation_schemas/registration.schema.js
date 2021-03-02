@@ -11,8 +11,7 @@ const userDetailsSchema = Joi.object({
 const organizationDetailsSchema = Joi.object({
   registrationToken: Joi.string().required(),
   name: Joi.string().required(),
-  website: Joi.string().optional(),
-  vat: Joi.string().optional(),
+  website: Joi.string().optional().allow('', null),
 })
 
 const securityDetailsSchema = Joi.object({

@@ -66,7 +66,6 @@ const setOrganizationDetails = async (req, res) => {
   try {
     registration.organizationName = req.body.name
     registration.organizationWebsite = req.body.website
-    registration.organizationVat = req.body.vat
     await registration.save()
 
     return res.status(HTTPStatus.OK).end()
@@ -110,7 +109,6 @@ const completeRegistration = async (req, res) => {
     } else if (registration.organizationName && registration.organizationName.length) {
       organization = await models.Organization.create({
         name: registration.organizationName,
-        vat: registration.organizationVat,
         website: registration.organizationWebsite,
         org_code: uuidv4(),
       }, { transaction })

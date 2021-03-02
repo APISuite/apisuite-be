@@ -41,8 +41,6 @@
  *         website:
  *           type: string
  *           format: uri
- *         vat:
- *           type: string
  *         registrationToken:
  *           type: string
  *           format: uuid
