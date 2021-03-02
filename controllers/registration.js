@@ -4,12 +4,10 @@ const log = require('../util/logger')
 const emailService = require('./email')
 const { models, sequelize } = require('../models')
 const { roles } = require('../util/enums')
-
-// TODO move to configs
-const REGISTRATION_TTL = 30 // minutes
+const config = require('../config')
 
 const isRegistrationValid = (createdAt) => {
-  return new Date(createdAt).getTime() + REGISTRATION_TTL * 60 * 1000 >= Date.now()
+  return new Date(createdAt).getTime() + config.get('registrationTTL') * 60 * 1000 >= Date.now()
 }
 
 const setUserDetails = async (req, res) => {

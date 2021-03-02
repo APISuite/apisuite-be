@@ -23,6 +23,12 @@ const schema = {
     default: 'DO_NOT_USE_THIS_DEFAULT',
     env: 'APISUITE_CIPHER_PASSWORD',
   },
+  registrationTTL: {
+    doc: 'User registration record TTL (minutes)',
+    format: Number,
+    default: 30,
+    env: 'APISUITE_REGISTRATION_TTL',
+  },
   auth: {
     tokenIssuer: {
       doc: 'Access Token Issuer Claim',
