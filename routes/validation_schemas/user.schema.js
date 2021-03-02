@@ -30,7 +30,7 @@ const userSetupSchema = Joi.object({
   settings: Joi.object({
     portalName: Joi.string().optional().allow(''),
     clientName: Joi.string().optional().allow(''),
-  }),
+  }).optional(),
 })
 
 /**

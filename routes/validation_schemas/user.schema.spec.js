@@ -7,6 +7,8 @@ const {
   validatePassword,
   validateRegisterBody,
   validateProfileUpdateBody,
+  validateChangePasswordBody,
+  validateSetupBody,
 } = require('./user.schema')
 const helpers = require('../../util/test-helpers')
 const Chance = require('chance')
@@ -142,6 +144,112 @@ describe('User Validations', () => {
           const next = sinon.spy()
 
           validateProfileUpdateBody(req, res, next)
+          sinon.assert.called(next)
+        })
+      })
+    })
+  })
+
+  describe('validateChangePasswordBody', () => {
+    describe('test invalid payloads', () => {
+      const testData = [
+        { body: { } },
+        { body: { old_password: 12341 } },
+        { body: { old_password: 12341, new_password: { } } },
+        { body: { old_password: 'somepwd', new_password: 'invalid' } },
+      ]
+
+      testData.forEach((mockReq) => {
+        it('should not validate and return 400', () => {
+          const req = mockRequest(mockReq)
+          const res = mockResponse()
+          const next = sinon.spy()
+
+          validateChangePasswordBody(req, res, next)
+          sinon.assert.notCalled(next)
+          sinon.assert.calledWith(res.status, HTTPStatus.BAD_REQUEST)
+          helpers.calledWithErrors(res.send)
+        })
+      })
+    })
+
+    describe('test valid payloads', () => {
+      const testData = [
+        { body: { old_password: 'somepwd', new_password: 'V4l1dPassword!$' } },
+        { body: { old_password: 'V4l1dPassword!$', new_password: 'V4l1dPassword!$' } },
+      ]
+
+      testData.forEach((mockReq) => {
+        it('should validate and call next', () => {
+          const req = mockRequest(mockReq)
+          const res = mockResponse()
+          const next = sinon.spy()
+
+          validateChangePasswordBody(req, res, next)
+          sinon.assert.called(next)
+        })
+      })
+    })
+  })
+
+  describe('validateSetupBody', () => {
+    describe('test invalid payloads', () => {
+      const testData = [
+        { body: { } },
+        { body: { email: 3423462 } },
+        { body: { email: chance.string() } },
+        { body: { email: chance.email(), organization: { } } },
+        { body: { email: chance.email(), organization: { name: 123434 } } },
+      ]
+
+      testData.forEach((mockReq) => {
+        it('should not validate and return 400', () => {
+          const req = mockRequest(mockReq)
+          const res = mockResponse()
+          const next = sinon.spy()
+
+          validateSetupBody(req, res, next)
+          sinon.assert.notCalled(next)
+          sinon.assert.calledWith(res.status, HTTPStatus.BAD_REQUEST)
+          helpers.calledWithErrors(res.send)
+        })
+      })
+    })
+
+    describe('test valid payloads', () => {
+      const testData = [
+        { body: { email: chance.email(), organization: { name: 'acme' } } },
+        {
+          body: {
+            email: chance.email(),
+            organization: {
+              name: 'acme',
+            },
+          },
+        },
+        {
+          body: {
+            email: chance.email(),
+            organization: {
+              name: 'acme',
+              website: chance.url(),
+              vat: chance.string(),
+            },
+            settings: {
+              portalName: chance.string(),
+              clientName: chance.string(),
+            },
+          },
+        },
+      ]
+
+      testData.forEach((mockReq) => {
+        it('should validate and call next', () => {
+          const req = mockRequest(mockReq)
+          const res = mockResponse()
+          const next = sinon.spy()
+
+          validateSetupBody(req, res, next)
           sinon.assert.called(next)
         })
       })
