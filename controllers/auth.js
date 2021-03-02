@@ -12,16 +12,12 @@ const { settingTypes } = require('../util/enums')
 const config = require('../config')
 const { oidcDiscovery } = require('../util/oidc')
 
-// TODO move to configs
-const RECOVERY_INTERVAL = 5 // minutes
-const RECOVERY_TTL = 120 // minutes
-
 const isRecoveryValid = (createdAt) => {
-  return new Date(createdAt.getTime() + RECOVERY_TTL * 60 * 1000) >= Date.now()
+  return new Date(createdAt.getTime() + config.get('passwordRecoveryTTL') * 60 * 1000) >= Date.now()
 }
 
 const isRecoveryRecent = (createdAt) => {
-  return new Date(createdAt.getTime() + RECOVERY_INTERVAL * 60 * 1000) >= Date.now()
+  return new Date(createdAt.getTime() + config.get('passwordRecoveryInterval') * 60 * 1000) >= Date.now()
 }
 
 const forgotPassword = async (req, res) => {
