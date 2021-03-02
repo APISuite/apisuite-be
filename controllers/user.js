@@ -334,7 +334,7 @@ const profileUpdate = async (req, res) => {
       message: 'Profile updated successfully',
     })
   } catch (error) {
-    await transaction.rollback()
+    if (transaction) await transaction.rollback()
     log.error(error, '[PROFILE UPDATE]')
     return {
       success: false,
@@ -499,7 +499,6 @@ module.exports = {
   getListInvitations,
   confirmInvite,
   profileUpdate,
-  updateLastLogin,
   profile,
   setupMainAccount,
 }
