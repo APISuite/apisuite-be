@@ -267,7 +267,48 @@ const confirmInvite = async (req, res) => {
 }
 
 const profileUpdate = async (req, res) => {
+  const transaction = await sequelize.transaction()
   try {
+    if (typeof req.body.org_id !== 'undefined' && req.body.org_id !== '') {
+      const ownsOrg = req.user.organizations.find((o) => o.id === parseInt(req.body.org_id))
+      if (!ownsOrg) {
+        return res.status(HTTPStatus.FORBIDDEN).send()
+      }
+
+      const updateOldOrg = await models.UserOrganization.update(
+        { current_org: false },
+        {
+          where: {
+            user_id: req.user.id,
+            current_org: true,
+          },
+          transaction,
+        },
+      )
+
+      if (!updateOldOrg) {
+        await transaction.rollback()
+        return res.sendInternalError('Failed to update profile data')
+      }
+
+      const updateNewOrg = await models.UserOrganization.update(
+        { current_org: true },
+        {
+          where: {
+            org_id: req.body.org_id,
+            user_id: req.user.id,
+            current_org: false,
+          },
+          transaction,
+        },
+      )
+
+      if (!updateNewOrg) {
+        await transaction.rollback()
+        return res.sendInternalError('Failed to update profile data')
+      }
+    }
+
     const user = await models.User.update(
       {
         name: req.body.name,
@@ -276,60 +317,30 @@ const profileUpdate = async (req, res) => {
         mobile: req.body.mobile,
       },
       {
-        where: {
-          id: req.user.id,
-        },
+        where: { id: req.user.id },
+        transaction,
       },
     )
 
     if (!user) {
-      return res.status(HTTPStatus.BAD_REQUEST).send({ errors: ['Failed to update Profile data.'] })
+      await transaction.rollback()
+      return res.sendInternalError('Failed to update profile data')
     }
 
-    if (typeof req.body.org_id !== 'undefined' && req.body.org_id !== '') {
-      const updateOldOrg = await models.UserOrganization.update(
-        {
-          current_org: false,
-        },
-        {
-          where: {
-            user_id: req.user.id,
-            current_org: true,
-          },
-        },
-      )
+    await transaction.commit()
 
-      if (!updateOldOrg) {
-        return res.status(HTTPStatus.BAD_REQUEST).send({
-          errors: ['Failed to update Profile data. It was not possible to change current_org = false to the old organization.'],
-        })
-      }
-
-      const updateNewOrg = await models.UserOrganization.update(
-        {
-          current_org: true,
-        },
-        {
-          where: {
-            org_id: req.body.org_id,
-            user_id: req.user.id,
-            current_org: false,
-          },
-        },
-      )
-
-      if (!updateNewOrg) {
-        return res.status(HTTPStatus.BAD_REQUEST).send({
-          errors: ['Failed to update Profile data. It was not possible to change current_org = true to the new organization.'],
-        })
-      }
-    }
+    return res.status(HTTPStatus.OK).send({
+      success: true,
+      message: 'Profile updated successfully',
+    })
   } catch (error) {
-    log.error(error, '[USERS profileUpdate]')
-    return res.status(HTTPStatus.INTERNAL_SERVER_ERROR).send({ errors: ['Failed to update profile.'] })
+    await transaction.rollback()
+    log.error(error, '[PROFILE UPDATE]')
+    return {
+      success: false,
+      message: 'Failed to update profile',
+    }
   }
-
-  return res.status(HTTPStatus.OK).send({ success: true, message: 'Profile updated successfully.' })
 }
 
 const profile = async (req, res) => {

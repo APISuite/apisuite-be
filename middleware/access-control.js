@@ -16,7 +16,7 @@ const fetchGrants = async () => {
 
 const sendForbidden = (res) => {
   return res.status(HTTPStatus.FORBIDDEN).json({
-    errors: ["You don't have permission to perform this action"],
+    errors: ['You don\'t have permission to perform this action'],
   })
 }
 
