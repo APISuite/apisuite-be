@@ -40,10 +40,11 @@ const accessControl = (action, possession, resource, options = {}) => {
     })
     if (!permission.granted) return sendForbidden(res)
 
+    const { idCarrier, idField } = options
+
     switch (resource) {
       case resources.ORGANIZATION: {
-        const { idCarrier, idField } = options
-        if (possession === possessions.OWN && idCarrier && idCarrier.length && idField && idField.length) {
+        if (checkOwnPossessionAndIdField(possession, idCarrier, idField)) {
           const organizationID = req[idCarrier][idField]
           const ownsOrg = req.user.organizations.find((o) => o.id === parseInt(organizationID))
           if (!ownsOrg) return sendForbidden(res)
@@ -51,8 +52,7 @@ const accessControl = (action, possession, resource, options = {}) => {
         break
       }
       case resources.APP: {
-        const { idCarrier, idField } = options
-        if (possession === possessions.OWN && idCarrier && idCarrier.length && idField && idField.length) {
+        if (checkOwnPossessionAndIdField(possession, idCarrier, idField)) {
           const app = await models.App.findOne({
             where: {
               id: req[idCarrier][idField],
@@ -63,11 +63,28 @@ const accessControl = (action, possession, resource, options = {}) => {
         }
         break
       }
+      case resources.PROFILE: {
+        if (checkOwnPossessionAndIdField(possession, idCarrier, idField)) {
+          if (req.user.id !== parseInt(req[idCarrier][idField])) return sendForbidden(res)
+        }
+        break
+      }
     }
 
     next()
   }
 }
+
+/**
+ * Checks if configured access control possession is OWN and if id field is present in the configured carrier.
+ * @param {String} possession
+ * @param {String} idCarrier
+ * @param {String} idField
+ * @returns {Boolean}
+ * */
+const checkOwnPossessionAndIdField = (possession, idCarrier, idField) => (
+  possession === possessions.OWN && idCarrier && idCarrier.length && idField && idField.length
+)
 
 let ac
 (async () => {

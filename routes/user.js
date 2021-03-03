@@ -469,4 +469,42 @@ router.postAsync('/setup',
   validateSetupBody,
   controllers.user.setupMainAccount)
 
+/**
+ * @openapi
+ * /users/{id}/organizations/{orgId}:
+ *   post:
+ *     summary: Change user's active organization
+ *     description: >
+ *        Changes the user's active organization to {orgId},
+ *        as long as {orgId} is an organization the user belongs to.
+ *     tags: [User]
+ *     parameters:
+ *       - name: id
+ *         description: The user id.
+ *         required: true
+ *         in: path
+ *         schema:
+ *           type: string
+ *       - name: orgId
+ *         description: The organization id the user is switching to.
+ *         required: true
+ *         in: path
+ *         schema:
+ *           type: string
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       204:
+ *         description: No Content
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ */
+router.postAsync('/:id/organizations/:orgId',
+  loggedIn,
+  accessControl(actions.UPDATE, possessions.OWN, resources.PROFILE, { idCarrier: 'params', idField: 'id' }),
+  accessControl(actions.READ, possessions.OWN, resources.ORGANIZATION, { idCarrier: 'params', idField: 'orgId' }),
+  controllers.user.setActiveOrganization)
+
 module.exports = router

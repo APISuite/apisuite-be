@@ -489,6 +489,52 @@ const setupMainAccount = async (req, res) => {
   }
 }
 
+const setActiveOrganization = async (req, res) => {
+  const transaction = await sequelize.transaction()
+  try {
+    const disableCurrentOrg = await models.UserOrganization.update(
+      { current_org: false },
+      {
+        where: {
+          user_id: req.user.id,
+          current_org: true,
+        },
+        transaction,
+      },
+    )
+
+    if (!disableCurrentOrg) {
+      await transaction.rollback()
+      return res.sendInternalError('Failed to update profile data')
+    }
+
+    const setActiveOrg = await models.UserOrganization.update(
+      { current_org: true },
+      {
+        where: {
+          org_id: req.params.orgId,
+          user_id: req.user.id,
+          current_org: false,
+        },
+        transaction,
+      },
+    )
+
+    if (!setActiveOrg) {
+      await transaction.rollback()
+      return res.sendInternalError('Failed to update profile data')
+    }
+
+    await transaction.commit()
+
+    return res.status(HTTPStatus.NO_CONTENT).send()
+  } catch (error) {
+    if (transaction) await transaction.rollback()
+    log.error(error, '[SET ACTIVE ORGANIZATION]')
+    return res.sendInternalError()
+  }
+}
+
 module.exports = {
   getAll,
   getById,
@@ -501,4 +547,5 @@ module.exports = {
   profileUpdate,
   profile,
   setupMainAccount,
+  setActiveOrganization,
 }
