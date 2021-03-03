@@ -1,21 +1,5 @@
 version: '3.7'
 services:
-  apisuite_migrations:
-    image: cloudokihub/apisuite-be:${IMG_VERSION}
-    build: .
-    command: npm run migrate
-    container_name: apisuite-migrations
-    depends_on:
-      - db
-    environment:
-      - POSTGRES_ADDRESS
-      - POSTGRES_PORT_INTERNAL
-      - POSTGRES_USERNAME
-      - POSTGRES_PASSWORD
-      - POSTGRES_DB
-      - APISUITE_CIPHER_PASSWORD
-    restart: on-failure
-
   db:
     image: postgres:12
     container_name: apisuite-db
