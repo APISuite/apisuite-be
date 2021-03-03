@@ -4,10 +4,8 @@ const controllers = require('../controllers')
 const { accessControl, loggedIn, setup } = require('../middleware')
 const { actions, possessions, resources } = require('../access-control')
 const { validateProfileUpdateBody, validateChangePasswordBody, validateSetupBody } = require('./validation_schemas/user.schema')
-const { validateLoginBody } = require('./validation_schemas/login.schema')
 const { validateForgotPasswordBody, validateRecoverPasswordBody } = require('./validation_schemas/auth.schema')
 const { validateInviteBody } = require('./validation_schemas/invite_organization.schema')
-const { isInternalRequest } = require('../util/internal-request')
 
 /**
  * @openapi
@@ -426,60 +424,6 @@ router.getAsync('/invitations/list',
  */
 router.postAsync('/invite/confirm',
   controllers.user.confirmInvite)
-
-/**
- * @openapi
- * /users/login:
- *   post:
- *     description: Login user.
- *     tags: [User]
- *     requestBody:
- *       description: Login data.
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - email
- *               - password
- *             properties:
- *               email:
- *                 type: string
- *                 format: email
- *               password:
- *                 type: string
- *                 format: password
- *     security:
- *       - x_internal_token: []
- *     responses:
- *       200:
- *         description: Successful login.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 id:
- *                   type: number
- *                 role_id:
- *                   type: number
- *                 name:
- *                   type: string
- *                 email:
- *                   type: string
- *                   format: email
- *       400:
- *         $ref: '#/components/responses/BadRequest'
- *       401:
- *         $ref: '#/components/responses/Unauthorized'
- *       403:
- *         $ref: '#/components/responses/Forbidden'
- */
-router.postAsync('/login',
-  isInternalRequest,
-  validateLoginBody,
-  controllers.user.getByLogin)
 
 /**
  * @openapi
