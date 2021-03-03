@@ -535,6 +535,37 @@ const setActiveOrganization = async (req, res) => {
   }
 }
 
+const updateUserProfile = async (req, res) => {
+  const transaction = await sequelize.transaction()
+  try {
+    const [rowsUpdated, [updated]] = await models.User.update(
+      {
+        name: req.body.name,
+        bio: req.body.bio,
+        avatar: req.body.avatar,
+        mobile: req.body.mobile,
+      },
+      {
+        where: { id: req.user.id },
+        returning: true,
+      },
+    )
+
+    if (!rowsUpdated) {
+      await transaction.rollback()
+      return res.sendInternalError('Failed to update profile data')
+    }
+
+    await transaction.commit()
+
+    return res.status(HTTPStatus.OK).send(updated.toProfileJSON())
+  } catch (error) {
+    if (transaction) await transaction.rollback()
+    log.error(error, '[UPDATE USER PROFILE]')
+    return res.sendInternalError()
+  }
+}
+
 module.exports = {
   getAll,
   getById,
@@ -548,4 +579,5 @@ module.exports = {
   profile,
   setupMainAccount,
   setActiveOrganization,
+  updateUserProfile,
 }

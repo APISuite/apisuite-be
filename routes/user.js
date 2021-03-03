@@ -3,14 +3,20 @@ const router = decorateRouter(require('express').Router())
 const controllers = require('../controllers')
 const { accessControl, loggedIn, setup } = require('../middleware')
 const { actions, possessions, resources } = require('../access-control')
-const { validateProfileUpdateBody, validateChangePasswordBody, validateSetupBody } = require('./validation_schemas/user.schema')
 const { validateForgotPasswordBody, validateRecoverPasswordBody } = require('./validation_schemas/auth.schema')
 const { validateInviteBody } = require('./validation_schemas/invite_organization.schema')
+const {
+  deprecatedValidateProfileUpdateBody,
+  validateProfileUpdateBody,
+  validateChangePasswordBody,
+  validateSetupBody,
+} = require('./validation_schemas/user.schema')
 
 /**
  * @openapi
  * /users/profile/update:
  *   put:
+ *     deprecated: true
  *     description: Edit user profile.
  *     tags: [User]
  *     requestBody:
@@ -43,7 +49,7 @@ const { validateInviteBody } = require('./validation_schemas/invite_organization
  */
 router.putAsync('/profile/update',
   loggedIn,
-  validateProfileUpdateBody,
+  deprecatedValidateProfileUpdateBody,
   accessControl(actions.UPDATE, possessions.OWN, resources.PROFILE),
   controllers.user.profileUpdate)
 
@@ -506,5 +512,41 @@ router.postAsync('/:id/organizations/:orgId',
   accessControl(actions.UPDATE, possessions.OWN, resources.PROFILE, { idCarrier: 'params', idField: 'id' }),
   accessControl(actions.READ, possessions.OWN, resources.ORGANIZATION, { idCarrier: 'params', idField: 'orgId' }),
   controllers.user.setActiveOrganization)
+
+/**
+ * @openapi
+ * /users/{id}:
+ *   put:
+ *     summary: Update user profile
+ *     description: Update (own) user profile
+ *     tags: [User]
+ *     requestBody:
+ *       description: User profile details.
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/UserProfile'
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: Profile edited successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/UserProfile'
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ */
+router.putAsync('/:id',
+  loggedIn,
+  validateProfileUpdateBody,
+  accessControl(actions.UPDATE, possessions.OWN, resources.PROFILE, { idCarrier: 'params', idField: 'id' }),
+  controllers.user.updateUserProfile)
 
 module.exports = router

@@ -108,10 +108,9 @@ describe('User Validations', () => {
       const testData = [
         { body: { } },
         { body: { name: 12341 } },
-        { body: { name: chance.string(), bio: {}, org_id: [], avatar: 1234, mobile: 87 } },
-        { body: { name: chance.string(), bio: chance.string(), org_id: [], avatar: 1234, mobile: 87 } },
-        { body: { name: chance.string(), bio: chance.string(), org_id: chance.string(), avatar: 1234, mobile: 87 } },
-        { body: { name: chance.string(), bio: chance.string(), org_id: chance.string(), avatar: chance.string(), mobile: 87 } },
+        { body: { name: chance.string(), bio: {}, avatar: 1234, mobile: 87 } },
+        { body: { name: chance.string(), bio: chance.string(), avatar: 1234, mobile: 87 } },
+        { body: { name: chance.string(), bio: chance.string(), avatar: chance.string(), mobile: 87 } },
       ]
 
       testData.forEach((mockReq) => {
@@ -132,9 +131,8 @@ describe('User Validations', () => {
       const testData = [
         { body: { name: chance.string() } },
         { body: { name: chance.string(), bio: chance.string() } },
-        { body: { name: chance.string(), bio: chance.string(), org_id: chance.string() } },
-        { body: { name: chance.string(), bio: chance.string(), org_id: chance.string(), avatar: chance.string() } },
-        { body: { name: chance.string(), bio: chance.string(), org_id: chance.string(), avatar: chance.string(), mobile: chance.string() } },
+        { body: { name: chance.string(), bio: chance.string(), avatar: chance.string() } },
+        { body: { name: chance.string(), bio: chance.string(), avatar: chance.string(), mobile: chance.string() } },
       ]
 
       testData.forEach((mockReq) => {

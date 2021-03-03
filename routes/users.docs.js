@@ -9,7 +9,6 @@
  *         - id
  *         - name
  *         - email
- *         - last_login
  *       properties:
  *         id:
  *           type: number
@@ -73,13 +72,10 @@
  *       type: object
  *       required:
  *         - name
- *         - mobile
  *       properties:
  *         name:
  *           type: string
  *         bio:
- *           type: string
- *         org_id:
  *           type: string
  *         avatar:
  *           type: string

@@ -99,6 +99,15 @@ const user = (sequelize, DataTypes) => {
     return bcrypt.compare(pwd, this.password)
   }
 
+  User.prototype.toProfileJSON = function () {
+    return {
+      name: this.name,
+      bio: this.bio,
+      avatar: this.avatar,
+      mobile: this.mobile,
+    }
+  }
+
   return User
 }
 
