@@ -1,7 +1,7 @@
 const HTTPStatus = require('http-status-codes')
 const { models } = require('../models')
 const { roles } = require('../util/enums')
-const jwt = require('../jwt')
+const jwt = require('../services/jwt')
 
 const getTokenUserByID = async (userID) => {
   const user = await models.User.findOne({
