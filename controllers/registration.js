@@ -1,7 +1,7 @@
 const { v4: uuidv4 } = require('uuid')
 const HTTPStatus = require('http-status-codes')
 const log = require('../util/logger')
-const emailService = require('./email')
+const emailService = require('../services/email')
 const { models, sequelize } = require('../models')
 const { roles } = require('../util/enums')
 const config = require('../config')
