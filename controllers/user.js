@@ -490,6 +490,14 @@ const setupMainAccount = async (req, res) => {
 }
 
 const setActiveOrganization = async (req, res) => {
+  if (req.user.id !== parseInt(req.params.id)) {
+    return res.status(HTTPStatus.BAD_REQUEST).send({ errors: ['Invalid user id'] })
+  }
+
+  if (!req.user.organizations.find((o) => o.id === parseInt(req.params.orgId))) {
+    return res.status(HTTPStatus.FORBIDDEN).send({ errors: ['User has no access to the organization'] })
+  }
+
   const transaction = await sequelize.transaction()
   try {
     const disableCurrentOrg = await models.UserOrganization.update(

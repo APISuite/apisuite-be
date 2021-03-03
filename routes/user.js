@@ -509,8 +509,6 @@ router.postAsync('/setup',
  */
 router.postAsync('/:id/organizations/:orgId',
   loggedIn,
-  accessControl(actions.UPDATE, possessions.OWN, resources.PROFILE, { idCarrier: 'params', idField: 'id' }),
-  accessControl(actions.READ, possessions.OWN, resources.ORGANIZATION, { idCarrier: 'params', idField: 'orgId' }),
   controllers.user.setActiveOrganization)
 
 /**

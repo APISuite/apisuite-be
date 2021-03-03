@@ -40,6 +40,7 @@ describe('User', () => {
       },
       user: {
         id: 1,
+        organizations: [{ id: 2 }],
       },
     }
 
@@ -52,6 +53,40 @@ describe('User', () => {
       sinon.assert.calledWith(res.status, HTTPStatus.NO_CONTENT)
       sinon.assert.calledOnce(fakeTxn.commit)
       sinon.assert.notCalled(fakeTxn.rollback)
+    })
+
+    it('should return 403 when the organization is invalid for the user', async () => {
+      const req = mockRequest({
+        params: {
+          id: 1,
+          orgId: 2222,
+        },
+        user: {
+          id: 1,
+          organizations: [{ id: 2 }],
+        },
+      })
+      const res = mockResponse()
+
+      await setActiveOrganization(req, res)
+      sinon.assert.calledWith(res.status, HTTPStatus.FORBIDDEN)
+    })
+
+    it('should return 400 when the user id does not match the requester user id', async () => {
+      const req = mockRequest({
+        params: {
+          id: 1000,
+          orgId: 2,
+        },
+        user: {
+          id: 1,
+          organizations: [{ id: 2 }],
+        },
+      })
+      const res = mockResponse()
+
+      await setActiveOrganization(req, res)
+      sinon.assert.calledWith(res.status, HTTPStatus.BAD_REQUEST)
     })
 
     it('should return 500 when update fails', async () => {
