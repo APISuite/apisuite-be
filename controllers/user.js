@@ -544,6 +544,10 @@ const setActiveOrganization = async (req, res) => {
 }
 
 const updateUserProfile = async (req, res) => {
+  if (req.user.id !== parseInt(req.params.id)) {
+    return res.status(HTTPStatus.BAD_REQUEST).send({ errors: ['Invalid user id'] })
+  }
+
   const transaction = await sequelize.transaction()
   try {
     const [rowsUpdated, [updated]] = await models.User.update(

@@ -544,7 +544,6 @@ router.postAsync('/:id/organizations/:orgId',
 router.putAsync('/:id',
   loggedIn,
   validateProfileUpdateBody,
-  accessControl(actions.UPDATE, possessions.OWN, resources.PROFILE, { idCarrier: 'params', idField: 'id' }),
   controllers.user.updateUserProfile)
 
 module.exports = router
