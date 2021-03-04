@@ -52,9 +52,9 @@ services:
       - hydra-migrate
       - db
     ports:
-      - "4444" # Public port
-      - "4445" # Admin port
-      - "5555" # Port for hydra token user
+      - "4444:4444" # Public port
+      - "4445:4445" # Admin port
+      - "5555:5555" # Port for hydra token user
     command:
       serve all --dangerous-force-http
     environment:
@@ -89,6 +89,46 @@ services:
     volumes:
       - ./.compose-utils/rabbitmq/etc/enabled_plugins:/etc/rabbitmq/enabled_plugins
       - ./.compose-utils/rabbitmq/data/:/var/lib/rabbitmq/
+
+  kong-migrations:
+    image: kong:2.3-alpine
+    container_name: apisuite-kong-migrations
+    depends_on:
+      - db
+    command: kong migrations bootstrap
+    environment:
+      - KONG_DATABASE
+      - KONG_PG_USER
+      - KONG_PG_PASSWORD
+      - KONG_PG_HOST
+      - KONG_PG_DATABASE
+    restart: on-failure
+
+  kong:
+    image: kong:2.3-alpine
+    container_name: apisuite-kong
+    depends_on:
+      - kong-migrations
+    environment:
+      - KONG_DATABASE
+      - KONG_PG_USER
+      - KONG_PG_PASSWORD
+      - KONG_PG_HOST
+      - KONG_PG_DATABASE
+      - KONG_ADMIN_LISTEN=0.0.0.0:8001
+      - KONG_ADMIN_ACCESS_LOG=/dev/stdout
+      - KONG_ADMIN_ERROR_LOG=/dev/stderr
+      - KONG_PROXY_ACCESS_LOG=/dev/stdout
+      - KONG_PROXY_ERROR_LOG=/dev/stderr
+    ports:
+      - "8000:8000"
+      - "8001:8001"
+    healthcheck:
+      test: ["CMD", "kong", "health"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    restart: on-failure
 
 networks:
   default:
