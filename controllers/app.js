@@ -160,15 +160,17 @@ const deleteApp = async (req, res) => {
       return res.status(HTTPStatus.NOT_FOUND).send({ errors: 'App not found' })
     }
 
-    const idp = await Idp.getIdP()
-    await idp.deleteClient(updated.clientId, updated.client_data)
+    if (updated.clientId) {
+      const idp = await Idp.getIdP()
+      await idp.deleteClient(updated.clientId, updated.client_data)
 
-    try {
-      const gateway = await Gateway()
-      await gateway.removeApp(updated.id)
-    } catch (error) {
-      if (transaction) await transaction.rollback()
-      log.error('[deleteApp] => removeApp', error)
+      try {
+        const gateway = await Gateway()
+        await gateway.removeApp(updated.id)
+      } catch (error) {
+        if (transaction) await transaction.rollback()
+        log.error('[deleteApp] => removeApp', error)
+      }
     }
 
     await transaction.commit()
@@ -384,6 +386,10 @@ const requestAccess = async (req, res) => {
       app.clientSecret = client.clientSecret
       app.client_data = client.extra
       app.idpProvider = idp.getProvider()
+
+      const gateway = await Gateway()
+      await gateway.subscribeAll(app.id, app.clientId)
+
       await app.save()
       break
     }

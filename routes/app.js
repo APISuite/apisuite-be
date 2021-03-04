@@ -149,7 +149,8 @@ router.putAsync('/update/:id',
  * @openapi
  * /apps/:id/request:
  *   post:
- *     description: Submit an access request for an application
+ *     summary: Access request
+ *     description: Submits an access request for an application
  *     tags: [App (v2)]
  *     security:
  *       - cookieAuth: []
