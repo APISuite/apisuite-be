@@ -138,7 +138,6 @@ const logout = async (req, res) => {
   await models.RefreshToken.destroy({
     where: {
       token: req.cookies.refresh_token,
-      user_id: req.user.id,
     },
   })
 

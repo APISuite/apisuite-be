@@ -36,7 +36,6 @@ router.postAsync('/login',
  *     summary: Logout user
  *     tags: [Auth]
  *     security:
- *       - cookieAuth: []
  *       - cookieRefreshAuth: []
  *     responses:
  *       204:
@@ -46,7 +45,6 @@ router.postAsync('/login',
  */
 router.postAsync('/logout',
   refreshToken,
-  loggedIn,
   controllers.auth.logout)
 
 /**
