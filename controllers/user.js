@@ -9,6 +9,7 @@ const emailService = require('../services/email')
 const { models, sequelize } = require('../models')
 const { Op } = require('sequelize')
 const { publishEvent, routingKeys } = require('../services/msg-broker')
+const { getRevokedCookieConfig } = require('../util/cookies')
 
 const getAll = async (req, res) => {
   try {
@@ -129,7 +130,10 @@ const deleteUser = async (req, res) => {
       user_id: req.user.id,
     })
 
-    return res.sendStatus(HTTPStatus.NO_CONTENT)
+    return res
+      .cookie('access_token', '', getRevokedCookieConfig())
+      .cookie('refresh_token', '', getRevokedCookieConfig())
+      .sendStatus(HTTPStatus.NO_CONTENT)
   } catch (error) {
     if (transaction) await transaction.rollback()
     log.error(error, '[USERS deleteUser]')

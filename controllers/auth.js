@@ -10,6 +10,7 @@ const jwt = require('../services/jwt')
 const Idp = require('../idp')
 const { settingTypes } = require('../util/enums')
 const config = require('../config')
+const { getRevokedCookieConfig } = require('../util/cookies')
 const { oidcDiscovery } = require('../util/oidc')
 
 const isRecoveryValid = (createdAt) => {
@@ -138,6 +139,7 @@ const logout = async (req, res) => {
   await models.RefreshToken.destroy({
     where: {
       token: req.cookies.refresh_token,
+      user_id: req.user.id,
     },
   })
 
@@ -364,20 +366,6 @@ const getCookieConfigs = () => {
       expires: new Date(Date.now() + config.get('auth.refreshTokenTTL') * 1000),
       path: '/auth',
     },
-  }
-}
-
-const getRevokedCookieConfig = () => {
-  const baseConfig = {
-    httpOnly: config.get('auth.cookieHttpOnly'),
-    secure: config.get('auth.cookieSecure'),
-    sameSite: config.get('auth.cookieSameSite'),
-    domain: config.get('auth.cookieDomain'),
-  }
-
-  return {
-    ...baseConfig,
-    expires: new Date('1900-01-01'),
   }
 }
 
