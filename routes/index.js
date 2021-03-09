@@ -4,7 +4,6 @@ const app = require('./app')
 const auth = require('./auth')
 const organization = require('./organization')
 const registration = require('./registration')
-const functions = require('./functions')
 const role = require('./role')
 const settings = require('./settings')
 const invites = require('./invites')
@@ -14,7 +13,6 @@ module.exports = {
   api,
   app,
   auth,
-  functions,
   invites,
   organization,
   owner,

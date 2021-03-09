@@ -9,7 +9,6 @@
  *         - id
  *         - name
  *         - email
- *         - last_login
  *       properties:
  *         id:
  *           type: number
@@ -62,6 +61,8 @@
  *         last_login:
  *           type: string
  *           format: date-time
+ *         oidcProvider:
+ *           type: string
  */
 
 /** @openapi
@@ -71,13 +72,10 @@
  *       type: object
  *       required:
  *         - name
- *         - mobile
  *       properties:
  *         name:
  *           type: string
  *         bio:
- *           type: string
- *         org_id:
  *           type: string
  *         avatar:
  *           type: string

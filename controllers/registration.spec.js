@@ -3,7 +3,7 @@ const HTTPStatus = require('http-status-codes')
 const { mockRequest, mockResponse } = require('mock-req-res')
 const helpers = require('../util/test-helpers')
 const { models, sequelize } = require('../models')
-const emailService = require('./email')
+const emailService = require('../services/email')
 const User = models.User
 const Role = models.Role
 const Organization = models.Organization
@@ -189,7 +189,6 @@ describe('Registration', () => {
         name: chance.name(),
         email: chance.email(),
         organizationName: chance.company(),
-        organizationVat: chance.string({ length: 9, numeric: true }),
         organizationWebsite: chance.url(),
         createdAt: Date.now(),
         get: function () { return this },
@@ -220,7 +219,6 @@ describe('Registration', () => {
         name: chance.name(),
         email: userEmail,
         organizationName: chance.company(),
-        organizationVat: chance.string({ length: 9, numeric: true }),
         organizationWebsite: chance.url(),
         createdAt: Date.now(),
         get: function () { return this },
@@ -271,7 +269,6 @@ describe('Registration', () => {
         name: chance.name(),
         email: chance.email(),
         organizationName: chance.company(),
-        organizationVat: chance.string({ length: 9, numeric: true }),
         organizationWebsite: chance.url(),
         createdAt: Date.now(),
         get: function () { return this },

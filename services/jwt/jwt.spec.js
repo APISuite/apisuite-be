@@ -2,7 +2,7 @@ const sinon = require('sinon')
 const jsonwebtoken = require('jsonwebtoken')
 const { expect } = require('chai')
 const jwt = require('./index')
-const config = require('../config')
+const config = require('../../config')
 
 describe('jwt', () => {
   beforeEach(() => {

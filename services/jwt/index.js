@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken')
 const crypto = require('crypto')
-const config = require('../config')
+const config = require('../../config')
 
 /**
  * Generates a signed access token

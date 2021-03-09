@@ -2,10 +2,13 @@ const HTTPStatus = require('http-status-codes')
 const fetch = require('node-fetch')
 const log = require('../util/logger')
 const IdP = require('./idp')
+const { oidcDiscovery } = require('../util/oidc')
 
 class Keycloak extends IdP {
   async createClient (clientConfig) {
-    const r = await fetch(this.config.configuration.clientRegistrationURL, {
+    const discoveryData = await oidcDiscovery(this.config.configuration.discoveryURL)
+
+    const r = await fetch(discoveryData.registration_endpoint, {
       method: 'POST',
       body: JSON.stringify({
         client_name: clientConfig.clientName,
