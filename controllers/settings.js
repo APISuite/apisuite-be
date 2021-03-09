@@ -6,6 +6,7 @@ const { models, sequelize } = require('../models')
 const msgBroker = require('../services/msg-broker')
 const { settingTypes, idpProviders } = require('../util/enums')
 const Gateway = require('../util/gateway')
+const Idp = require('../idp')
 
 const createDefaultAccountSettings = (txn) => {
   return models.Setting.create({
@@ -42,6 +43,26 @@ const get = async (req, res) => {
 
     if (!settings) {
       settings = await createDefaultAccountSettings()
+    }
+
+    settings = settings.get({ plain: true })
+    settings.values.sso = []
+
+    const idp = await Idp.getIdP()
+    if (idp.getProvider() !== idpProviders.INTERNAL) {
+      const ssoClient = await models.SSOClient.findOne({
+        where: { provider: idp.getProvider() },
+      })
+      if (ssoClient) {
+        settings.values.sso = [ssoClient.provider]
+
+        const idpSettings = await models.Setting.findOne({
+          where: { type: settingTypes.IDP },
+        })
+        if (idpSettings && idpSettings.values.configuration.providerSignupURL) {
+          settings.values.providerSignupURL = idpSettings.values.configuration.providerSignupURL
+        }
+      }
     }
 
     return res.status(HTTPStatus.OK).send(settings.values)
@@ -117,19 +138,25 @@ const getIdp = async (req, res) => {
 }
 
 const updateIdp = async (req, res) => {
+  req.body.provider = req.body.provider.toLowerCase()
   const transaction = await sequelize.transaction()
   try {
-    const settings = await models.Setting.findOne({
+    let ssoEnabled = false
+    let settings = await models.Setting.findOne({
       where: { type: settingTypes.IDP },
       transaction,
     })
 
     if (!settings) {
-      await models.Setting.create({
+      settings = await models.Setting.create({
         type: settingTypes.IDP,
         values: {},
       }, { transaction })
     }
+
+    ssoEnabled = settings.values &&
+      settings.values.configuration &&
+      !!settings.values.configuration.ssoEnabled
 
     if (req.body.provider === idpProviders.INTERNAL) {
       req.body.configuration = {
@@ -137,22 +164,28 @@ const updateIdp = async (req, res) => {
       }
     }
 
-    const [rowsUpdated, [updated]] = await models.Setting.update(
-      { values: req.body },
-      {
-        where: { type: settingTypes.IDP },
-        returning: true,
-        transaction,
-      },
-    )
-
-    if (!rowsUpdated) {
-      return res.status(HTTPStatus.INTERNAL_SERVER_ERROR).send({ errors: ['IdP Settings not found'] })
+    if (!Object.prototype.hasOwnProperty.call(req.body.configuration, 'ssoEnabled')) {
+      req.body.configuration.ssoEnabled = false
     }
+
+    settings.values = req.body
+    await settings.save({ transaction })
 
     await transaction.commit()
 
-    return res.status(HTTPStatus.OK).send(cleanInternalConfig(updated.values))
+    const ssoChanged = ssoEnabled !== req.body.configuration.ssoEnabled
+    if (ssoChanged) {
+      try {
+        await toggleSSO(settings.values.configuration.ssoEnabled)
+      } catch (err) {
+        req.body.configuration.ssoEnabled = ssoEnabled
+        settings.values = req.body
+        await settings.save()
+        return res.sendInternalError('Could not enable/disable SSO')
+      }
+    }
+
+    return res.status(HTTPStatus.OK).send(cleanInternalConfig(settings.values))
   } catch (error) {
     if (transaction) {
       await transaction.rollback()
@@ -225,6 +258,46 @@ const cleanInternalConfig = (settings) => {
     settings.configuration = {}
   }
   return settings
+}
+
+const toggleSSO = async (enable) => {
+  const idp = await Idp.getIdP()
+
+  if (idp.getProvider() === idpProviders.INTERNAL) {
+    throw new Error('Internal IDP does not support SSO')
+  }
+
+  const ssoClient = await models.SSOClient.findOne({
+    where: { provider: idp.getProvider() },
+  })
+
+  if (enable) {
+    return enableSSO(idp, ssoClient)
+  }
+  return disableSSO(idp, ssoClient)
+}
+
+const enableSSO = async (idp, ssoClient) => {
+  if (ssoClient) return
+
+  const client = await idp.createClient({
+    clientName: 'APISuite SSO Client',
+    redirectURIs: [`${config.get('appURL')}/sso/auth`],
+  })
+
+  await models.SSOClient.create({
+    provider: idp.getProvider(),
+    clientId: client.clientId.startsWith('_') ? client.clientId.substring(1) : client.clientId,
+    clientSecret: client.clientSecret,
+    clientData: client.extra,
+  })
+}
+
+const disableSSO = async (idp, ssoClient) => {
+  if (!ssoClient) return
+
+  await idp.deleteClient(ssoClient.clientId, ssoClient.clientData)
+  await ssoClient.destroy()
 }
 
 module.exports = {

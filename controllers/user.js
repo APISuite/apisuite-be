@@ -427,7 +427,6 @@ const profile = async (req, res) => {
 }
 
 const setupMainAccount = async (req, res) => {
-  const SETTING_TYPE = 'account'
   const transaction = await sequelize.transaction()
   try {
     const org = await models.Organization.create({
@@ -449,7 +448,7 @@ const setupMainAccount = async (req, res) => {
       }
 
       await models.Setting.create({
-        type: SETTING_TYPE,
+        type: enums.settingTypes.ACCOUNT,
         values: newSettings,
       }, { transaction })
     }

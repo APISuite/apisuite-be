@@ -15,11 +15,13 @@ const getConfig = async () => {
 const getIdP = async () => {
   const config = await getConfig()
 
-  switch (config.provider) {
+  switch (config.provider.toLowerCase()) {
     case idpProviders.INTERNAL: return new Hydra(config)
     case idpProviders.KEYCLOAK: return new Keycloak(config)
     default: throw new Error('IdP Provider not implemented')
   }
 }
 
-module.exports = getIdP
+module.exports = {
+  getIdP,
+}

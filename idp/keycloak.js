@@ -1,7 +1,5 @@
 const HTTPStatus = require('http-status-codes')
 const fetch = require('node-fetch')
-const { models } = require('../models')
-const { idpProviders } = require('../util/enums')
 const log = require('../util/logger')
 const IdP = require('./idp')
 
@@ -39,20 +37,13 @@ class Keycloak extends IdP {
     return res
   }
 
-  async deleteClient (clientID) {
+  async deleteClient (clientID, clientData) {
     if (!clientID) return
 
-    const app = await models.App.findByClientID(clientID)
-
-    if (!app || app.idpProvider !== idpProviders.KEYCLOAK) {
-      log.error(`[DELETE KEYCLOAK CLIENT] could not find app with clientID ${clientID}`)
-      return
-    }
-
-    const r = await fetch(app.client_data.registration_client_uri, {
+    const r = await fetch(clientData.registration_client_uri, {
       method: 'DELETE',
       headers: {
-        Authorization: `Bearer ${app.client_data.registration_access_token}`,
+        Authorization: `Bearer ${clientData.registration_access_token}`,
       },
     })
 

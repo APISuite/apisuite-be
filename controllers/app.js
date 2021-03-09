@@ -5,11 +5,17 @@ const { models, sequelize } = require('../models')
 const Gateway = require('../util/gateway')
 const { publishEvent, routingKeys } = require('../services/msg-broker')
 const { settingTypes, subscriptionModels, appStates } = require('../util/enums')
-
 const Idp = require('../idp')
 
 const appAttributes = {
-  exclude: ['client_data'],
+  include: [
+    ['redirect_url', 'redirectUrl'],
+    ['org_id', 'orgId'],
+  ],
+  exclude: [
+    'client_data',
+    'enable',
+  ],
 }
 
 const includes = () => [
@@ -154,15 +160,17 @@ const deleteApp = async (req, res) => {
       return res.status(HTTPStatus.NOT_FOUND).send({ errors: 'App not found' })
     }
 
-    const idp = await Idp()
-    await idp.deleteClient(updated.clientId)
+    if (updated.clientId) {
+      const idp = await Idp.getIdP()
+      await idp.deleteClient(updated.clientId, updated.client_data)
 
-    try {
-      const gateway = await Gateway()
-      await gateway.removeApp(updated.id)
-    } catch (error) {
-      if (transaction) await transaction.rollback()
-      log.error('[deleteApp] => removeApp', error)
+      try {
+        const gateway = await Gateway()
+        await gateway.removeApp(updated.id)
+      } catch (error) {
+        if (transaction) await transaction.rollback()
+        log.error('[deleteApp] => removeApp', error)
+      }
     }
 
     await transaction.commit()
@@ -188,8 +196,14 @@ const updateApp = async (req, res) => {
       {
         name: req.body.name,
         description: req.body.description,
-        redirect_url: req.body.redirect_url,
+        shortDescription: req.body.shortDescription,
+        redirect_url: req.body.redirectUrl || req.body.redirect_url,
         logo: req.body.logo,
+        tosUrl: req.body.tosUrl,
+        privacyUrl: req.body.privacyUrl,
+        youtubeUrl: req.body.youtubeUrl,
+        websiteUrl: req.body.websiteUrl,
+        supportUrl: req.body.supportUrl,
       },
       {
         transaction,
@@ -289,32 +303,24 @@ const updateApp = async (req, res) => {
 const createDraftApp = async (req, res) => {
   const transaction = await sequelize.transaction()
   try {
-    const idp = await Idp()
+    const idp = await Idp.getIdP()
 
-    const app = await models.App.create(
-      {
-        name: req.body.name,
-        description: req.body.description,
-        redirect_url: req.body.redirect_url,
-        logo: req.body.logo,
-        enable: true,
-        org_id: req.user.org.id,
-        idpProvider: idp.getProvider(),
-        state: appStates.DRAFT,
-        tosUrl: req.body.tosUrl,
-        privacyUrl: req.body.privacyUrl,
-        youtubeUrl: req.body.youtubeUrl,
-        websiteUrl: req.body.websiteUrl,
-        supportUrl: req.body.supportUrl,
-      },
-      {
-        transaction,
-        include: [
-          ...includes(),
-        ],
-        attributes: appAttributes,
-      },
-    )
+    let app = await models.App.create({
+      name: req.body.name,
+      description: req.body.description,
+      shortDescription: req.body.shortDescription,
+      redirect_url: req.body.redirectUrl || req.body.redirect_url,
+      logo: req.body.logo,
+      enable: true,
+      org_id: req.user.org.id,
+      idpProvider: idp.getProvider(),
+      state: appStates.DRAFT,
+      tosUrl: req.body.tosUrl,
+      privacyUrl: req.body.privacyUrl,
+      youtubeUrl: req.body.youtubeUrl,
+      websiteUrl: req.body.websiteUrl,
+      supportUrl: req.body.supportUrl,
+    }, { transaction })
 
     if (typeof req.body.pub_urls !== 'undefined') {
       const data = []
@@ -332,6 +338,11 @@ const createDraftApp = async (req, res) => {
       }
     }
     await transaction.commit()
+
+    app = await models.App.findByPk(app.id, {
+      attributes: appAttributes,
+      include: includes(),
+    })
 
     publishEvent(routingKeys.APP_CREATED, {
       user_id: req.user.id,
@@ -364,7 +375,7 @@ const requestAccess = async (req, res) => {
   const subscriptionModel = await getSubscriptionModel()
   switch (subscriptionModel) {
     case subscriptionModels.SIMPLIFIED: {
-      const idp = await Idp()
+      const idp = await Idp.getIdP()
       const client = await idp.createClient({
         clientName: app.name,
         redirectURIs: [app.redirect_url],
@@ -375,6 +386,10 @@ const requestAccess = async (req, res) => {
       app.clientSecret = client.clientSecret
       app.client_data = client.extra
       app.idpProvider = idp.getProvider()
+
+      const gateway = await Gateway()
+      await gateway.subscribeAll(app.id, app.clientId)
+
       await app.save()
       break
     }
@@ -398,7 +413,7 @@ const requestAccess = async (req, res) => {
 const createApp = async (req, res) => {
   const transaction = await sequelize.transaction()
   try {
-    const idp = await Idp()
+    const idp = await Idp.getIdP()
     const client = await idp.createClient({
       clientName: req.body.name,
       redirectURIs: [req.body.redirect_url],

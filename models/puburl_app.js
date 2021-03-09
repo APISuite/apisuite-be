@@ -16,7 +16,7 @@ const puburlApp = (sequelize, DataTypes) => {
       },
     },
   }, {
-    timestamp: true,
+    timestamps: true,
     underscored: true,
   })
 

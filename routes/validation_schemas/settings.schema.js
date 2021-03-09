@@ -38,7 +38,10 @@ const gatewaySettingsSchema = Joi.object({
 const internalIdpConfig = Joi.object({})
 const keycloakIdpConfig = Joi.object({
   clientRegistrationURL: Joi.string().uri({ scheme: ['http', 'https'] }).required(),
+  discoveryURL: Joi.string().uri({ scheme: ['http', 'https'] }).optional(),
   initialAccessToken: Joi.string().required(),
+  ssoEnabled: Joi.boolean().optional(),
+  providerSignupURL: Joi.string().optional().allow(null, ''),
 })
 
 const idpSettingsSchema = Joi.object({

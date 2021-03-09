@@ -96,9 +96,9 @@
  *                 type: string
  *               id:
  *                 type: number
- *           created_at:
+ *           createdAt:
  *             type: string
- *           updated_at:
+ *           updatedAt:
  *             type: string
  */
 
