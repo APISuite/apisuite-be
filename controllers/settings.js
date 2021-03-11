@@ -5,7 +5,7 @@ const config = require('../config')
 const { models, sequelize } = require('../models')
 const msgBroker = require('../services/msg-broker')
 const { settingTypes, idpProviders } = require('../util/enums')
-const Gateway = require('../util/gateway')
+const Gateway = require('../services/gateway')
 const Idp = require('../services/idp')
 
 const createDefaultAccountSettings = (txn) => {

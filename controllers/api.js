@@ -3,7 +3,7 @@ const { Op } = require('sequelize')
 const log = require('../util/logger')
 const { models, sequelize } = require('../models')
 const swaggerUtil = require('../util/swagger_util')
-const Gateway = require('../util/gateway')
+const Gateway = require('../services/gateway')
 const { apiTypes } = require('../util/enums')
 const { createAPIHandler } = require('./api-helper')
 
