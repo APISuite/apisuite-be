@@ -91,6 +91,13 @@ router.postAsync('/refresh',
  *           type: string
  *           minLength: 10
  *           maxLength: 15
+ *       - name: invite
+ *         description: Flags invite sign in flow
+ *         in: query
+ *         required: false
+ *         schema:
+ *           type: string
+ *           enum: [true]
  *     responses:
  *       302:
  *         description: OIDC provider login page redirect
@@ -100,6 +107,7 @@ router.postAsync('/refresh',
 router.getAsync('/oidc/:provider',
   validations.validateProvider,
   validations.validateState,
+  validations.validateAuthFlags,
   controllers.auth.oidcAuth)
 
 /**
@@ -116,6 +124,13 @@ router.getAsync('/oidc/:provider',
  *         schema:
  *           type: string
  *           enum: [keycloak]
+ *       - name: invite
+ *         description: Flags invite sign in flow
+ *         in: query
+ *         required: false
+ *         schema:
+ *           type: string
+ *           enum: [true]
  *     requestBody:
  *       description: Auth code
  *       required: true
@@ -134,6 +149,7 @@ router.getAsync('/oidc/:provider',
  */
 router.postAsync('/oidc/:provider/token',
   validations.validateCode,
+  validations.validateAuthFlags,
   controllers.auth.oidcToken)
 
 /**

@@ -35,6 +35,10 @@ const codeSchema = Joi.object({
   code: Joi.string().required(),
 })
 
+const flagsSchema = Joi.object({
+  invite: Joi.string().valid('true').optional(),
+})
+
 module.exports = {
   validateForgotPasswordBody: validator(forgotPasswordSchema),
   validateRecoverPasswordBody: validator(recoverPasswordSchema, 'body', recoverPasswordExtraValidator),
@@ -42,4 +46,5 @@ module.exports = {
   validateProvider: validator(providerSchema, 'params'),
   validateState: validator(stateSchema, 'query'),
   validateCode: validator(codeSchema),
+  validateAuthFlags: validator(flagsSchema, 'query'),
 }
