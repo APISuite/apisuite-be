@@ -11,7 +11,7 @@ const options = {
       <br>It is the API that the API Suite Portal uses to communicate and interact with it's datastore.
       <br>So everything done in the API Suite Portal can be achieved via this API.`,
       'x-logo': {
-        url: '/assets/images/apisuite_logo.svg',
+        url: 'https://cloudcdn.apisuite.io/apisuite_logo.svg',
         backgroundColor: 'rgb(250, 250, 250)',
         altText: 'API Suite logo',
       },

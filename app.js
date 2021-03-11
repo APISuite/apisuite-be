@@ -46,13 +46,6 @@ app.use('/users', routes.user)
 
 app.use(middleware.error)
 
-// serve images for documentation
-app.use('/assets/images/apisuite_logo.svg', (req, res) => {
-  res.status(HTTPStatus.OK).sendFile('./util/assets/apisuite_logo.svg', { root: '.' })
-})
-app.use('/assets/images/favicon.ico', (req, res) => {
-  res.status(HTTPStatus.OK).sendFile('./util/assets/favicon.ico', { root: '.' })
-})
 // serve api documentation
 app.use('/docs/spec.json', (req, res) => {
   res.status(HTTPStatus.OK).json(specs)
@@ -61,7 +54,7 @@ app.use('/docs/spec.json', (req, res) => {
 app.use('/api-docs', redoc({
   title: 'API Suite API Documentation',
   specUrl: '/docs/spec.json',
-  favicon: '/assets/images/favicon.ico',
+  favicon: 'https://cloudcdn.apisuite.io/favicon.ico',
 }))
 
 const bootstrapIdPSettings = async () => {
