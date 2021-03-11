@@ -282,7 +282,7 @@ const enableSSO = async (idp, ssoClient) => {
 
   const client = await idp.createClient({
     clientName: 'APISuite SSO Client',
-    redirectURIs: [`${config.get('appURL')}/sso/auth`],
+    redirectURIs: [config.get('sso.signInRedirectURL')],
   })
 
   await models.SSOClient.create({

@@ -211,7 +211,7 @@ const oidcAuth = async (req, res) => {
   authURL.searchParams.append('scope', 'openid email')
   authURL.searchParams.append('state', req.query.state)
   authURL.searchParams.append('response_type', 'code')
-  authURL.searchParams.append('redirect_uri', `${config.get('appURL')}/sso/auth`)
+  authURL.searchParams.append('redirect_uri', config.get('sso.signInRedirectURL'))
 
   res.redirect(authURL.toString())
 }
@@ -300,7 +300,7 @@ const exchangeCode = async (code, ssoClient, discoveryData) => {
   const params = new URLSearchParams()
   params.append('grant_type', 'authorization_code')
   params.append('code', code)
-  params.append('redirect_uri', `${config.get('appURL')}/sso/auth`)
+  params.append('redirect_uri', config.get('sso.signInRedirectURL'))
   params.append('client_id', ssoClient.clientId)
   params.append('client_secret', ssoClient.clientSecret)
 

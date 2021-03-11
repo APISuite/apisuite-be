@@ -177,6 +177,14 @@ const schema = {
     default: '',
     env: 'APISUITE_SETUP_TOKEN',
   },
+  sso: {
+    signInRedirectURL: {
+      doc: 'Redirect URL for regular sign in flow',
+      format: String,
+      default: 'http://localhost:3001/sso/auth',
+      env: 'APISUITE_SSO_SIGNIN_REDIRECT_URL',
+    },
+  },
 }
 
 module.exports = schema
