@@ -6,7 +6,7 @@ const { models, sequelize } = require('../models')
 const msgBroker = require('../services/msg-broker')
 const { settingTypes, idpProviders } = require('../util/enums')
 const Gateway = require('../util/gateway')
-const Idp = require('../idp')
+const Idp = require('../services/idp')
 
 const createDefaultAccountSettings = (txn) => {
   return models.Setting.create({

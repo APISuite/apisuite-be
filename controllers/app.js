@@ -5,7 +5,7 @@ const { models, sequelize } = require('../models')
 const Gateway = require('../util/gateway')
 const { publishEvent, routingKeys } = require('../services/msg-broker')
 const { settingTypes, subscriptionModels, appStates } = require('../util/enums')
-const Idp = require('../idp')
+const Idp = require('../services/idp')
 
 const appAttributes = {
   include: [
