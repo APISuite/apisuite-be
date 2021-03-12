@@ -191,6 +191,36 @@ const schema = {
       env: 'APISUITE_SSO_INVITE_REDIRECT_URL',
     },
   },
+  storage: {
+    provider: {
+      doc: 'Cloud storage provider',
+      format: ['s3'],
+      default: '',
+      env: 'APISUITE_STORAGE_PROVIDER',
+    },
+    s3: {
+      region: {
+        doc: 'AWS S3 region',
+        format: String,
+        default: '',
+        env: 'APISUITE_STORAGE_S3_REGION',
+      },
+      credentials: {
+        accessKeyId: {
+          doc: 'AWS access key ID',
+          format: String,
+          default: '',
+          env: 'APISUITE_STORAGE_S3_ACCESS_KEY_ID',
+        },
+        secretAccessKey: {
+          doc: 'AWS secret access key',
+          format: String,
+          default: '',
+          env: 'APISUITE_STORAGE_S3_SECRET_ACCESS_KEY',
+        },
+      },
+    },
+  },
 }
 
 module.exports = schema
