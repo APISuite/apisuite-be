@@ -1,6 +1,6 @@
 const config = require('../../config')
 const { storageProviders } = require('../../util/enums')
-const Storage = require('./storage')
+const S3 = require('./s3')
 
 const getStorageClient = () => {
   const storageConfig = config.get('storage')

@@ -205,6 +205,12 @@ const schema = {
         default: '',
         env: 'APISUITE_STORAGE_S3_REGION',
       },
+      bucket: {
+        doc: 'AWS S3 bucket to be used for media storage',
+        format: String,
+        default: '',
+        env: 'APISUITE_STORAGE_S3_BUCKET',
+      },
       credentials: {
         accessKeyId: {
           doc: 'AWS access key ID',
