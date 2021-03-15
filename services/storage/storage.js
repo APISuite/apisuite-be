@@ -11,11 +11,17 @@ class Storage {
   }
 
   /**
+   * Storage client file upload result.
+   * @typedef {Object} SaveFileResult
+   * @property {String} objectURL
+   * @property {Error} error
+   */
+
+  /**
    * @abstract
    * @param {String} filePath - file to save on the cloud
    * @param {String} name - name for the file on the cloud
-   * @returns {Promise<string>} Cloud storage file URL
-   * @throws will throw an error if upload fails
+   * @returns {Promise<SaveFileResult>}
    * */
   async saveFile (filePath, name) {
     throw new Error('Storage.saveFile should not be called directly')

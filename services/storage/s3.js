@@ -17,10 +17,17 @@ class S3 extends Storage {
 
     try {
       await client.send(cmd)
-      return `s3://${this.config.bucket}/${name}`
     } catch (error) {
       log.error('[S3 PUT OBJECT] ', error)
-      throw new Error('failed to upload file to storage')
+      return {
+        objectURL: null,
+        error: new Error('failed to upload file to storage'),
+      }
+    }
+
+    return {
+      objectURL: `s3://${this.config.bucket}/${name}`,
+      error: null,
     }
   }
 }
