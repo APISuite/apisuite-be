@@ -10,6 +10,8 @@ const { models, sequelize } = require('../models')
 const { Op } = require('sequelize')
 const { publishEvent, routingKeys } = require('../services/msg-broker')
 const { getRevokedCookieConfig } = require('../util/cookies')
+const Storage = require('../services/storage')
+const fs = require('fs').promises
 
 const getAll = async (req, res) => {
   try {
@@ -582,6 +584,55 @@ const updateUserProfile = async (req, res) => {
   }
 }
 
+const updateAvatar = async (req, res) => {
+  if (req.user.id !== parseInt(req.params.id)) {
+    return res.status(HTTPStatus.FORBIDDEN).send({ errors: ['Invalid user id'] })
+  }
+
+  if (!req.formdata || !req.formdata.files || !req.formdata.files.mediaFile) {
+    return res.status(HTTPStatus.BAD_REQUEST).send({ errors: ['File was not uploaded.'] })
+  }
+
+  const file = req.formdata.files.mediaFile
+  if (file.type.split('/')[0] !== 'image') {
+    return res.status(HTTPStatus.BAD_REQUEST).send({
+      error: ['invalid image type'],
+    })
+  }
+
+  const extension = file.name.split('.').pop()
+  const storageClient = Storage.getStorageClient()
+  const uploaded = await storageClient.saveFile(file.path, `users-avatars-${req.user.id}.${extension}`)
+  if (uploaded.error) {
+    return res.sendInternalError()
+  }
+
+  await fs.unlink(file.path)
+
+  const transaction = await sequelize.transaction()
+  try {
+    const [rowsUpdated] = await models.User.update(
+      { avatar: uploaded.objectURL },
+      { where: { id: req.user.id } },
+    )
+
+    if (!rowsUpdated) {
+      await transaction.rollback()
+      return res.sendInternalError('Failed to update profile data')
+    }
+
+    await transaction.commit()
+  } catch (error) {
+    if (transaction) await transaction.rollback()
+    log.error(error, '[UPDATE USER AVATAR]')
+    return res.sendInternalError()
+  }
+
+  return res.status(HTTPStatus.OK).send({
+    avatar: uploaded.objectURL,
+  })
+}
+
 module.exports = {
   getAll,
   getById,
@@ -596,4 +647,5 @@ module.exports = {
   setupMainAccount,
   setActiveOrganization,
   updateUserProfile,
+  updateAvatar,
 }

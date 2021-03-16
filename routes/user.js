@@ -1,7 +1,7 @@
 const { decorateRouter } = require('@awaitjs/express')
 const router = decorateRouter(require('express').Router())
 const controllers = require('../controllers')
-const { accessControl, loggedIn, setup } = require('../middleware')
+const { accessControl, loggedIn, setup, uploader } = require('../middleware')
 const { actions, possessions, resources } = require('../access-control')
 const { validateForgotPasswordBody, validateRecoverPasswordBody } = require('./validation_schemas/auth.schema')
 const { validateInviteBody } = require('./validation_schemas/invite_organization.schema')
@@ -11,6 +11,7 @@ const {
   validateChangePasswordBody,
   validateSetupBody,
 } = require('./validation_schemas/user.schema')
+const { fileParser } = require('../util/file-parser')
 
 /**
  * @openapi
@@ -545,5 +546,49 @@ router.putAsync('/:id',
   loggedIn,
   validateProfileUpdateBody,
   controllers.user.updateUserProfile)
+
+/**
+ * @openapi
+ * /users/{id}/avatar:
+ *   post:
+ *     description: Avatar picture upload
+ *     tags: [Users]
+ *     security:
+ *       - cookieAuth: []
+ *     requestBody:
+ *       description: Data form
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               mediaFile:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: Avatar image URL
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 avatar:
+ *                   type: string
+ *                   format: url
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ *       500:
+ *         $ref: '#/components/responses/Internal'
+ */
+router.postAsync('/:id/avatar',
+  loggedIn,
+  fileParser,
+  controllers.user.updateAvatar)
 
 module.exports = router
