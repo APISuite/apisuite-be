@@ -9,7 +9,6 @@ const api = require('./api')
 const settings = require('./settings')
 const invites = require('./invites')
 const owner = require('./owner')
-const media = require('./media')
 
 module.exports = {
   api,
@@ -17,7 +16,6 @@ module.exports = {
   auth,
   functions,
   invites,
-  media,
   organization,
   owner,
   role,
