@@ -26,6 +26,15 @@ class Storage {
   async saveFile (filePath, name) {
     throw new Error('Storage.saveFile should not be called directly')
   }
+
+  /**
+   * @abstract
+   * @param {String} objectURL
+   * @returns {Promise<Error>}
+   * */
+  async deleteFile (objectURL) {
+    throw new Error('Storage.deleteFile should not be called directly')
+  }
 }
 
 module.exports = Storage

@@ -4,6 +4,7 @@ const log = require('../../util/logger')
 const {
   S3Client,
   PutObjectCommand,
+  DeleteObjectCommand,
 } = require('@aws-sdk/client-s3')
 
 class S3 extends Storage {
@@ -37,6 +38,24 @@ class S3 extends Storage {
       objectURL: `https://${this.config.bucket}.s3-${this.config.region}.amazonaws.com/${name}`,
       error: null,
     }
+  }
+
+  async deleteFile (objectURL) {
+    const client = new S3Client(this.config)
+
+    const cmd = new DeleteObjectCommand({
+      Bucket: this.config.bucket,
+      Key: objectURL.split('/').pop(),
+    })
+
+    try {
+      await client.send(cmd)
+    } catch (error) {
+      log.error(error, '[S3 DELETE OBJECT]')
+      return new Error('failed to delete media object')
+    }
+
+    return null
   }
 }
 
