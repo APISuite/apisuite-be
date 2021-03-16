@@ -633,6 +633,44 @@ const updateAvatar = async (req, res) => {
   })
 }
 
+const deleteAvatar = async (req, res) => {
+  const transaction = await sequelize.transaction()
+  try {
+    const user = await models.User.findByPk(req.user.id, { transaction })
+    if (!user) {
+      return res.status(HTTPStatus.NOT_FOUND).send({ errors: ['User does not exist.'] })
+    }
+
+    const storageClient = Storage.getStorageClient()
+    const err = await storageClient.deleteFile(user.avatar)
+    if (err) {
+      await transaction.rollback()
+      return res.sendInternalError()
+    }
+
+    const [rowsUpdated] = await models.User.update(
+      { avatar: null },
+      {
+        where: { id: req.user.id },
+        transaction,
+      },
+    )
+
+    if (!rowsUpdated) {
+      await transaction.rollback()
+      return res.sendInternalError('Failed to update profile data')
+    }
+
+    await transaction.commit()
+  } catch (error) {
+    if (transaction) await transaction.rollback()
+    log.error(error, '[DELETE USER AVATAR]')
+    return res.sendInternalError()
+  }
+
+  return res.sendStatus(HTTPStatus.NO_CONTENT)
+}
+
 module.exports = {
   getAll,
   getById,
@@ -648,4 +686,5 @@ module.exports = {
   setActiveOrganization,
   updateUserProfile,
   updateAvatar,
+  deleteAvatar,
 }

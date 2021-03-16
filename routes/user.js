@@ -552,7 +552,7 @@ router.putAsync('/:id',
  * /users/{id}/avatar:
  *   post:
  *     description: Avatar picture upload
- *     tags: [Users]
+ *     tags: [User]
  *     security:
  *       - cookieAuth: []
  *     requestBody:
@@ -590,5 +590,29 @@ router.postAsync('/:id/avatar',
   loggedIn,
   fileParser,
   controllers.user.updateAvatar)
+
+/**
+ * @openapi
+ * /users/{id}/avatar:
+ *   delete:
+ *     description: Removes user avatar
+ *     tags: [User]
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       204:
+ *         description: No Content
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ *       500:
+ *         $ref: '#/components/responses/Internal'
+ */
+router.deleteAsync('/:id/avatar',
+  loggedIn,
+  controllers.user.deleteAvatar)
 
 module.exports = router
