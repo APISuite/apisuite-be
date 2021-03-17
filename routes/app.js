@@ -10,30 +10,17 @@ const { validateAppBody, validateSubscriptionBody } = require('./validation_sche
  * /apps:
  *   get:
  *     summary: Get list of apps
- *     description: >
- *        Returns list of apps in the context of the user's current organization (when logged in).
- *        The query param 'public' will make this endpoint return a list of public apps.
- *        This param is valid for both authenticated and anonymous users.
+ *     description: Returns list of apps in the context of the user's current organization.
  *     tags: [App (v2)]
  *     security:
  *       - cookieAuth: []
- *     parameters:
- *       - name: public
- *         description: Show public app listing
- *         in: query
- *         required: false
- *         schema:
- *           type: string
- *           enum: [true]
  *     responses:
  *       200:
  *         description: Simplified app list
  *         content:
  *           application/json:
  *             schema:
- *               oneOf:
- *                 - $ref: '#/components/schemas/AppList'
- *                 - $ref: '#/components/schemas/PublicAppList'
+ *               $ref: '#/components/schemas/AppList'
  *       400:
  *         $ref: '#/components/responses/BadRequest'
  *       401:
@@ -42,10 +29,37 @@ const { validateAppBody, validateSubscriptionBody } = require('./validation_sche
  *         $ref: '#/components/responses/NotFound'
  */
 router.getAsync('/',
-  controllers.app.listPublicApps,
   loggedIn,
   accessControl(actions.READ, possessions.OWN, resources.APP),
   controllers.app.listApps)
+
+/**
+ * @openapi
+ * /apps/public:
+ *   get:
+ *     summary: Get list of public apps
+ *     description: >
+ *        The query param 'public' will make this endpoint return a list of public apps.
+ *        This param is valid for both authenticated and anonymous users.
+ *     tags: [App (v2)]
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: Public app list
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/PublicAppList'
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ */
+router.getAsync('/',
+  controllers.app.listPublicApps)
 
 /**
  * @openapi

@@ -624,10 +624,6 @@ const isSubscribedTo = async (req, res) => {
 }
 
 const listPublicApps = async (req, res, next) => {
-  if (!req.query.public || req.query.public !== 'true') {
-    return next()
-  }
-
   const apps = await models.App.findAll({
     where: {
       visibility: 'public',
