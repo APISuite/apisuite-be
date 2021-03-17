@@ -42,8 +42,6 @@ router.getAsync('/',
  *        The query param 'public' will make this endpoint return a list of public apps.
  *        This param is valid for both authenticated and anonymous users.
  *     tags: [App (v2)]
- *     security:
- *       - cookieAuth: []
  *     responses:
  *       200:
  *         description: Public app list
