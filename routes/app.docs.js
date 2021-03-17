@@ -4,6 +4,69 @@
  * @openapi
  * components:
  *   schemas:
+ *     AppList:
+ *       type: array
+ *       items:
+ *         $ref: '#/components/schemas/AppV2'
+ *
+ *     PublicAppList:
+ *       type: array
+ *       items:
+ *         $ref: '#/components/schemas/PublicApp'
+ *
+ *     PublicApp:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: number
+ *         orgId:
+ *           type: number
+ *         name:
+ *           type: string
+ *         shortDescription:
+ *           type: string
+ *         description:
+ *           type: string
+ *         logo:
+ *           type: string
+ *           format: uri
+ *         tosUrl:
+ *           type: string
+ *           format: uri
+ *         privacyUrl:
+ *           type: string
+ *           format: uri
+ *         youtubeUrl:
+ *           type: string
+ *           format: uri
+ *         websiteUrl:
+ *           type: string
+ *           format: uri
+ *         supportUrl:
+ *           type: string
+ *           format: uri
+ *         createdAt:
+ *           type: string
+ *         updatedAt:
+ *           type: string
+ *         organization:
+ *           type: object
+ *           properties:
+ *             id:
+ *               type: string
+ *             name:
+ *               type: string
+ *             tosUrl:
+ *               type: string
+ *               format: uri
+ *             privacyUrl:
+ *               type: string
+ *               format: uri
+ *             supportUrl:
+ *               type: string
+ *               format: uri
+ *
+ *
  *     AppV2:
  *       type: object
  *       properties:
