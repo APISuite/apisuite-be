@@ -54,7 +54,7 @@ router.getAsync('/',
  *       404:
  *         $ref: '#/components/responses/NotFound'
  */
-router.getAsync('/',
+router.getAsync('/public',
   controllers.app.listPublicApps)
 
 /**
