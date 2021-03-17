@@ -11,7 +11,7 @@ const { validateAppBody, validateSubscriptionBody } = require('./validation_sche
  *   get:
  *     summary: Get list of apps
  *     description: Returns list of apps in the context of the user's current organization.
- *     tags: [App (v2)]
+ *     tags: [App]
  *     security:
  *       - cookieAuth: []
  *     responses:
@@ -38,10 +38,8 @@ router.getAsync('/',
  * /apps/public:
  *   get:
  *     summary: Get list of public apps
- *     description: >
- *        The query param 'public' will make this endpoint return a list of public apps.
- *        This param is valid for both authenticated and anonymous users.
- *     tags: [App (v2)]
+ *     description: Returns a list of publicly accessible apps
+ *     tags: [App]
  *     responses:
  *       200:
  *         description: Public app list
@@ -64,7 +62,7 @@ router.getAsync('/',
  * /apps/:id:
  *   get:
  *     description: Get details of an application
- *     tags: [App (v2)]
+ *     tags: [App]
  *     security:
  *       - cookieAuth: []
  *     responses:
@@ -93,7 +91,7 @@ router.getAsync('/:id',
  * /apps:
  *   post:
  *     description: Create new draft app
- *     tags: [App (v2)]
+ *     tags: [App]
  *     security:
  *       - cookieAuth: []
  *     requestBody:
@@ -128,7 +126,7 @@ router.postAsync('/',
  * /apps/{id}:
  *   put:
  *     description: Update app
- *     tags: [App (v2)]
+ *     tags: [App]
  *     parameters:
  *       - name: id
  *         description: The app id.
@@ -175,7 +173,7 @@ router.putAsync('/update/:id',
  *   post:
  *     summary: Access request
  *     description: Submits an access request for an application
- *     tags: [App (v2)]
+ *     tags: [App]
  *     security:
  *       - cookieAuth: []
  *     responses:
@@ -198,7 +196,7 @@ router.postAsync('/:id/request',
  * /apps/{id}:
  *   delete:
  *     description: Delete app
- *     tags: [App (v2)]
+ *     tags: [App]
  *     parameters:
  *       - name: id
  *         description: The app id.
@@ -221,157 +219,6 @@ router.postAsync('/:id/request',
  *         $ref: '#/components/responses/Internal'
  */
 router.deleteAsync('/:id',
-  loggedIn,
-  accessControl(actions.DELETE, possessions.OWN, resources.APP),
-  controllers.app.deleteApp)
-
-/**
- * @openapi
- * /app/list/{userId}:
- *   get:
- *     deprecated: true
- *     description: Get list of user apps
- *     tags: [App]
- *     parameters:
- *       - name: userId
- *         required: true
- *         description: The user id.
- *         in: path
- *         schema:
- *           type: number
- *     security:
- *       - cookieAuth: []
- *     responses:
- *       200:
- *         description: List of user Apps
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/App'
- *       400:
- *         $ref: '#/components/responses/BadRequest'
- *       401:
- *         $ref: '#/components/responses/Unauthorized'
- *       404:
- *         $ref: '#/components/responses/NotFound'
- */
-router.getAsync('/list/:userId',
-  loggedIn,
-  accessControl(actions.READ, possessions.OWN, resources.APP),
-  controllers.app.listApps)
-
-/**
- * @openapi
- * /app/create:
- *   post:
- *     deprecated: true
- *     description: Create new app
- *     tags: [App]
- *     security:
- *       - cookieAuth: []
- *     requestBody:
- *       description: App object that need to be created
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: "#/components/schemas/App"
- *     responses:
- *       201:
- *         description: The created App
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/App'
- *       400:
- *         $ref: '#/components/responses/BadRequest'
- *       401:
- *         $ref: '#/components/responses/Unauthorized'
- *       500:
- *         $ref: '#/components/responses/Internal'
- */
-router.postAsync('/create',
-  loggedIn,
-  validateAppBody,
-  accessControl(actions.CREATE, possessions.OWN, resources.APP),
-  controllers.app.createApp)
-
-/**
- * @openapi
- * /app/update/{id}:
- *   put:
- *     deprecated: true
- *     description: Update app
- *     tags: [App]
- *     parameters:
- *       - name: id
- *         description: The app id.
- *         in: path
- *         required: true
- *         schema:
- *           type: number
- *     requestBody:
- *       description: App object to update
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: "#/components/schemas/App"
- *     security:
- *       - cookieAuth: []
- *     responses:
- *       200:
- *         description: The updated App
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/App'
- *       400:
- *         $ref: '#/components/responses/BadRequest'
- *       401:
- *         $ref: '#/components/responses/Unauthorized'
- *       404:
- *         $ref: '#/components/responses/NotFound'
- *       500:
- *         $ref: '#/components/responses/Internal'
- */
-router.putAsync('/:id',
-  loggedIn,
-  validateAppBody,
-  accessControl(actions.UPDATE, possessions.OWN, resources.APP),
-  controllers.app.updateApp)
-
-/**
- * @openapi
- * /app/delete/{id}:
- *   delete:
- *     deprecated: true
- *     description: Delete app
- *     tags: [App]
- *     parameters:
- *       - name: id
- *         description: The app id.
- *         in: path
- *         required: true
- *         schema:
- *           type: number
- *     security:
- *       - cookieAuth: []
- *     responses:
- *       204:
- *         description: No Content
- *       400:
- *         $ref: '#/components/responses/BadRequest'
- *       401:
- *         $ref: '#/components/responses/Unauthorized'
- *       404:
- *         $ref: '#/components/responses/NotFound'
- *       500:
- *         $ref: '#/components/responses/Internal'
- */
-router.deleteAsync('/delete/:id',
   loggedIn,
   accessControl(actions.DELETE, possessions.OWN, resources.APP),
   controllers.app.deleteApp)
