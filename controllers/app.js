@@ -623,6 +623,47 @@ const isSubscribedTo = async (req, res) => {
   }
 }
 
+const listPublicApps = async (req, res, next) => {
+  if (!req.query.public || req.query.public !== 'true') {
+    return next()
+  }
+
+  const apps = await models.App.findAll({
+    where: {
+      visibility: 'public',
+      enable: true,
+      state: appStates.APPROVED,
+    },
+    include: [{
+      model: models.Organization,
+      attributes: [
+        'id',
+        'name',
+        'tosUrl',
+        'privacyUrl',
+        'supportUrl',
+      ],
+    }],
+    attributes: [
+      'id',
+      'name',
+      'description',
+      'shortDescription',
+      'logo',
+      'tosUrl',
+      'privacyUrl',
+      'youtubeUrl',
+      'websiteUrl',
+      'supportUrl',
+      'createdAt',
+      'updatedAt',
+      ['org_id', 'orgId'],
+    ],
+  })
+
+  return res.status(HTTPStatus.OK).json(apps)
+}
+
 module.exports = {
   getApp,
   createDraftApp,
@@ -633,4 +674,5 @@ module.exports = {
   subscribeToAPI,
   listApps,
   isSubscribedTo,
+  listPublicApps,
 }

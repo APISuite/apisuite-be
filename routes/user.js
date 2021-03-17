@@ -518,6 +518,13 @@ router.postAsync('/:id/organizations/:orgId',
  *     summary: Update user profile
  *     description: Update (own) user profile
  *     tags: [User]
+ *     parameters:
+ *       - name: id
+ *         required: true
+ *         description: The user id.
+ *         in: path
+ *         schema:
+ *           type: number
  *     requestBody:
  *       description: User profile details.
  *       required: true
