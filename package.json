@@ -20,6 +20,7 @@
   "dependencies": {
     "@apidevtools/swagger-parser": "9.0.1",
     "@awaitjs/express": "0.6.1",
+    "@aws-sdk/client-s3": "3.8.1",
     "@sendgrid/mail": "7.2.6",
     "accesscontrol": "2.2.1",
     "amqp-connection-manager": "3.2.1",

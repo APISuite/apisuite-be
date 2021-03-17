@@ -1,6 +1,6 @@
 const formidable = require('formidable')
 
-const fileParser = async (req, res, next) => {
+module.exports = async (req, res, next) => {
   // if no files skip
   if (req.header('Content-Type').indexOf('multipart/form-data') === -1) return next()
 
@@ -16,8 +16,4 @@ const fileParser = async (req, res, next) => {
     })
   })
   await next()
-}
-
-module.exports = {
-  fileParser,
 }

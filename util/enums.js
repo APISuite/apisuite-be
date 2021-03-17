@@ -14,6 +14,10 @@ const gatewayProviders = {
   KONG: 'kong',
 }
 
+const storageProviders = {
+  S3: 's3',
+}
+
 const roles = {
   ADMIN: 'admin',
   ORGANIZATION_OWNER: 'organizationOwner',
@@ -51,5 +55,6 @@ module.exports = {
   gatewayProviders,
   roles,
   settingTypes,
+  storageProviders,
   subscriptionModels,
 }
