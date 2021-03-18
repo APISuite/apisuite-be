@@ -18,6 +18,7 @@ const appSchema = Joi.object({
       type: Joi.string().valid('client', 'tos', 'policy', 'support', 'support_email').required(),
     }).optional(),
   ).optional().allow(null),
+  labels: Joi.array().items(Joi.string()).optional(),
   subscriptions: Joi.array().items(Joi.number().min(0).optional()).optional().allow(null),
   tosUrl: Joi.string().optional().allow(null, ''),
   privacyUrl: Joi.string().optional().allow(null, ''),

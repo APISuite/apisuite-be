@@ -30,6 +30,10 @@
  *         logo:
  *           type: string
  *           format: uri
+ *         labels:
+ *           type: array
+ *           items:
+ *             type: string
  *         tosUrl:
  *           type: string
  *           format: uri
@@ -95,6 +99,10 @@
  *           items:
  *             type: number
  *             minimum: 0
+ *         labels:
+ *           type: array
+ *           items:
+ *             type: string
  *         tosUrl:
  *           type: string
  *           format: uri
@@ -145,6 +153,10 @@
  *         supportUrl:
  *           type: string
  *           format: uri
+ *         labels:
+ *           type: array
+ *           items:
+ *             type: string
  */
 
 /**

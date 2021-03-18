@@ -16,6 +16,7 @@ describe('Apps Validations', () => {
       visibility: 'public',
       logo: chance.url(),
       subscriptions: [],
+      labels: [],
       tosUrl: chance.url(),
       privacyUrl: chance.url(),
       youtubeUrl: chance.url(),
