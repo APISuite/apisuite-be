@@ -187,7 +187,7 @@ router.postAsync('/',
  *       500:
  *         $ref: '#/components/responses/Internal'
  */
-router.putAsync('/update/:id',
+router.putAsync('/:id',
   loggedIn,
   validateAppBody,
   accessControl(actions.UPDATE, possessions.OWN, resources.APP),
