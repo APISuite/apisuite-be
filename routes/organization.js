@@ -21,12 +21,14 @@ const {
  *         content:
  *           application/json:
  *             schema:
- *                type: object
- *                properties:
- *                  id:
- *                   type: number
- *                  name:
- *                   type: string
+ *                type: array
+ *                items:
+ *                  type: object
+ *                  properties:
+ *                    id:
+ *                      type: number
+ *                    name:
+ *                     type: string
  */
 router.getAsync('/publishers',
   controllers.organization.listPublishers)
