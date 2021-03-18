@@ -689,6 +689,37 @@ const listPublicApps = async (req, res, next) => {
   return res.status(HTTPStatus.OK).json(apps)
 }
 
+const listPublicLabels = async (req, res) => {
+  // const sql = `
+  //   SELECT DISTINCT unnest(labels) AS label
+  //   FROM app
+  //   WHERE visibility = 'public'
+  //   AND enable = true
+  //   AND state = 'approved'
+  // ORDER BY label`
+  // const labels = await sequelize.query(sql, { type: sequelize.QueryTypes.SELECT })
+
+  const labels = await models.App.findAll({
+    attributes: [
+      [
+        sequelize.fn('distinct',
+          sequelize.fn('unnest',
+            sequelize.literal('labels'),
+          ),
+        ), 'label'],
+    ],
+    raw: true,
+    where: {
+      visibility: 'public',
+      enable: true,
+      state: appStates.APPROVED,
+    },
+    order: [[sequelize.literal('label')]],
+  })
+
+  return res.status(HTTPStatus.OK).json(labels.map((l) => l.label))
+}
+
 module.exports = {
   getApp,
   createDraftApp,
@@ -700,4 +731,5 @@ module.exports = {
   listApps,
   isSubscribedTo,
   listPublicApps,
+  listPublicLabels,
 }

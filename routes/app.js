@@ -85,6 +85,25 @@ router.getAsync('/public',
 
 /**
  * @openapi
+ * /apps/public/labels:
+ *   get:
+ *     summary: Get the set public app labels
+ *     tags: [App]
+ *     responses:
+ *       200:
+ *         description: Labels list
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: string
+ */
+router.getAsync('/public/labels',
+  controllers.app.listPublicLabels)
+
+/**
+ * @openapi
  * /apps/:id:
  *   get:
  *     description: Get details of an application
