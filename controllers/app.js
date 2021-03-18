@@ -624,12 +624,20 @@ const isSubscribedTo = async (req, res) => {
 }
 
 const listPublicApps = async (req, res, next) => {
+  const filters = {
+    visibility: 'public',
+    enable: true,
+    state: appStates.APPROVED,
+  }
+
+  if (req.query.org_id) {
+    filters.org_id = {
+      [Op.in]: Array.isArray(req.query.org_id) ? req.query.org_id : [req.query.org_id],
+    }
+  }
+
   const apps = await models.App.findAll({
-    where: {
-      visibility: 'public',
-      enable: true,
-      state: appStates.APPROVED,
-    },
+    where: filters,
     include: [{
       model: models.Organization,
       attributes: [
