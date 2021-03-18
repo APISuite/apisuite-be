@@ -78,10 +78,6 @@ router.getAsync('/',
  *               $ref: '#/components/schemas/PublicAppList'
  *       400:
  *         $ref: '#/components/responses/BadRequest'
- *       401:
- *         $ref: '#/components/responses/Unauthorized'
- *       404:
- *         $ref: '#/components/responses/NotFound'
  */
 router.getAsync('/public',
   validatePublicAppsListQuery,

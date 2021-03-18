@@ -2,7 +2,7 @@ const HTTPStatus = require('http-status-codes')
 const { v4: uuidv4 } = require('uuid')
 const log = require('../util/logger')
 const { models, sequelize } = require('../models')
-const { roles } = require('../util/enums')
+const { roles, appStates } = require('../util/enums')
 const { publishEvent, routingKeys } = require('../services/msg-broker')
 
 const getAll = async (req, res) => {
@@ -222,6 +222,27 @@ const getPendingInvites = async (req, res) => {
   return res.status(HTTPStatus.OK).send(list)
 }
 
+const listPublishers = async (req, res) => {
+  const publishers = await models.Organization.findAll({
+    include: [{
+      model: models.App,
+      where: {
+        visibility: 'public',
+        enable: true,
+        state: appStates.APPROVED,
+      },
+      attributes: [],
+    }],
+    attributes: [
+      'id',
+      'name',
+    ],
+    order: [['name', 'asc']],
+  })
+
+  return res.status(HTTPStatus.OK).json(publishers)
+}
+
 module.exports = {
   getAll,
   getById,
@@ -231,4 +252,5 @@ module.exports = {
   assignUserToOrg,
   getAllMembers,
   getPendingInvites,
+  listPublishers,
 }
