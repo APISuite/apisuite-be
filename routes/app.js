@@ -3,7 +3,11 @@ const router = decorateRouter(require('express').Router())
 const controllers = require('../controllers')
 const { actions, possessions, resources } = require('../access-control')
 const { accessControl, loggedIn } = require('../middleware')
-const { validateAppBody, validateSubscriptionBody } = require('./validation_schemas/app.schema')
+const {
+  validateAppBody,
+  validateSubscriptionBody,
+  validatePublicAppsListQuery,
+} = require('./validation_schemas/app.schema')
 
 /**
  * @openapi
@@ -46,6 +50,25 @@ router.getAsync('/',
  *         in: query
  *         schema:
  *           type: number
+ *       - name: sort_by
+ *         description: Sorting field
+ *         in: query
+ *         schema:
+ *           type: string
+ *           default: app
+ *           enum:
+ *             - app
+ *             - org
+ *             - updated
+ *       - name: order
+ *         description: Sorting order
+ *         in: query
+ *         schema:
+ *           type: string
+ *           default: asc
+ *           enum:
+ *             - asc
+ *             - desc
  *     responses:
  *       200:
  *         description: Public app list
@@ -61,6 +84,7 @@ router.getAsync('/',
  *         $ref: '#/components/responses/NotFound'
  */
 router.getAsync('/public',
+  validatePublicAppsListQuery,
   controllers.app.listPublicApps)
 
 /**

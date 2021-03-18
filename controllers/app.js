@@ -636,6 +636,23 @@ const listPublicApps = async (req, res, next) => {
     }
   }
 
+  let order = []
+  const sortOrder = req.query.order || 'asc'
+  switch (req.query.sort_by) {
+    case 'updated': {
+      order = [['updated_at', sortOrder]]
+      break
+    }
+    case 'org': {
+      order = [[models.Organization, 'name', sortOrder]]
+      break
+    }
+    default: {
+      order = [['name', sortOrder]]
+      break
+    }
+  }
+
   const apps = await models.App.findAll({
     where: filters,
     include: [{
@@ -663,6 +680,7 @@ const listPublicApps = async (req, res, next) => {
       'updatedAt',
       ['org_id', 'orgId'],
     ],
+    order,
   })
 
   return res.status(HTTPStatus.OK).json(apps)

@@ -30,7 +30,17 @@ const subscriptionSchema = Joi.object({
   subscriptions: Joi.array().items(Joi.number().min(0)).required(),
 })
 
+const publicAppsQuerySchema = Joi.object({
+  org_id: Joi.alternatives().try(
+    Joi.number(),
+    Joi.array().min(1).items(Joi.number()),
+  ).optional(),
+  sort_by: Joi.string().valid('app', 'org', 'updated').optional(),
+  order: Joi.string().valid('asc', 'desc').optional(),
+})
+
 module.exports = {
   validateAppBody: validator(appSchema),
   validateSubscriptionBody: validator(subscriptionSchema),
+  validatePublicAppsListQuery: validator(publicAppsQuerySchema, 'query'),
 }
