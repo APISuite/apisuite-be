@@ -1,15 +1,13 @@
 const { v4: uuidv4 } = require('uuid')
 const HTTPStatus = require('http-status-codes')
 const log = require('../util/logger')
-const emailService = require('./email')
+const emailService = require('../services/email')
 const { models, sequelize } = require('../models')
 const { roles } = require('../util/enums')
-
-// TODO move to configs
-const REGISTRATION_TTL = 30 // minutes
+const config = require('../config')
 
 const isRegistrationValid = (createdAt) => {
-  return new Date(createdAt).getTime() + REGISTRATION_TTL * 60 * 1000 >= Date.now()
+  return new Date(createdAt).getTime() + config.get('registrationTTL') * 60 * 1000 >= Date.now()
 }
 
 const setUserDetails = async (req, res) => {
@@ -68,7 +66,6 @@ const setOrganizationDetails = async (req, res) => {
   try {
     registration.organizationName = req.body.name
     registration.organizationWebsite = req.body.website
-    registration.organizationVat = req.body.vat
     await registration.save()
 
     return res.status(HTTPStatus.OK).end()
@@ -92,29 +89,26 @@ const completeRegistration = async (req, res) => {
   let wasInvited = false
   let invite = null
   try {
+    // TODO deprecated - remove when new invite flow is implemented
     invite = await models.InviteOrganization.findByConfirmationToken(req.body.registrationToken)
     wasInvited = !!(invite && invite.email)
   } catch (error) {
     wasInvited = false
   }
 
-  let transaction
   registration = registration.get({ plain: true })
+
+  const transaction = await sequelize.transaction()
   try {
-    transaction = await sequelize.transaction()
-
-    const activationToken = uuidv4()
-
     let organization = {}
 
     if (wasInvited) {
       organization = {
         id: invite.org_id,
       }
-    } else {
+    } else if (registration.organizationName && registration.organizationName.length) {
       organization = await models.Organization.create({
         name: registration.organizationName,
-        vat: registration.organizationVat,
         website: registration.organizationWebsite,
         org_code: uuidv4(),
       }, { transaction })
@@ -125,6 +119,8 @@ const completeRegistration = async (req, res) => {
       transaction,
     })
     if (!defaultRole) throw new Error('missing organizationOwner role')
+
+    const activationToken = uuidv4()
 
     const user = await models.User.create({
       name: registration.name,
@@ -137,12 +133,14 @@ const completeRegistration = async (req, res) => {
       role_id: wasInvited ? invite.role_id : defaultRole.id,
     }, { transaction })
 
-    await models.UserOrganization.create({
-      user_id: user.id,
-      org_id: organization.id,
-      role_id: user.role_id,
-      current_org: true,
-    }, { transaction })
+    if (organization.id) {
+      await models.UserOrganization.create({
+        user_id: user.id,
+        org_id: organization.id,
+        role_id: user.role_id,
+        current_org: true,
+      }, { transaction })
+    }
 
     await models.UserRegistration.destroy({
       where: { id: registration.id },

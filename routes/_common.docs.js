@@ -73,10 +73,6 @@
  *       type: apiKey
  *       name: x-app-token
  *       in: header
- *     x_internal_token:
- *       type: apiKey
- *       name: x-internal-token
- *       in: header
  *     x_setup_token:
  *       type: apiKey
  *       name: x-setup-token

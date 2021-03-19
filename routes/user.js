@@ -3,16 +3,20 @@ const router = decorateRouter(require('express').Router())
 const controllers = require('../controllers')
 const { accessControl, loggedIn, setup } = require('../middleware')
 const { actions, possessions, resources } = require('../access-control')
-const { validateProfileUpdateBody, validateChangePasswordBody, validateSetupBody } = require('./validation_schemas/user.schema')
-const { validateLoginBody, validateLastLoginBody } = require('./validation_schemas/login.schema')
 const { validateForgotPasswordBody, validateRecoverPasswordBody } = require('./validation_schemas/auth.schema')
 const { validateInviteBody } = require('./validation_schemas/invite_organization.schema')
-const { isInternalRequest } = require('../util/internal-request')
+const {
+  deprecatedValidateProfileUpdateBody,
+  validateProfileUpdateBody,
+  validateChangePasswordBody,
+  validateSetupBody,
+} = require('./validation_schemas/user.schema')
 
 /**
  * @openapi
  * /users/profile/update:
  *   put:
+ *     deprecated: true
  *     description: Edit user profile.
  *     tags: [User]
  *     requestBody:
@@ -45,7 +49,7 @@ const { isInternalRequest } = require('../util/internal-request')
  */
 router.putAsync('/profile/update',
   loggedIn,
-  validateProfileUpdateBody,
+  deprecatedValidateProfileUpdateBody,
   accessControl(actions.UPDATE, possessions.OWN, resources.PROFILE),
   controllers.user.profileUpdate)
 
@@ -121,7 +125,6 @@ router.putAsync('/password',
  */
 router.getAsync('/profile',
   loggedIn,
-  accessControl(actions.READ, possessions.OWN, resources.PROFILE),
   controllers.user.profile)
 
 /**
@@ -430,103 +433,6 @@ router.postAsync('/invite/confirm',
 
 /**
  * @openapi
- * /users/login:
- *   post:
- *     description: Login user.
- *     tags: [User]
- *     requestBody:
- *       description: Login data.
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - email
- *               - password
- *             properties:
- *               email:
- *                 type: string
- *                 format: email
- *               password:
- *                 type: string
- *                 format: password
- *     security:
- *       - x_internal_token: []
- *     responses:
- *       200:
- *         description: Successful login.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 id:
- *                   type: number
- *                 role_id:
- *                   type: number
- *                 name:
- *                   type: string
- *                 email:
- *                   type: string
- *                   format: email
- *       400:
- *         $ref: '#/components/responses/BadRequest'
- *       401:
- *         $ref: '#/components/responses/Unauthorized'
- *       403:
- *         $ref: '#/components/responses/Forbidden'
- */
-router.postAsync('/login',
-  isInternalRequest,
-  validateLoginBody,
-  controllers.user.getByLogin)
-
-/**
- * @openapi
- * /users/login/lastlogin:
- *   put:
- *     description: Update user last login date.
- *     tags: [User]
- *     requestBody:
- *       description: User id.
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - user_id
- *             properties:
- *               user_id:
- *                 type: number
- *     security:
- *       - x_internal_token: []
- *     responses:
- *       200:
- *         description: Successful update.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 id:
- *                   type: number
- *                 last_login:
- *                   type: string
- *                   format: date-time
- *       400:
- *         $ref: '#/components/responses/BadRequest'
- *       401:
- *         $ref: '#/components/responses/Unauthorized'
- */
-router.putAsync('/login/lastlogin',
-  isInternalRequest,
-  validateLastLoginBody,
-  controllers.user.updateLastLogin)
-
-/**
- * @openapi
  * /users/setup:
  *   post:
  *     summary: Creates an initial user and main organization
@@ -568,5 +474,76 @@ router.postAsync('/setup',
   setup,
   validateSetupBody,
   controllers.user.setupMainAccount)
+
+/**
+ * @openapi
+ * /users/{id}/organizations/{orgId}:
+ *   post:
+ *     summary: Change user's active organization
+ *     description: >
+ *        Changes the user's active organization to {orgId},
+ *        as long as {orgId} is an organization the user belongs to.
+ *     tags: [User]
+ *     parameters:
+ *       - name: id
+ *         description: The user id.
+ *         required: true
+ *         in: path
+ *         schema:
+ *           type: string
+ *       - name: orgId
+ *         description: The organization id the user is switching to.
+ *         required: true
+ *         in: path
+ *         schema:
+ *           type: string
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       204:
+ *         description: No Content
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ */
+router.postAsync('/:id/organizations/:orgId',
+  loggedIn,
+  controllers.user.setActiveOrganization)
+
+/**
+ * @openapi
+ * /users/{id}:
+ *   put:
+ *     summary: Update user profile
+ *     description: Update (own) user profile
+ *     tags: [User]
+ *     requestBody:
+ *       description: User profile details.
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/UserProfile'
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: Profile edited successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/UserProfile'
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ */
+router.putAsync('/:id',
+  loggedIn,
+  validateProfileUpdateBody,
+  controllers.user.updateUserProfile)
 
 module.exports = router

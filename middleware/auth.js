@@ -1,7 +1,7 @@
 const HTTPStatus = require('http-status-codes')
 const { models } = require('../models')
 const { roles } = require('../util/enums')
-const jwt = require('../jwt')
+const jwt = require('../services/jwt')
 
 const getTokenUserByID = async (userID) => {
   const user = await models.User.findOne({
@@ -58,7 +58,6 @@ module.exports = async (req, res, next) => {
       return res.status(HTTPStatus.UNAUTHORIZED).json({ errors: ['The account is not active, token must have expired. Please login to obtain a new one'] })
     }
 
-    // TODO the following is temporary (data can be kept in the token)
     const user = await getTokenUserByID(token.payload.sub)
     if (!user) {
       return res.status(HTTPStatus.UNAUTHORIZED).json({ errors: ['User not found'] })

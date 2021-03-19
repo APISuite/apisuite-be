@@ -1,6 +1,5 @@
 const user = require('./user')
 const app = require('./app')
-const email = require('./email')
 const auth = require('./auth')
 const organization = require('./organization')
 const registration = require('./registration')
@@ -15,7 +14,6 @@ module.exports = {
   api,
   app,
   auth,
-  email,
   functions,
   invites,
   organization,

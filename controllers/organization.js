@@ -61,12 +61,22 @@ const addOrg = async (req, res) => {
       terms: req.body.terms,
       logo: req.body.logo,
       org_code: uuidv4(),
+      tosUrl: req.body.tosUrl,
+      privacyUrl: req.body.privacyUrl,
+      youtubeUrl: req.body.youtubeUrl,
+      websiteUrl: req.body.websiteUrl,
+      supportUrl: req.body.supportUrl,
+    }, { transaction })
+
+    const userOrgs = await models.UserOrganization.count({
+      where: { user_id: req.user.id },
     }, { transaction })
 
     await models.UserOrganization.create({
       user_id: req.user.id,
       org_id: newOrganization.id,
       role_id: defaultRole.id,
+      current_org: !userOrgs,
     }, { transaction })
 
     await transaction.commit()

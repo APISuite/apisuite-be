@@ -4,23 +4,21 @@ const jsonwebtoken = require('jsonwebtoken')
 const jwksRSA = require('jwks-rsa')
 const HTTPStatus = require('http-status-codes')
 const log = require('../util/logger')
-const emailService = require('./email')
+const emailService = require('../services/email')
 const { models, sequelize } = require('../models')
-const jwt = require('../jwt')
+const jwt = require('../services/jwt')
 const Idp = require('../idp')
 const { settingTypes } = require('../util/enums')
 const config = require('../config')
-
-// TODO move to configs
-const RECOVERY_INTERVAL = 5 // minutes
-const RECOVERY_TTL = 120 // minutes
+const { getRevokedCookieConfig } = require('../util/cookies')
+const { oidcDiscovery } = require('../util/oidc')
 
 const isRecoveryValid = (createdAt) => {
-  return new Date(createdAt.getTime() + RECOVERY_TTL * 60 * 1000) >= Date.now()
+  return new Date(createdAt.getTime() + config.get('passwordRecoveryTTL') * 60 * 1000) >= Date.now()
 }
 
 const isRecoveryRecent = (createdAt) => {
-  return new Date(createdAt.getTime() + RECOVERY_INTERVAL * 60 * 1000) >= Date.now()
+  return new Date(createdAt.getTime() + config.get('passwordRecoveryInterval') * 60 * 1000) >= Date.now()
 }
 
 const forgotPassword = async (req, res) => {
@@ -291,15 +289,6 @@ const oidcToken = async (req, res) => {
   }
 }
 
-const oidcDiscovery = async (discoveryURL) => {
-  const discovery = await fetch(discoveryURL)
-  if (!discovery.ok || discovery.status !== HTTPStatus.OK) {
-    throw new Error('could not get discovery')
-  }
-
-  return discovery.json()
-}
-
 /**
  * Exchanges the authorization code for the access/ID tokens.
  * @param {string} code
@@ -377,20 +366,6 @@ const getCookieConfigs = () => {
       expires: new Date(Date.now() + config.get('auth.refreshTokenTTL') * 1000),
       path: '/auth',
     },
-  }
-}
-
-const getRevokedCookieConfig = () => {
-  const baseConfig = {
-    httpOnly: config.get('auth.cookieHttpOnly'),
-    secure: config.get('auth.cookieSecure'),
-    sameSite: config.get('auth.cookieSameSite'),
-    domain: config.get('auth.cookieDomain'),
-  }
-
-  return {
-    ...baseConfig,
-    expires: new Date('1900-01-01'),
   }
 }
 

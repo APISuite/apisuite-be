@@ -18,10 +18,6 @@ const userRegistration = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true,
     },
-    organizationVat: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
     organizationWebsite: {
       type: DataTypes.STRING,
       allowNull: true,
