@@ -638,6 +638,12 @@ const listPublicApps = async (req, res, next) => {
     }
   }
 
+  if (req.query.label) {
+    filters.labels = {
+      [Op.contains]: Array.isArray(req.query.label) ? req.query.label : [req.query.label],
+    }
+  }
+
   let order = []
   const sortOrder = req.query.order || 'asc'
   switch (req.query.sort_by) {

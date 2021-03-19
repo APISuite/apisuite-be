@@ -112,6 +112,9 @@ describe('Apps Validations', () => {
         { query: { org_id: 'abc' } },
         { query: { org_id: [] } },
         { query: { org_id: ['cba'] } },
+        { query: { label: 543 } },
+        { query: { label: [] } },
+        { query: { label: [666] } },
         { query: { sort_by: 'inv' } },
         { query: { order: 'inv' } },
       ]
@@ -133,7 +136,10 @@ describe('Apps Validations', () => {
     describe('test valid payloads', () => {
       const testData = [
         { query: { } },
+        { query: { org_id: 1 } },
         { query: { org_id: [1] } },
+        { query: { label: 'acme' } },
+        { query: { label: ['acme'] } },
         { query: { sort_by: 'app' } },
         { query: { sort_by: 'org' } },
         { query: { sort_by: 'updated' } },

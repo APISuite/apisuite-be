@@ -50,6 +50,11 @@ router.getAsync('/',
  *         in: query
  *         schema:
  *           type: number
+ *       - name: label
+ *         description: App label(s) for filtering
+ *         in: query
+ *         schema:
+ *           type: string
  *       - name: sort_by
  *         description: Sorting field
  *         in: query

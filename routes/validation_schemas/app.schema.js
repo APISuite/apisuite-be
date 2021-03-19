@@ -36,6 +36,10 @@ const publicAppsQuerySchema = Joi.object({
     Joi.number(),
     Joi.array().min(1).items(Joi.number()),
   ).optional(),
+  label: Joi.alternatives().try(
+    Joi.string(),
+    Joi.array().min(1).items(Joi.string()),
+  ).optional(),
   sort_by: Joi.string().valid('app', 'org', 'updated').optional(),
   order: Joi.string().valid('asc', 'desc').optional(),
 })
