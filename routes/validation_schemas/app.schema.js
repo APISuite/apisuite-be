@@ -32,6 +32,7 @@ const subscriptionSchema = Joi.object({
 })
 
 const publicAppsQuerySchema = Joi.object({
+  search: Joi.string().optional(),
   org_id: Joi.alternatives().try(
     Joi.number(),
     Joi.array().min(1).items(Joi.number()),

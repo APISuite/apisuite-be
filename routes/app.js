@@ -45,6 +45,11 @@ router.getAsync('/',
  *     description: Returns a list of publicly accessible apps
  *     tags: [App]
  *     parameters:
+ *       - name: search
+ *         description: Search terms
+ *         in: query
+ *         schema:
+ *           type: string
  *       - name: org_id
  *         description: Organization id(s) for filtering
  *         in: query

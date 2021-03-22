@@ -644,6 +644,18 @@ const listPublicApps = async (req, res, next) => {
     }
   }
 
+  let search = {}
+  let orgSearch = {}
+  if (req.query.search && typeof req.query.search === 'string') {
+    search = {
+      [Op.or]: [
+        { name: { [Op.iLike]: `%${req.query.search}%` } },
+        { description: { [Op.iLike]: `%${req.query.search}%` } },
+      ],
+    }
+    orgSearch = { name: { [Op.iLike]: `%${req.query.search}%` } }
+  }
+
   let order = []
   const sortOrder = req.query.order || 'asc'
   switch (req.query.sort_by) {
@@ -662,9 +674,10 @@ const listPublicApps = async (req, res, next) => {
   }
 
   const apps = await models.App.findAll({
-    where: filters,
+    where: { ...filters, ...search },
     include: [{
       model: models.Organization,
+      where: orgSearch,
       attributes: [
         'id',
         'name',
