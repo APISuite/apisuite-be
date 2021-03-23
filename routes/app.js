@@ -95,6 +95,26 @@ router.getAsync('/public',
 
 /**
  * @openapi
+ * /apps/public/{id}:
+ *   get:
+ *     summary: Get details of public apps
+ *     tags: [App]
+ *     responses:
+ *       200:
+ *         description: Public app
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/PublicApp'
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ */
+router.getAsync('/public/:id',
+  validatePublicAppsListQuery,
+  controllers.app.publicAppDetails)
+
+/**
+ * @openapi
  * /apps/public/labels:
  *   get:
  *     summary: Get the set public app labels

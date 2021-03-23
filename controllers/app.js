@@ -738,6 +738,49 @@ const listPublicLabels = async (req, res) => {
   return res.status(HTTPStatus.OK).json(labels.map((l) => l.label))
 }
 
+const publicAppDetails = async (req, res) => {
+  const app = await models.App.findOne({
+    where: {
+      id: req.params.id,
+      visibility: 'public',
+      enable: true,
+      state: appStates.APPROVED,
+    },
+    include: [{
+      model: models.Organization,
+      attributes: [
+        'id',
+        'name',
+        'tosUrl',
+        'privacyUrl',
+        'supportUrl',
+      ],
+    }],
+    attributes: [
+      'id',
+      'name',
+      'description',
+      'shortDescription',
+      'logo',
+      'labels',
+      'tosUrl',
+      'privacyUrl',
+      'youtubeUrl',
+      'websiteUrl',
+      'supportUrl',
+      'createdAt',
+      'updatedAt',
+      ['org_id', 'orgId'],
+    ],
+  })
+
+  if (!app) {
+    return res.status(HTTPStatus.NOT_FOUND).send({ errors: ['App not found'] })
+  }
+
+  return res.status(HTTPStatus.OK).json(app)
+}
+
 module.exports = {
   getApp,
   createDraftApp,
@@ -750,4 +793,5 @@ module.exports = {
   isSubscribedTo,
   listPublicApps,
   listPublicLabels,
+  publicAppDetails,
 }
