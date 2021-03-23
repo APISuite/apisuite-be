@@ -316,7 +316,7 @@ const createDraftApp = async (req, res) => {
       org_id: req.user.org.id,
       idpProvider: idp.getProvider(),
       state: appStates.DRAFT,
-      labels: req.body.labels,
+      labels: req.body.labels || [],
       tosUrl: req.body.tosUrl,
       privacyUrl: req.body.privacyUrl,
       youtubeUrl: req.body.youtubeUrl,
@@ -409,106 +409,6 @@ const requestAccess = async (req, res) => {
   })
 
   return res.sendStatus(HTTPStatus.NO_CONTENT)
-}
-
-// deprecated
-const createApp = async (req, res) => {
-  const transaction = await sequelize.transaction()
-  try {
-    const idp = await Idp.getIdP()
-    const client = await idp.createClient({
-      clientName: req.body.name,
-      redirectURIs: [req.body.redirect_url],
-    })
-
-    let app = await models.App.create(
-      {
-        name: req.body.name,
-        description: req.body.description,
-        redirect_url: req.body.redirect_url,
-        visibility: req.body.visibility || 'private',
-        logo: req.body.logo,
-        clientId: client.clientId,
-        clientSecret: client.clientSecret,
-        client_data: client.extra,
-        enable: true,
-        org_id: req.user.org.id,
-        idpProvider: idp.getProvider(),
-      },
-      {
-        transaction,
-        include: [
-          ...includes(),
-        ],
-        attributes: appAttributes,
-      },
-    )
-
-    if (typeof req.body.pub_urls !== 'undefined') {
-      const data = []
-      for (const pubUrl of req.body.pub_urls) {
-        const puburlData = {
-          url: pubUrl.url,
-          app_id: app.dataValues.id,
-          type: pubUrl.type,
-        }
-        data.push(puburlData)
-      }
-
-      if (data.length > 0) {
-        await models.PubURLApp.bulkCreate(data, { transaction })
-      }
-    }
-
-    const subscriptionModel = await getSubscriptionModel()
-    if (subscriptionModel === subscriptionModels.SIMPLIFIED) {
-      const gateway = await Gateway()
-      await gateway.subscribeAll(app.id, app.clientId)
-    }
-
-    if (subscriptionModel === subscriptionModels.DETAILED && typeof req.body.subscriptions !== 'undefined') {
-      const subscriptions = req.body.subscriptions || []
-      // unsubscribe all and add subscriptions again
-      let currSubs = await app.getSubscriptions({ transaction })
-      currSubs = currSubs.length ? currSubs.map(s => s.id) : []
-      await app.removeSubscriptions(currSubs, { transaction })
-      await app.addSubscriptions(subscriptions, { transaction })
-
-      await handleGatewaySubscriptions(app, currSubs, subscriptions)
-    }
-
-    // get app with associations
-    app = await models.App.findOne(
-      {
-        where: {
-          id: app.dataValues.id,
-        },
-        include: includes(),
-        transaction,
-      },
-    )
-
-    // TODO this is a temporary adjustment to simplify adoption of the simplified model in the FE
-    if (subscriptionModel === subscriptionModels.SIMPLIFIED) {
-      const apis = await models.Api.findAll({
-        where: {
-          publishedAt: { [Op.not]: null },
-        },
-        distinct: true,
-        include: [{ model: models.ApiVersion }],
-      })
-
-      app.subscriptions = apis.map((s) => s.id)
-    }
-
-    await transaction.commit()
-
-    return res.status(HTTPStatus.CREATED).send(app)
-  } catch (err) {
-    if (transaction) await transaction.rollback()
-    log.error(err, '[CREATE APP]')
-    return res.status(HTTPStatus.INTERNAL_SERVER_ERROR).send({ success: false, errors: ['Failed to create app.'] })
-  }
 }
 
 const subscribeToAPI = async (req, res) => {
@@ -738,11 +638,53 @@ const listPublicLabels = async (req, res) => {
   return res.status(HTTPStatus.OK).json(labels.map((l) => l.label))
 }
 
+const publicAppDetails = async (req, res) => {
+  const app = await models.App.findOne({
+    where: {
+      id: req.params.id,
+      visibility: 'public',
+      enable: true,
+      state: appStates.APPROVED,
+    },
+    include: [{
+      model: models.Organization,
+      attributes: [
+        'id',
+        'name',
+        'tosUrl',
+        'privacyUrl',
+        'supportUrl',
+      ],
+    }],
+    attributes: [
+      'id',
+      'name',
+      'description',
+      'shortDescription',
+      'logo',
+      'labels',
+      'tosUrl',
+      'privacyUrl',
+      'youtubeUrl',
+      'websiteUrl',
+      'supportUrl',
+      'createdAt',
+      'updatedAt',
+      ['org_id', 'orgId'],
+    ],
+  })
+
+  if (!app) {
+    return res.status(HTTPStatus.NOT_FOUND).send({ errors: ['App not found'] })
+  }
+
+  return res.status(HTTPStatus.OK).json(app)
+}
+
 module.exports = {
   getApp,
   createDraftApp,
   requestAccess,
-  createApp,
   updateApp,
   deleteApp,
   subscribeToAPI,
@@ -750,4 +692,5 @@ module.exports = {
   isSubscribedTo,
   listPublicApps,
   listPublicLabels,
+  publicAppDetails,
 }

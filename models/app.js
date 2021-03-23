@@ -90,6 +90,7 @@ const app = (sequelize, DataTypes) => {
     labels: {
       type: DataTypes.ARRAY(DataTypes.TEXT),
       allowNull: false,
+      default: [],
     },
   }, {
     timestamps: true,
