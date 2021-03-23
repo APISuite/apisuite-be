@@ -5,8 +5,8 @@ const config = require('../config')
 const { models, sequelize } = require('../models')
 const msgBroker = require('../services/msg-broker')
 const { settingTypes, idpProviders } = require('../util/enums')
-const Gateway = require('../util/gateway')
-const Idp = require('../idp')
+const Gateway = require('../services/gateway')
+const Idp = require('../services/idp')
 
 const createDefaultAccountSettings = (txn) => {
   return models.Setting.create({
@@ -282,7 +282,10 @@ const enableSSO = async (idp, ssoClient) => {
 
   const client = await idp.createClient({
     clientName: 'APISuite SSO Client',
-    redirectURIs: [`${config.get('appURL')}/sso/auth`],
+    redirectURIs: [
+      config.get('sso.signInRedirectURL'),
+      config.get('sso.inviteSignInRedirectURL'),
+    ],
   })
 
   await models.SSOClient.create({

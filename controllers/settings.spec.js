@@ -7,7 +7,7 @@ const { models, sequelize } = require('../models')
 const msgBroker = require('../services/msg-broker')
 const Setting = models.Setting
 const SSOClient = models.SSOClient
-const Idp = require('../idp')
+const Idp = require('../services/idp')
 const {
   get,
   upsert,

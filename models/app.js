@@ -87,6 +87,10 @@ const app = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true,
     },
+    labels: {
+      type: DataTypes.ARRAY(DataTypes.TEXT),
+      allowNull: false,
+    },
   }, {
     timestamps: true,
     underscored: true,

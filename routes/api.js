@@ -2,9 +2,8 @@ const { decorateRouter } = require('@awaitjs/express')
 const router = decorateRouter(require('express').Router())
 const controllers = require('../controllers')
 const { actions, possessions, resources } = require('../access-control')
-const { accessControl, loggedIn } = require('../middleware')
+const { accessControl, loggedIn, fileParser } = require('../middleware')
 const validations = require('./validation_schemas/api.schema')
-const { fileParser } = require('../util/file-parser')
 
 /**
  * @openapi

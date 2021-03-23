@@ -5,6 +5,7 @@ const internalError = require('./internal-error')
 const accessControl = require('./access-control')
 const loggedIn = require('./logged-in')
 const refreshToken = require('./refresh-token')
+const fileParser = require('./file-parser')
 
 module.exports = {
   auth,
@@ -14,4 +15,5 @@ module.exports = {
   internalError,
   loggedIn,
   refreshToken,
+  fileParser,
 }

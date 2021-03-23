@@ -2,8 +2,8 @@ const semver = require('semver')
 const fetch = require('node-fetch')
 const { createAPIHandler } = require('../../controllers/api-helper')
 const Gateway = require('./gateway')
-const log = require('../logger')
-const { apiTypes, subscriptionModels } = require('../enums')
+const log = require('../../util/logger')
+const { apiTypes, subscriptionModels } = require('../../util/enums')
 
 // version of kong that has changes in plugin payload
 const KONG_VERSION = '1.5.0'

@@ -1,8 +1,8 @@
 const Hydra = require('./hydra')
 const Keycloak = require('./keycloak')
 
-const { models } = require('../models')
-const { settingTypes, idpProviders } = require('../util/enums')
+const { models } = require('../../models')
+const { settingTypes, idpProviders } = require('../../util/enums')
 
 const getConfig = async () => {
   const settings = await models.Setting.findOne({

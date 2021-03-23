@@ -5,7 +5,7 @@ const controllers = require('../controllers')
 
 /**
  * @openapi
- * /invites/:token:
+ * /invites/{token}:
  *   get:
  *     summary: Get/validate token
  *     description: Gets (and implicitly validates) an invite token
@@ -37,7 +37,7 @@ router.getAsync('/:token',
 
 /**
  * @openapi
- * /invites/:token/accept:
+ * /invites/{token}/accept:
  *   post:
  *     summary: Accept organization invite
  *     description: Accept invite to add user to organization
@@ -68,7 +68,7 @@ router.postAsync('/:token/accept',
 
 /**
  * @openapi
- * /invites/:token/reject:
+ * /invites/{token}/reject:
  *   post:
  *     summary: Reject an organization invite
  *     description: Reject an invite to add user to organization

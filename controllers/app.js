@@ -2,10 +2,10 @@ const HTTPStatus = require('http-status-codes')
 const log = require('../util/logger')
 const { Op } = require('sequelize')
 const { models, sequelize } = require('../models')
-const Gateway = require('../util/gateway')
+const Gateway = require('../services/gateway')
 const { publishEvent, routingKeys } = require('../services/msg-broker')
 const { settingTypes, subscriptionModels, appStates } = require('../util/enums')
-const Idp = require('../idp')
+const Idp = require('../services/idp')
 
 const appAttributes = {
   include: [
@@ -199,6 +199,7 @@ const updateApp = async (req, res) => {
         shortDescription: req.body.shortDescription,
         redirect_url: req.body.redirectUrl || req.body.redirect_url,
         logo: req.body.logo,
+        labels: req.body.labels,
         tosUrl: req.body.tosUrl,
         privacyUrl: req.body.privacyUrl,
         youtubeUrl: req.body.youtubeUrl,
@@ -315,6 +316,7 @@ const createDraftApp = async (req, res) => {
       org_id: req.user.org.id,
       idpProvider: idp.getProvider(),
       state: appStates.DRAFT,
+      labels: req.body.labels,
       tosUrl: req.body.tosUrl,
       privacyUrl: req.body.privacyUrl,
       youtubeUrl: req.body.youtubeUrl,
@@ -623,6 +625,119 @@ const isSubscribedTo = async (req, res) => {
   }
 }
 
+const listPublicApps = async (req, res, next) => {
+  const filters = {
+    visibility: 'public',
+    enable: true,
+    state: appStates.APPROVED,
+  }
+
+  if (req.query.org_id) {
+    filters.org_id = {
+      [Op.in]: Array.isArray(req.query.org_id) ? req.query.org_id : [req.query.org_id],
+    }
+  }
+
+  if (req.query.label) {
+    filters.labels = {
+      [Op.contains]: Array.isArray(req.query.label) ? req.query.label : [req.query.label],
+    }
+  }
+
+  let search = {}
+  if (req.query.search && typeof req.query.search === 'string') {
+    const matchSearch = `%${req.query.search}%`
+    search = {
+      [Op.or]: [
+        { name: { [Op.iLike]: matchSearch } },
+        { '$organization.name$': { [Op.iLike]: matchSearch } },
+        sequelize.literal(`EXISTS (SELECT * FROM unnest(labels) AS label WHERE label ILIKE '${matchSearch}')`),
+      ],
+    }
+  }
+
+  let order = []
+  const sortOrder = req.query.order || 'asc'
+  switch (req.query.sort_by) {
+    case 'updated': {
+      order = [['updated_at', sortOrder]]
+      break
+    }
+    case 'org': {
+      order = [[models.Organization, 'name', sortOrder]]
+      break
+    }
+    default: {
+      order = [['name', sortOrder]]
+      break
+    }
+  }
+
+  const apps = await models.App.findAll({
+    where: { ...filters, ...search },
+    include: [{
+      model: models.Organization,
+      attributes: [
+        'id',
+        'name',
+        'tosUrl',
+        'privacyUrl',
+        'supportUrl',
+      ],
+    }],
+    attributes: [
+      'id',
+      'name',
+      'description',
+      'shortDescription',
+      'logo',
+      'labels',
+      'tosUrl',
+      'privacyUrl',
+      'youtubeUrl',
+      'websiteUrl',
+      'supportUrl',
+      'createdAt',
+      'updatedAt',
+      ['org_id', 'orgId'],
+    ],
+    order,
+  })
+
+  return res.status(HTTPStatus.OK).json(apps)
+}
+
+const listPublicLabels = async (req, res) => {
+  // const sql = `
+  //   SELECT DISTINCT unnest(labels) AS label
+  //   FROM app
+  //   WHERE visibility = 'public'
+  //   AND enable = true
+  //   AND state = 'approved'
+  // ORDER BY label`
+  // const labels = await sequelize.query(sql, { type: sequelize.QueryTypes.SELECT })
+
+  const labels = await models.App.findAll({
+    attributes: [
+      [
+        sequelize.fn('distinct',
+          sequelize.fn('unnest',
+            sequelize.literal('labels'),
+          ),
+        ), 'label'],
+    ],
+    raw: true,
+    where: {
+      visibility: 'public',
+      enable: true,
+      state: appStates.APPROVED,
+    },
+    order: [[sequelize.literal('label')]],
+  })
+
+  return res.status(HTTPStatus.OK).json(labels.map((l) => l.label))
+}
+
 module.exports = {
   getApp,
   createDraftApp,
@@ -633,4 +748,6 @@ module.exports = {
   subscribeToAPI,
   listApps,
   isSubscribedTo,
+  listPublicApps,
+  listPublicLabels,
 }
