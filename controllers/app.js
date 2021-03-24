@@ -540,7 +540,7 @@ const listPublicApps = async (req, res, next) => {
 
   if (req.query.label) {
     filters.labels = {
-      [Op.contains]: Array.isArray(req.query.label) ? req.query.label : [req.query.label],
+      [Op.overlap]: Array.isArray(req.query.label) ? req.query.label : [req.query.label],
     }
   }
 
