@@ -319,6 +319,26 @@ const getTheme = async (req, res) => {
   return res.status(HTTPStatus.OK).send(settings.values)
 }
 
+const updateTheme = async (req, res) => {
+  let settings = await models.Setting.findOne({
+    where: { type: settingTypes.THEME },
+  })
+
+  if (!settings) {
+    return models.Setting.create({
+      type: settingTypes.THEME,
+      values: req.body,
+    }, {
+      returning: true,
+    })
+  }
+
+  settings.values = req.body
+  settings = await settings.save({ returning: true })
+
+  return res.status(HTTPStatus.OK).send(settings.values)
+}
+
 module.exports = {
   get,
   upsert,
@@ -328,4 +348,5 @@ module.exports = {
   getGateway,
   setGateway,
   syncGateway,
+  updateTheme,
 }

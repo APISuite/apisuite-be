@@ -24,23 +24,6 @@ router.getAsync('/',
 
 /**
  * @openapi
- * /settings/theme:
- *   get:
- *     description: Get theme settings
- *     tags: [Settings]
- *     responses:
- *       200:
- *         description: Theme settings
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- */
-router.getAsync('/theme',
-  controllers.settings.getTheme)
-
-/**
- * @openapi
  * /settings:
  *   put:
  *     description: Upsert (fully or partially) the list of account settings
@@ -73,6 +56,55 @@ router.putAsync('/',
   validateSettingsBody,
   accessControl(actions.UPDATE, possessions.ANY, resources.SETTINGS),
   controllers.settings.upsert)
+
+/**
+ * @openapi
+ * /settings/theme:
+ *   get:
+ *     description: Get theme settings
+ *     tags: [Settings]
+ *     responses:
+ *       200:
+ *         description: Theme settings
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ */
+router.getAsync('/theme',
+  controllers.settings.getTheme)
+
+/**
+ * @openapi
+ * /settings/theme:
+ *   put:
+ *     description: Upsert (fully or partially) the list of theme settings
+ *     tags: [Settings]
+ *     requestBody:
+ *       description: Theme settings to update
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: Theme settings
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ */
+router.putAsync('/theme',
+  loggedIn,
+  accessControl(actions.UPDATE, possessions.ANY, resources.SETTINGS),
+  controllers.settings.updateTheme)
 
 /**
  * @openapi
