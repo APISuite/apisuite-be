@@ -7,6 +7,7 @@ const msgBroker = require('../services/msg-broker')
 const { settingTypes, idpProviders } = require('../util/enums')
 const Gateway = require('../services/gateway')
 const Idp = require('../services/idp')
+const themeSettings = require('../util/theme-config')
 
 const createDefaultAccountSettings = (txn) => {
   return models.Setting.create({
@@ -303,9 +304,25 @@ const disableSSO = async (idp, ssoClient) => {
   await ssoClient.destroy()
 }
 
+const getTheme = async (req, res) => {
+  let settings = await models.Setting.findOne({
+    where: { type: settingTypes.THEME },
+  })
+
+  if (!settings) {
+    settings = models.Setting.create({
+      type: settingTypes.THEME,
+      values: themeSettings,
+    })
+  }
+
+  return res.status(HTTPStatus.OK).send(settings.values)
+}
+
 module.exports = {
   get,
   upsert,
+  getTheme,
   getIdp,
   updateIdp,
   getGateway,

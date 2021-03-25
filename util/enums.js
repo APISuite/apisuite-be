@@ -3,6 +3,7 @@ const settingTypes = {
   IDP: 'idp',
   GATEWAY: 'gateway',
   PLAN: 'plan',
+  THEME: 'theme',
 }
 
 const idpProviders = {
