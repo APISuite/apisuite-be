@@ -24,6 +24,23 @@ router.getAsync('/',
 
 /**
  * @openapi
+ * /settings/theme:
+ *   get:
+ *     description: Get theme settings
+ *     tags: [Settings]
+ *     responses:
+ *       200:
+ *         description: Theme settings
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ */
+router.getAsync('/theme',
+  controllers.settings.getTheme)
+
+/**
+ * @openapi
  * /settings:
  *   put:
  *     description: Upsert (fully or partially) the list of account settings
