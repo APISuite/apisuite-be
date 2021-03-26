@@ -59,29 +59,29 @@ router.putAsync('/',
 
 /**
  * @openapi
- * /settings/theme:
+ * /settings/portal:
  *   get:
- *     description: Get theme settings
+ *     description: Get portal settings
  *     tags: [Settings]
  *     responses:
  *       200:
- *         description: Theme settings
+ *         description: Portal settings
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  */
-router.getAsync('/theme',
-  controllers.settings.getTheme)
+router.getAsync('/portal',
+  controllers.settings.getPortalSettings)
 
 /**
  * @openapi
- * /settings/theme:
+ * /settings/portal:
  *   put:
- *     description: Upsert (fully or partially) the list of theme settings
+ *     description: Upsert (fully or partially) the list of portal settings
  *     tags: [Settings]
  *     requestBody:
- *       description: Theme settings to update
+ *       description: Portal settings to update
  *       required: true
  *       content:
  *         application/json:
@@ -91,7 +91,7 @@ router.getAsync('/theme',
  *       - cookieAuth: []
  *     responses:
  *       200:
- *         description: Theme settings
+ *         description: Portal settings
  *         content:
  *           application/json:
  *             schema:
@@ -101,10 +101,10 @@ router.getAsync('/theme',
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  */
-router.putAsync('/theme',
+router.putAsync('/portal',
   loggedIn,
   accessControl(actions.UPDATE, possessions.ANY, resources.SETTINGS),
-  controllers.settings.updateTheme)
+  controllers.settings.updatePortalSettings)
 
 /**
  * @openapi

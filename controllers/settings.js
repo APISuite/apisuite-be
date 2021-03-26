@@ -7,7 +7,7 @@ const msgBroker = require('../services/msg-broker')
 const { settingTypes, idpProviders } = require('../util/enums')
 const Gateway = require('../services/gateway')
 const Idp = require('../services/idp')
-const themeSettings = require('../util/theme-config')
+const portalSettings = require('../util/portal-settings')
 
 const createDefaultAccountSettings = (txn) => {
   return models.Setting.create({
@@ -304,29 +304,29 @@ const disableSSO = async (idp, ssoClient) => {
   await ssoClient.destroy()
 }
 
-const getTheme = async (req, res) => {
+const getPortalSettings = async (req, res) => {
   let settings = await models.Setting.findOne({
-    where: { type: settingTypes.THEME },
+    where: { type: settingTypes.PORTAL },
   })
 
   if (!settings) {
     settings = models.Setting.create({
-      type: settingTypes.THEME,
-      values: themeSettings,
+      type: settingTypes.PORTAL,
+      values: portalSettings,
     })
   }
 
   return res.status(HTTPStatus.OK).send(settings.values)
 }
 
-const updateTheme = async (req, res) => {
+const updatePortalSettings = async (req, res) => {
   let settings = await models.Setting.findOne({
-    where: { type: settingTypes.THEME },
+    where: { type: settingTypes.PORTAL },
   })
 
   if (!settings) {
     return models.Setting.create({
-      type: settingTypes.THEME,
+      type: settingTypes.PORTAL,
       values: req.body,
     }, {
       returning: true,
@@ -342,11 +342,11 @@ const updateTheme = async (req, res) => {
 module.exports = {
   get,
   upsert,
-  getTheme,
+  getPortalSettings,
+  updatePortalSettings,
   getIdp,
   updateIdp,
   getGateway,
   setGateway,
   syncGateway,
-  updateTheme,
 }
