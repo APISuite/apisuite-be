@@ -7,7 +7,7 @@ const log = require('../util/logger')
 const emailService = require('../services/email')
 const { models, sequelize } = require('../models')
 const jwt = require('../services/jwt')
-const Idp = require('../idp')
+const Idp = require('../services/idp')
 const { settingTypes } = require('../util/enums')
 const config = require('../config')
 const { getRevokedCookieConfig } = require('../util/cookies')
@@ -211,7 +211,8 @@ const oidcAuth = async (req, res) => {
   authURL.searchParams.append('scope', 'openid email')
   authURL.searchParams.append('state', req.query.state)
   authURL.searchParams.append('response_type', 'code')
-  authURL.searchParams.append('redirect_uri', `${config.get('appURL')}/sso/auth`)
+  const redirectURL = req.query.invite ? config.get('sso.inviteSignInRedirectURL') : config.get('sso.signInRedirectURL')
+  authURL.searchParams.append('redirect_uri', redirectURL)
 
   res.redirect(authURL.toString())
 }
@@ -236,7 +237,9 @@ const oidcToken = async (req, res) => {
 
   const discoveryData = await oidcDiscovery(settings.values.configuration.discoveryURL)
 
-  const tokens = await exchangeCode(req.body.code, ssoClient, discoveryData)
+  const redirectURL = req.query.invite ? config.get('sso.inviteSignInRedirectURL') : config.get('sso.signInRedirectURL')
+
+  const tokens = await exchangeCode(req.body.code, ssoClient, discoveryData, redirectURL)
   if (!tokens) {
     return res.status(HTTPStatus.UNAUTHORIZED).send({ errors: ['OIDC: could not authenticate'] })
   }
@@ -294,13 +297,14 @@ const oidcToken = async (req, res) => {
  * @param {string} code
  * @param {object} ssoClient
  * @param {object} discoveryData - Object with the data returned from OIDC discovery endpoint
+ * @param {string} redirectURL
  * @returns {Promise<null|object>} - Returns an object with the set of tokens obtained in code exchange
  * */
-const exchangeCode = async (code, ssoClient, discoveryData) => {
+const exchangeCode = async (code, ssoClient, discoveryData, redirectURL) => {
   const params = new URLSearchParams()
   params.append('grant_type', 'authorization_code')
   params.append('code', code)
-  params.append('redirect_uri', `${config.get('appURL')}/sso/auth`)
+  params.append('redirect_uri', redirectURL)
   params.append('client_id', ssoClient.clientId)
   params.append('client_secret', ssoClient.clientSecret)
 

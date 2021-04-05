@@ -1,7 +1,7 @@
 const Kong = require('./kong')
 
 const { models } = require('../../models')
-const { settingTypes, gatewayProviders, subscriptionModels } = require('../enums')
+const { settingTypes, gatewayProviders, subscriptionModels } = require('../../util/enums')
 
 const getConfig = async () => {
   const settings = await models.Setting.findOne({

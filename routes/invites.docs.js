@@ -1,18 +1,16 @@
-// Documentation for settings endpoints
-
 /**
  * @openapi
  * components:
  *   schemas:
  *     OrganizationInvite:
  *       type: object
- *       required:
- *         - url
- *         - apiKey
  *       properties:
- *         url:
+ *         email:
  *           type: string
- *           format: uri
- *         apiKey:
+ *         organization:
  *           type: string
+ *         isUser:
+ *           type: boolean
+ *         hasOrganizations:
+ *           type: boolean
  */

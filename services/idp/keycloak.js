@@ -1,8 +1,8 @@
 const HTTPStatus = require('http-status-codes')
 const fetch = require('node-fetch')
-const log = require('../util/logger')
+const log = require('../../util/logger')
 const IdP = require('./idp')
-const { oidcDiscovery } = require('../util/oidc')
+const { oidcDiscovery } = require('../../util/oidc')
 
 class Keycloak extends IdP {
   async createClient (clientConfig) {

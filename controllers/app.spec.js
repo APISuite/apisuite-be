@@ -5,7 +5,7 @@ const helpers = require('../util/test-helpers')
 const { models, sequelize } = require('../models')
 const Api = models.Api
 const App = models.App
-const Gateway = require('../util/gateway')
+const Gateway = require('../services/gateway')
 const {
   subscribeToAPI,
   isSubscribedTo,

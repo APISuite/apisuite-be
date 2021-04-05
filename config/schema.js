@@ -177,6 +177,56 @@ const schema = {
     default: '',
     env: 'APISUITE_SETUP_TOKEN',
   },
+  sso: {
+    signInRedirectURL: {
+      doc: 'Redirect URL for regular sign in flow',
+      format: String,
+      default: 'http://localhost:3001/sso/auth',
+      env: 'APISUITE_SSO_SIGNIN_REDIRECT_URL',
+    },
+    inviteSignInRedirectURL: {
+      doc: 'Redirect URL for invite page sign in flow',
+      format: String,
+      default: 'http://localhost:3001/auth/register',
+      env: 'APISUITE_SSO_INVITE_REDIRECT_URL',
+    },
+  },
+  storage: {
+    provider: {
+      doc: 'Cloud storage provider',
+      format: ['s3'],
+      default: '',
+      env: 'APISUITE_STORAGE_PROVIDER',
+    },
+    s3: {
+      region: {
+        doc: 'AWS S3 region',
+        format: String,
+        default: '',
+        env: 'APISUITE_STORAGE_S3_REGION',
+      },
+      bucket: {
+        doc: 'AWS S3 bucket to be used for media storage',
+        format: String,
+        default: '',
+        env: 'APISUITE_STORAGE_S3_BUCKET',
+      },
+      credentials: {
+        accessKeyId: {
+          doc: 'AWS access key ID',
+          format: String,
+          default: '',
+          env: 'APISUITE_STORAGE_S3_ACCESS_KEY_ID',
+        },
+        secretAccessKey: {
+          doc: 'AWS secret access key',
+          format: String,
+          default: '',
+          env: 'APISUITE_STORAGE_S3_SECRET_ACCESS_KEY',
+        },
+      },
+    },
+  },
 }
 
 module.exports = schema

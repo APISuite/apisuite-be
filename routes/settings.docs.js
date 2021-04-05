@@ -71,7 +71,6 @@
  *     Keycloak:
  *       type: object
  *       required:
- *         - clientRegistrationURL
  *         - initialAccessToken
  *       properties:
  *         clientRegistrationURL:

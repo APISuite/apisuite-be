@@ -11,6 +11,30 @@ const {
 
 /**
  * @openapi
+ * /organizations/publishers:
+ *   get:
+ *     summary: Get list of public app publishers
+ *     tags: [Organization]
+ *     responses:
+ *       200:
+ *         description: Public app publishers list
+ *         content:
+ *           application/json:
+ *             schema:
+ *                type: array
+ *                items:
+ *                  type: object
+ *                  properties:
+ *                    id:
+ *                      type: number
+ *                    name:
+ *                     type: string
+ */
+router.getAsync('/publishers',
+  controllers.organization.listPublishers)
+
+/**
+ * @openapi
  * /organizations:
  *   get:
  *     description: Get list of organizations

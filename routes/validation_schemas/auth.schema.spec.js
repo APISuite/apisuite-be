@@ -8,6 +8,7 @@ const {
   validateProvider,
   validateState,
   validateCode,
+  validateAuthFlags,
 } = require('./auth.schema')
 const helpers = require('../../util/test-helpers')
 const Chance = require('chance')
@@ -262,6 +263,48 @@ describe('Auth Validations', () => {
           const next = sinon.spy()
 
           validateCode(req, res, next)
+          sinon.assert.called(next)
+        })
+      })
+    })
+  })
+
+  describe('validateAuthFlags', () => {
+    describe('test invalid payloads', () => {
+      const testData = [
+        { query: { invite: 12345 } },
+        { query: { invite: 't' } },
+        { query: { invite: 'yes' } },
+        { query: { invite: [] } },
+        { query: { invite: {} } },
+      ]
+
+      testData.forEach((mockReq) => {
+        it('should not validate and return 400', () => {
+          const req = mockRequest(mockReq)
+          const res = mockResponse()
+          const next = sinon.spy()
+
+          validateAuthFlags(req, res, next)
+          sinon.assert.notCalled(next)
+          sinon.assert.calledWith(res.status, HTTPStatus.BAD_REQUEST)
+          helpers.calledWithErrors(res.send)
+        })
+      })
+    })
+
+    describe('test valid payloads', () => {
+      const testData = [
+        { query: { invite: 'true' } },
+      ]
+
+      testData.forEach((mockReq) => {
+        it('should validate and call next', () => {
+          const req = mockRequest(mockReq)
+          const res = mockResponse()
+          const next = sinon.spy()
+
+          validateAuthFlags(req, res, next)
           sinon.assert.called(next)
         })
       })

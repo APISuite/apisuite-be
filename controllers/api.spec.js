@@ -6,7 +6,7 @@ const { models, sequelize } = require('../models')
 const Api = models.Api
 const ApiVersion = models.ApiVersion
 const swaggerUtil = require('../util/swagger_util')
-const Gateway = require('../util/gateway')
+const Gateway = require('../services/gateway')
 const {
   getAll,
   getById,

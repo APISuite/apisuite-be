@@ -2,10 +2,10 @@ const HTTPStatus = require('http-status-codes')
 const log = require('../util/logger')
 const { Op } = require('sequelize')
 const { models, sequelize } = require('../models')
-const Gateway = require('../util/gateway')
+const Gateway = require('../services/gateway')
 const { publishEvent, routingKeys } = require('../services/msg-broker')
 const { settingTypes, subscriptionModels, appStates } = require('../util/enums')
-const Idp = require('../idp')
+const Idp = require('../services/idp')
 
 const appAttributes = {
   include: [
@@ -199,6 +199,7 @@ const updateApp = async (req, res) => {
         shortDescription: req.body.shortDescription,
         redirect_url: req.body.redirectUrl || req.body.redirect_url,
         logo: req.body.logo,
+        labels: req.body.labels,
         tosUrl: req.body.tosUrl,
         privacyUrl: req.body.privacyUrl,
         youtubeUrl: req.body.youtubeUrl,
@@ -315,6 +316,7 @@ const createDraftApp = async (req, res) => {
       org_id: req.user.org.id,
       idpProvider: idp.getProvider(),
       state: appStates.DRAFT,
+      labels: req.body.labels || [],
       tosUrl: req.body.tosUrl,
       privacyUrl: req.body.privacyUrl,
       youtubeUrl: req.body.youtubeUrl,
@@ -407,106 +409,6 @@ const requestAccess = async (req, res) => {
   })
 
   return res.sendStatus(HTTPStatus.NO_CONTENT)
-}
-
-// deprecated
-const createApp = async (req, res) => {
-  const transaction = await sequelize.transaction()
-  try {
-    const idp = await Idp.getIdP()
-    const client = await idp.createClient({
-      clientName: req.body.name,
-      redirectURIs: [req.body.redirect_url],
-    })
-
-    let app = await models.App.create(
-      {
-        name: req.body.name,
-        description: req.body.description,
-        redirect_url: req.body.redirect_url,
-        visibility: req.body.visibility || 'private',
-        logo: req.body.logo,
-        clientId: client.clientId,
-        clientSecret: client.clientSecret,
-        client_data: client.extra,
-        enable: true,
-        org_id: req.user.org.id,
-        idpProvider: idp.getProvider(),
-      },
-      {
-        transaction,
-        include: [
-          ...includes(),
-        ],
-        attributes: appAttributes,
-      },
-    )
-
-    if (typeof req.body.pub_urls !== 'undefined') {
-      const data = []
-      for (const pubUrl of req.body.pub_urls) {
-        const puburlData = {
-          url: pubUrl.url,
-          app_id: app.dataValues.id,
-          type: pubUrl.type,
-        }
-        data.push(puburlData)
-      }
-
-      if (data.length > 0) {
-        await models.PubURLApp.bulkCreate(data, { transaction })
-      }
-    }
-
-    const subscriptionModel = await getSubscriptionModel()
-    if (subscriptionModel === subscriptionModels.SIMPLIFIED) {
-      const gateway = await Gateway()
-      await gateway.subscribeAll(app.id, app.clientId)
-    }
-
-    if (subscriptionModel === subscriptionModels.DETAILED && typeof req.body.subscriptions !== 'undefined') {
-      const subscriptions = req.body.subscriptions || []
-      // unsubscribe all and add subscriptions again
-      let currSubs = await app.getSubscriptions({ transaction })
-      currSubs = currSubs.length ? currSubs.map(s => s.id) : []
-      await app.removeSubscriptions(currSubs, { transaction })
-      await app.addSubscriptions(subscriptions, { transaction })
-
-      await handleGatewaySubscriptions(app, currSubs, subscriptions)
-    }
-
-    // get app with associations
-    app = await models.App.findOne(
-      {
-        where: {
-          id: app.dataValues.id,
-        },
-        include: includes(),
-        transaction,
-      },
-    )
-
-    // TODO this is a temporary adjustment to simplify adoption of the simplified model in the FE
-    if (subscriptionModel === subscriptionModels.SIMPLIFIED) {
-      const apis = await models.Api.findAll({
-        where: {
-          publishedAt: { [Op.not]: null },
-        },
-        distinct: true,
-        include: [{ model: models.ApiVersion }],
-      })
-
-      app.subscriptions = apis.map((s) => s.id)
-    }
-
-    await transaction.commit()
-
-    return res.status(HTTPStatus.CREATED).send(app)
-  } catch (err) {
-    if (transaction) await transaction.rollback()
-    log.error(err, '[CREATE APP]')
-    return res.status(HTTPStatus.INTERNAL_SERVER_ERROR).send({ success: false, errors: ['Failed to create app.'] })
-  }
 }
 
 const subscribeToAPI = async (req, res) => {
@@ -623,14 +525,172 @@ const isSubscribedTo = async (req, res) => {
   }
 }
 
+const listPublicApps = async (req, res, next) => {
+  const filters = {
+    visibility: 'public',
+    enable: true,
+    state: appStates.APPROVED,
+  }
+
+  if (req.query.org_id) {
+    filters.org_id = {
+      [Op.in]: Array.isArray(req.query.org_id) ? req.query.org_id : [req.query.org_id],
+    }
+  }
+
+  if (req.query.label) {
+    filters.labels = {
+      [Op.contains]: Array.isArray(req.query.label) ? req.query.label : [req.query.label],
+    }
+  }
+
+  let search = {}
+  if (req.query.search && typeof req.query.search === 'string') {
+    const matchSearch = `%${req.query.search}%`
+    search = {
+      [Op.or]: [
+        { name: { [Op.iLike]: matchSearch } },
+        { '$organization.name$': { [Op.iLike]: matchSearch } },
+        sequelize.literal(`EXISTS (SELECT * FROM unnest(labels) AS label WHERE label ILIKE '${matchSearch}')`),
+      ],
+    }
+  }
+
+  let order = []
+  const sortOrder = req.query.order || 'asc'
+  switch (req.query.sort_by) {
+    case 'updated': {
+      order = [['updated_at', sortOrder]]
+      break
+    }
+    case 'org': {
+      order = [[models.Organization, 'name', sortOrder]]
+      break
+    }
+    default: {
+      order = [['name', sortOrder]]
+      break
+    }
+  }
+
+  const apps = await models.App.findAll({
+    where: { ...filters, ...search },
+    include: [{
+      model: models.Organization,
+      attributes: [
+        'id',
+        'name',
+        'tosUrl',
+        'privacyUrl',
+        'supportUrl',
+      ],
+    }],
+    attributes: [
+      'id',
+      'name',
+      'description',
+      'shortDescription',
+      'logo',
+      'labels',
+      'tosUrl',
+      'privacyUrl',
+      'youtubeUrl',
+      'websiteUrl',
+      'supportUrl',
+      'createdAt',
+      'updatedAt',
+      ['org_id', 'orgId'],
+    ],
+    order,
+  })
+
+  return res.status(HTTPStatus.OK).json(apps)
+}
+
+const listPublicLabels = async (req, res) => {
+  // const sql = `
+  //   SELECT DISTINCT unnest(labels) AS label
+  //   FROM app
+  //   WHERE visibility = 'public'
+  //   AND enable = true
+  //   AND state = 'approved'
+  // ORDER BY label`
+  // const labels = await sequelize.query(sql, { type: sequelize.QueryTypes.SELECT })
+
+  const labels = await models.App.findAll({
+    attributes: [
+      [
+        sequelize.fn('distinct',
+          sequelize.fn('unnest',
+            sequelize.literal('labels'),
+          ),
+        ), 'label'],
+    ],
+    raw: true,
+    where: {
+      visibility: 'public',
+      enable: true,
+      state: appStates.APPROVED,
+    },
+    order: [[sequelize.literal('label')]],
+  })
+
+  return res.status(HTTPStatus.OK).json(labels.map((l) => l.label))
+}
+
+const publicAppDetails = async (req, res) => {
+  const app = await models.App.findOne({
+    where: {
+      id: req.params.id,
+      visibility: 'public',
+      enable: true,
+      state: appStates.APPROVED,
+    },
+    include: [{
+      model: models.Organization,
+      attributes: [
+        'id',
+        'name',
+        'tosUrl',
+        'privacyUrl',
+        'supportUrl',
+      ],
+    }],
+    attributes: [
+      'id',
+      'name',
+      'description',
+      'shortDescription',
+      'logo',
+      'labels',
+      'tosUrl',
+      'privacyUrl',
+      'youtubeUrl',
+      'websiteUrl',
+      'supportUrl',
+      'createdAt',
+      'updatedAt',
+      ['org_id', 'orgId'],
+    ],
+  })
+
+  if (!app) {
+    return res.status(HTTPStatus.NOT_FOUND).send({ errors: ['App not found'] })
+  }
+
+  return res.status(HTTPStatus.OK).json(app)
+}
+
 module.exports = {
   getApp,
   createDraftApp,
   requestAccess,
-  createApp,
   updateApp,
   deleteApp,
   subscribeToAPI,
   listApps,
   isSubscribedTo,
+  listPublicApps,
+  listPublicLabels,
+  publicAppDetails,
 }
