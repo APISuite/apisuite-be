@@ -374,7 +374,7 @@ const getCookieConfigs = () => {
 }
 
 const introspect = async (req, res) => {
-  return res.status(HTTPStatus.OK).send({ id: req.user.id })
+  return res.status(HTTPStatus.OK).send(req.user)
 }
 
 module.exports = {
