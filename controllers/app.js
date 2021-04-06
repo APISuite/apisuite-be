@@ -540,7 +540,7 @@ const listPublicApps = async (req, res, next) => {
 
   if (req.query.label) {
     filters.labels = {
-      [Op.contains]: Array.isArray(req.query.label) ? req.query.label : [req.query.label],
+      [Op.overlap]: Array.isArray(req.query.label) ? req.query.label : [req.query.label],
     }
   }
 
@@ -560,11 +560,17 @@ const listPublicApps = async (req, res, next) => {
   const sortOrder = req.query.order || 'asc'
   switch (req.query.sort_by) {
     case 'updated': {
-      order = [['updated_at', sortOrder]]
+      order = [
+        ['updated_at', sortOrder],
+        ['name', sortOrder],
+      ]
       break
     }
     case 'org': {
-      order = [[models.Organization, 'name', sortOrder]]
+      order = [
+        [models.Organization, 'name', sortOrder],
+        ['name', sortOrder],
+      ]
       break
     }
     default: {

@@ -7,6 +7,7 @@ const msgBroker = require('../services/msg-broker')
 const { settingTypes, idpProviders } = require('../util/enums')
 const Gateway = require('../services/gateway')
 const Idp = require('../services/idp')
+const portalSettings = require('../util/portal-settings')
 
 const createDefaultAccountSettings = (txn) => {
   return models.Setting.create({
@@ -303,9 +304,46 @@ const disableSSO = async (idp, ssoClient) => {
   await ssoClient.destroy()
 }
 
+const getPortalSettings = async (req, res) => {
+  let settings = await models.Setting.findOne({
+    where: { type: settingTypes.PORTAL },
+  })
+
+  if (!settings) {
+    settings = models.Setting.create({
+      type: settingTypes.PORTAL,
+      values: portalSettings,
+    })
+  }
+
+  return res.status(HTTPStatus.OK).send(settings.values)
+}
+
+const updatePortalSettings = async (req, res) => {
+  let settings = await models.Setting.findOne({
+    where: { type: settingTypes.PORTAL },
+  })
+
+  if (!settings) {
+    return models.Setting.create({
+      type: settingTypes.PORTAL,
+      values: req.body,
+    }, {
+      returning: true,
+    })
+  }
+
+  settings.values = req.body
+  settings = await settings.save({ returning: true })
+
+  return res.status(HTTPStatus.OK).send(settings.values)
+}
+
 module.exports = {
   get,
   upsert,
+  getPortalSettings,
+  updatePortalSettings,
   getIdp,
   updateIdp,
   getGateway,

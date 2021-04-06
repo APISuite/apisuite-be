@@ -4,17 +4,8 @@ const { roles } = require('../util/enums')
 const jwt = require('../services/jwt')
 
 const getTokenUserByID = async (userID) => {
-  const user = await models.User.findOne({
-    where: { id: userID },
-    attributes: ['email'],
-  })
-  if (!user) return
-  return getTokenUser(user.email)
-}
-
-const getTokenUser = async (email) => {
   let user = await models.User.findOne({
-    where: { email: email },
+    where: { id: userID },
     attributes: ['id', 'name', 'email'],
   })
 
