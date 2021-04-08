@@ -20,7 +20,7 @@ describe('Settings', () => {
 
     beforeEach(() => {
       stubs = {
-        findOne: sinon.stub(Setting, 'findOne'),
+        findAll: sinon.stub(Setting, 'findAll'),
         SSOClient_findOne: sinon.stub(SSOClient, 'findOne'),
         create: sinon.stub(Setting, 'create'),
         idp_getIdP: sinon.stub(Idp, 'getIdP'),
@@ -32,13 +32,11 @@ describe('Settings', () => {
     })
 
     it('should return 200 and the settings', async () => {
-      const mockData = {
-        get: () => ({
-          values: {
-            portalName: 'test',
-          },
-        }),
-      }
+      const mockData = [
+        { type: enums.settingTypes.ACCOUNT, values: {} },
+        { type: enums.settingTypes.PORTAL, values: {} },
+        { type: enums.settingTypes.IDP, values: {} },
+      ]
       stubs.idp_getIdP.resolves({
         getProvider: () => enums.idpProviders.INTERNAL,
       })
@@ -46,21 +44,19 @@ describe('Settings', () => {
 
       const req = mockRequest()
       const res = mockResponse()
-      stubs.findOne.resolves(mockData)
+      stubs.findAll.resolves(mockData)
 
       await get(req, res)
       sinon.assert.calledWith(res.status, HTTPStatus.OK)
-      sinon.assert.calledWith(res.send, { portalName: 'test', sso: [] })
+      sinon.assert.calledWith(res.send, sinon.match.object)
     })
 
     it('should return 200 and the settings when no settings exist yet', async () => {
       const req = mockRequest()
       const res = mockResponse()
-      stubs.findOne.resolves(null)
+      stubs.findAll.resolves([])
       stubs.create.resolves({
-        get: () => ({
-          values: {},
-        }),
+        values: {},
       })
       stubs.idp_getIdP.resolves({
         getProvider: () => enums.idpProviders.INTERNAL,
@@ -68,13 +64,13 @@ describe('Settings', () => {
 
       await get(req, res)
       sinon.assert.calledWith(res.status, HTTPStatus.OK)
-      sinon.assert.calledWith(res.send, { sso: [] })
+      sinon.assert.calledWith(res.send, sinon.match.object)
     })
 
     it('should return 500 and errors when something fails', async () => {
       const req = mockRequest()
       const res = mockResponse({ sendInternalError: sinon.spy(() => undefined) })
-      stubs.findOne.rejects()
+      stubs.findAll.rejects()
 
       await get(req, res)
       sinon.assert.called(res.sendInternalError)

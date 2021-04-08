@@ -1,9 +1,4 @@
 module.exports = {
-  portalName: 'API Suite Portal',
-  clientName: 'API Suite',
-  supportURL: 'https://intercom.help/api-suite/en/articles/4586659-api-portal-users',
-  documentationURL: '',
-  socialURLs: [],
   i18nOptions: [
     { locale: 'en-US', label: 'We speak English' },
     { locale: 'pt-PT', label: 'Nós falamos Português' },
@@ -56,16 +51,6 @@ module.exports = {
     label: '#BAC0C6',
     dimensions: {
       borderRadius: 4,
-    },
-  },
-  infra: {
-    hydra: 'hydraauth.develop.apisuite.io',
-    sandbox: 'sandbox.develop.apisuite.io',
-    remoteAPI: 'remoteAPI',
-  },
-  pages: {
-    landing: {
-      components: [],
     },
   },
 }
