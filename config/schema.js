@@ -187,7 +187,7 @@ const schema = {
     inviteSignInRedirectURL: {
       doc: 'Redirect URL for invite page sign in flow',
       format: String,
-      default: 'http://localhost:3001/auth/register',
+      default: 'http://localhost:3001/auth/signup',
       env: 'APISUITE_SSO_INVITE_REDIRECT_URL',
     },
   },
