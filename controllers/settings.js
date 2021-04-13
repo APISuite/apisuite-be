@@ -1,6 +1,5 @@
 const HTTPStatus = require('http-status-codes')
 const merge = require('deepmerge')
-const { Op } = require('sequelize')
 const log = require('../util/logger')
 const config = require('../config')
 const { models, sequelize } = require('../models')
@@ -14,13 +13,6 @@ const createDefaultAccountSettings = (txn) => {
   return models.Setting.create({
     type: settingTypes.ACCOUNT,
     values: {},
-  }, { transaction: txn })
-}
-
-const createDefaultPortalSettings = (txn) => {
-  return models.Setting.create({
-    type: settingTypes.PORTAL,
-    values: portalSettings,
   }, { transaction: txn })
 }
 
@@ -46,52 +38,36 @@ const upsertSettings = async (payload, type) => {
 
 const get = async (req, res) => {
   try {
-    let mergedSettings = {}
-    const settings = await models.Setting.findAll({
-      where: {
-        [Op.or]: [
-          { type: settingTypes.ACCOUNT },
-          { type: settingTypes.PORTAL },
-          { type: settingTypes.IDP },
-        ],
-      },
+    let settings = await models.Setting.findOne({
+      where: { type: settingTypes.ACCOUNT },
     })
 
-    let accountSettings = settings.find((s) => s.type === settingTypes.ACCOUNT)
-    if (!accountSettings) {
-      accountSettings = await createDefaultAccountSettings()
-    }
-    mergedSettings = {
-      ...accountSettings.values,
-      sso: [],
+    if (!settings) {
+      settings = await createDefaultAccountSettings()
     }
 
-    let portalSettings = settings.find((s) => s.type === settingTypes.PORTAL)
-    if (!portalSettings) {
-      portalSettings = await createDefaultPortalSettings()
-    }
-    mergedSettings = {
-      ...mergedSettings,
-      ...portalSettings.values,
-    }
+    settings = settings.get({ plain: true })
+    settings.values.sso = []
+    settings.values.providerSignupURL = ''
 
     const idp = await Idp.getIdP()
     if (idp.getProvider() !== idpProviders.INTERNAL) {
       const ssoClient = await models.SSOClient.findOne({
         where: { provider: idp.getProvider() },
       })
-
       if (ssoClient) {
-        mergedSettings.sso = [ssoClient.provider]
+        settings.values.sso = [ssoClient.provider]
 
-        const idpSettings = settings.find((s) => s.type === settingTypes.IDP)
+        const idpSettings = await models.Setting.findOne({
+          where: { type: settingTypes.IDP },
+        })
         if (idpSettings && idpSettings.values.configuration.providerSignupURL) {
-          mergedSettings.providerSignupURL = idpSettings.values.configuration.providerSignupURL
+          settings.values.providerSignupURL = idpSettings.values.configuration.providerSignupURL
         }
       }
     }
 
-    return res.status(HTTPStatus.OK).send(mergedSettings)
+    return res.status(HTTPStatus.OK).send(settings.values)
   } catch (error) {
     log.error(error, '[SETTINGS get]')
     return res.sendInternalError()
@@ -335,7 +311,7 @@ const getPortalSettings = async (req, res) => {
   })
 
   if (!settings) {
-    settings = await models.Setting.create({
+    settings = models.Setting.create({
       type: settingTypes.PORTAL,
       values: portalSettings,
     })
