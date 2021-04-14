@@ -64,7 +64,7 @@ const get = async (req, res) => {
     mergedSettings = {
       ...accountSettings.values,
       sso: [],
-      providerSignupURL: ''
+      providerSignupURL: '',
     }
 
     let portalSettings = settings.find((s) => s.type === settingTypes.PORTAL)

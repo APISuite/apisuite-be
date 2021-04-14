@@ -4,7 +4,11 @@ const { Op } = require('sequelize')
 const { models, sequelize } = require('../models')
 const Gateway = require('../services/gateway')
 const { publishEvent, routingKeys } = require('../services/msg-broker')
-const { settingTypes, subscriptionModels, appStates } = require('../util/enums')
+const {
+  settingTypes,
+  subscriptionModels,
+  appStates,
+} = require('../util/enums')
 const Idp = require('../services/idp')
 
 const appAttributes = {
@@ -199,6 +203,7 @@ const updateApp = async (req, res) => {
         shortDescription: req.body.shortDescription,
         redirect_url: req.body.redirectUrl || req.body.redirect_url,
         logo: req.body.logo,
+        visibility: req.body.visibility,
         labels: req.body.labels,
         tosUrl: req.body.tosUrl,
         privacyUrl: req.body.privacyUrl,
@@ -291,6 +296,16 @@ const updateApp = async (req, res) => {
       user_id: req.user.id,
       app_id: req.params.id,
       organization_id: req.user.org.id,
+      meta: {
+        id: updated.id,
+        name: updated.name,
+        description: updated.description,
+        shortDescription: updated.shortDescription,
+        logo: updated.logo,
+        visibility: updated.visibility,
+        state: updated.state,
+        org: req.user.org,
+      },
     })
 
     return res.status(HTTPStatus.OK).send(updated)
@@ -316,6 +331,7 @@ const createDraftApp = async (req, res) => {
       org_id: req.user.org.id,
       idpProvider: idp.getProvider(),
       state: appStates.DRAFT,
+      visibility: req.body.visibility,
       labels: req.body.labels || [],
       tosUrl: req.body.tosUrl,
       privacyUrl: req.body.privacyUrl,
@@ -350,6 +366,16 @@ const createDraftApp = async (req, res) => {
       user_id: req.user.id,
       app_id: app.id,
       organization_id: req.user.org.id,
+      meta: {
+        id: app.id,
+        name: app.name,
+        description: app.description,
+        shortDescription: app.shortDescription,
+        logo: app.logo,
+        visibility: app.visibility,
+        state: app.state,
+        org: req.user.org,
+      },
     })
 
     return res.status(HTTPStatus.CREATED).send(app)
@@ -406,6 +432,16 @@ const requestAccess = async (req, res) => {
     user_id: req.user.id,
     app_id: req.params.id,
     organization_id: req.user.org.id,
+    meta: {
+      id: app.id,
+      name: app.name,
+      description: app.description,
+      shortDescription: app.shortDescription,
+      logo: app.logo,
+      visibility: app.visibility,
+      state: app.state,
+      org: req.user.org,
+    },
   })
 
   return res.sendStatus(HTTPStatus.NO_CONTENT)

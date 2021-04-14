@@ -132,6 +132,12 @@
  *           type: string
  *         description:
  *           type: string
+ *         visibility:
+ *           type: string
+ *           description: App visibility
+ *           enum:
+ *             - public
+ *             - private
  *         logo:
  *           type: string
  *           format: uri
