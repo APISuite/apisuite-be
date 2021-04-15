@@ -22,7 +22,15 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser())
 
-morgan.token('body', (req, res) => JSON.stringify(req.body))
+morgan.token('body', (req, res) => {
+  const noLogRoutes = [
+    '/auth/login',
+    '/registration/security',
+    '/users/password',
+  ]
+  if (noLogRoutes.includes(req.originalUrl)) return
+  return JSON.stringify(req.body)
+})
 app.use(morgan(':method :url :status - :body'))
 
 app.use(middleware.internalError)
