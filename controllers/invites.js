@@ -59,7 +59,7 @@ const accept = async (req, res) => {
   await invite.save()
 
   await models.UserOrganization.create({
-    user_id: invite.user_id,
+    user_id: req.user.id,
     org_id: invite.org_id,
     role_id: invite.role_id,
   })
