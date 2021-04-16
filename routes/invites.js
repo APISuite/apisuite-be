@@ -81,8 +81,6 @@ router.postAsync('/:token/accept',
  *         schema:
  *           type: string
  *           format: uuid
- *     security:
- *       - cookieAuth: []
  *     responses:
  *       204:
  *         description: No Content
@@ -94,7 +92,6 @@ router.postAsync('/:token/accept',
  *         $ref: '#/components/responses/NotFound'
  */
 router.postAsync('/:token/reject',
-  loggedIn,
   controllers.invites.reject)
 
 module.exports = router
