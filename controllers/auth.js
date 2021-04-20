@@ -336,7 +336,7 @@ const tokenVerifier = async (token, clientID, discoveryData) => {
     jwksUri: discoveryData.jwks_uri,
   })
 
-  const key = await jwksClient.getSigningKeyAsync(decoded.header.kid)
+  const key = await jwksClient.getSigningKey(decoded.header.kid)
   const signingKey = key.getPublicKey()
 
   let verified
@@ -374,7 +374,7 @@ const getCookieConfigs = () => {
 }
 
 const introspect = async (req, res) => {
-  return res.status(HTTPStatus.OK).send({ id: req.user.id })
+  return res.status(HTTPStatus.OK).send(req.user)
 }
 
 module.exports = {

@@ -59,6 +59,55 @@ router.putAsync('/',
 
 /**
  * @openapi
+ * /settings/portal:
+ *   get:
+ *     description: Get portal settings
+ *     tags: [Settings]
+ *     responses:
+ *       200:
+ *         description: Portal settings
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ */
+router.getAsync('/portal',
+  controllers.settings.getPortalSettings)
+
+/**
+ * @openapi
+ * /settings/portal:
+ *   put:
+ *     description: Upsert (fully or partially) the list of portal settings
+ *     tags: [Settings]
+ *     requestBody:
+ *       description: Portal settings to update
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: Portal settings
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ */
+router.putAsync('/portal',
+  loggedIn,
+  accessControl(actions.UPDATE, possessions.ANY, resources.SETTINGS),
+  controllers.settings.updatePortalSettings)
+
+/**
+ * @openapi
  * /settings/idp:
  *   get:
  *     description: Get list of IdP settings

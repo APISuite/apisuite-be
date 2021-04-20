@@ -29,15 +29,15 @@ const providerSchema = Joi.object({
 
 const stateSchema = Joi.object({
   state: Joi.string().min(10).max(15).required(),
-})
+}).unknown()
 
 const codeSchema = Joi.object({
   code: Joi.string().required(),
-})
+}).unknown()
 
 const flagsSchema = Joi.object({
   invite: Joi.string().valid('true').optional(),
-})
+}).unknown()
 
 module.exports = {
   validateForgotPasswordBody: validator(forgotPasswordSchema),
