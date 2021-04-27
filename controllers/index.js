@@ -9,6 +9,7 @@ const api = require('./api')
 const settings = require('./settings')
 const invites = require('./invites')
 const owner = require('./owner')
+const translations = require('./translations')
 
 module.exports = {
   api,
@@ -21,5 +22,6 @@ module.exports = {
   role,
   registration,
   settings,
+  translations,
   user,
 }

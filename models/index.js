@@ -33,6 +33,7 @@ const models = {
   Role: importModel('./role'),
   Setting: importModel('./setting'),
   SSOClient: importModel('./sso_client'),
+  Translation: importModel('./translation'),
   User: importModel('./user'),
   UserOrganization: importModel('./user_organization'),
   UserRegistration: importModel('./user_registration'),
