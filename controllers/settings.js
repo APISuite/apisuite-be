@@ -351,12 +351,13 @@ const updatePortalSettings = async (req, res) => {
   })
 
   if (!settings) {
-    return models.Setting.create({
+    settings = await models.Setting.create({
       type: settingTypes.PORTAL,
       values: req.body,
     }, {
       returning: true,
     })
+    return res.status(HTTPStatus.OK).send(settings.values)
   }
 
   settings.values = req.body
