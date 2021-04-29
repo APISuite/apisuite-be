@@ -4,7 +4,7 @@ const validator = require('./validator')
 const appSchema = Joi.object({
   name: Joi.string().required(),
   description: Joi.string().optional().allow(null, ''),
-  shortDescription: Joi.string().length(60).optional().allow(null, ''),
+  shortDescription: Joi.string().max(60).optional().allow(null, ''),
   redirectUrl: Joi.string().uri({ scheme: ['http', 'https'] }).optional(),
   redirect_url: Joi.string().uri({ scheme: ['http', 'https'] }).optional(),
   visibility: Joi.string().valid('public', 'private').optional(),
