@@ -391,13 +391,16 @@ const requestAccess = async (req, res) => {
     where: {
       id: req.params.id,
       org_id: req.user.org.id,
-      state: appStates.DRAFT,
       enable: true,
     },
   })
 
   if (!app) {
     return res.status(HTTPStatus.NOT_FOUND).send({ errors: ['App not found'] })
+  }
+
+  if (app.state === appStates.APPROVED) {
+    return res.sendStatus(HTTPStatus.NO_CONTENT)
   }
 
   const subscriptionModel = await getSubscriptionModel()
