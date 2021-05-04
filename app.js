@@ -66,6 +66,8 @@ app.use('/api-docs', redoc({
   favicon: 'https://cloudcdn.apisuite.io/favicon.ico',
 }))
 
+app.use('/media', express.static('media'))
+
 const bootstrapIdPSettings = async () => {
   const settings = await models.Setting.findOne({
     where: { type: settingTypes.IDP },
