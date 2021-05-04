@@ -85,7 +85,7 @@ router.getAsync('/',
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/PublicAppList'
+ *               $ref: '#/components/schemas/PublicAppListPaginated'
  *       400:
  *         $ref: '#/components/responses/BadRequest'
  */
@@ -118,6 +118,13 @@ router.getAsync('/public/labels',
  *   get:
  *     summary: Get details of public apps
  *     tags: [App]
+ *     parameters:
+ *       - name: id
+ *         description: The app id.
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: number
  *     responses:
  *       200:
  *         description: Public app
@@ -134,12 +141,19 @@ router.getAsync('/public/:id',
 
 /**
  * @openapi
- * /apps/:id:
+ * /apps/{id}:
  *   get:
  *     description: Get details of an application
  *     tags: [App]
  *     security:
  *       - cookieAuth: []
+ *     parameters:
+ *       - name: id
+ *         description: The app id.
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: number
  *     responses:
  *       200:
  *         description: App details

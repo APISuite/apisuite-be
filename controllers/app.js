@@ -618,7 +618,7 @@ const listPublicApps = async (req, res, next) => {
     }
   }
 
-  const apps = await models.App.findAll({
+  const queryOptions = {
     where: { ...filters, ...search },
     include: [{
       model: models.Organization,
@@ -647,6 +647,12 @@ const listPublicApps = async (req, res, next) => {
       ['org_id', 'orgId'],
     ],
     order,
+  }
+
+  const apps = await models.App.findAllPaginated({
+    page: req.query.page,
+    pageSize: req.query.pageSize,
+    options: queryOptions,
   })
 
   return res.status(HTTPStatus.OK).json(apps)

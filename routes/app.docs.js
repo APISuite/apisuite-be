@@ -9,6 +9,14 @@
  *       items:
  *         $ref: '#/components/schemas/AppV2'
  *
+ *     PublicAppListPaginated:
+ *       type: object
+ *       properties:
+ *         rows:
+ *           $ref: '#/components/schemas/PublicAppList'
+ *         pagination:
+ *           $ref: '#/components/schemas/Pagination'
+ *
  *     PublicAppList:
  *       type: array
  *       items:
