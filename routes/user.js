@@ -159,16 +159,7 @@ router.getAsync('/profile',
  *                   items:
  *                     $ref: '#/components/schemas/User'
  *                 pagination:
- *                   type: object
- *                   properties:
- *                     rowCount:
- *                       type: number
- *                     pageCount:
- *                       type: number
- *                     page:
- *                       type: number
- *                     pageSize:
- *                       type: number
+ *                   $ref: '#/components/schemas/Pagination'
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  *       500:
@@ -561,6 +552,13 @@ router.putAsync('/:id',
  *     tags: [User]
  *     security:
  *       - cookieAuth: []
+ *     parameters:
+ *       - name: id
+ *         required: true
+ *         description: The user id.
+ *         in: path
+ *         schema:
+ *           type: number
  *     requestBody:
  *       description: Data form
  *       required: true
@@ -605,6 +603,13 @@ router.postAsync('/:id/avatar',
  *     tags: [User]
  *     security:
  *       - cookieAuth: []
+ *     parameters:
+ *       - name: id
+ *         required: true
+ *         description: The user id.
+ *         in: path
+ *         schema:
+ *           type: number
  *     responses:
  *       204:
  *         description: No Content
