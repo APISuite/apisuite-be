@@ -8,6 +8,10 @@ class Storage {
     if (this.saveFile === Storage.prototype.saveFile) {
       throw new Error(`Storage[${new.target}]: missing saveFile implementation`)
     }
+
+    if (this.deleteFile === Storage.prototype.deleteFile) {
+      throw new Error(`Storage[${new.target}]: missing deleteFile implementation`)
+    }
   }
 
   /**

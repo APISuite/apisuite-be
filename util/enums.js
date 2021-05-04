@@ -16,6 +16,7 @@ const gatewayProviders = {
 }
 
 const storageProviders = {
+  LOCAL: 'local',
   S3: 's3',
 }
 

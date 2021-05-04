@@ -17,6 +17,12 @@ const schema = {
     default: 'http://localhost:3001',
     env: 'APISUITE_APP_URL',
   },
+  apiURL: {
+    doc: 'APISuite API URL',
+    format: String,
+    default: 'http://localhost:6001',
+    env: 'APISUITE_API_URL',
+  },
   cipherPassword: {
     doc: 'Cipher password',
     format: String,
@@ -194,8 +200,8 @@ const schema = {
   storage: {
     provider: {
       doc: 'Cloud storage provider',
-      format: ['s3'],
-      default: '',
+      format: ['local', 's3'],
+      default: 'local',
       env: 'APISUITE_STORAGE_PROVIDER',
     },
     s3: {
