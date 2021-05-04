@@ -77,16 +77,7 @@ router.getAsync('/publishers',
  *                   items:
  *                     $ref: '#/components/schemas/Organization'
  *                 pagination:
- *                   type: object
- *                   properties:
- *                     rowCount:
- *                       type: number
- *                     pageCount:
- *                       type: number
- *                     page:
- *                       type: number
- *                     pageSize:
- *                       type: number
+ *                   $ref: '#/components/schemas/Pagination'
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  *       500:

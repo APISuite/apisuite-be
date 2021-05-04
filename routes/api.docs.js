@@ -69,16 +69,7 @@
  *           items:
  *             $ref: '#/components/schemas/API'
  *         pagination:
- *           type: object
- *           properties:
- *             rowCount:
- *               type: number
- *             pageCount:
- *               type: number
- *             page:
- *               type: number
- *             pageSize:
- *               type: number
+ *           $ref: '#/components/schemas/Pagination'
  */
 
 /** @openapi

@@ -14,6 +14,18 @@
  *           items:
  *             type: string
  *
+ *     Pagination:
+ *       type: object
+ *       properties:
+ *         rowCount:
+ *           type: number
+ *         pageCount:
+ *           type: number
+ *         page:
+ *           type: number
+ *         pageSize:
+ *           type: number
+ *
  *   responses:
  *     BadRequest:
  *       description: Bad request
@@ -65,10 +77,6 @@
  *       type: apiKey
  *       in: cookie
  *       name: refresh_token
- *     x_access_token:
- *       type: apiKey
- *       name: x-access-token
- *       in: header
  *     x_app_token:
  *       type: apiKey
  *       name: x-app-token
