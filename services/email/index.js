@@ -77,7 +77,7 @@ const sendRecoverPassword = async (message) => {
 const sendInviteToOrg = async (message) => {
   const source = fs.readFileSync(path.join(__dirname, 'templates/confirm_invite.hbs'))
   const template = handlebars.compile(source.toString())
-  const link = new url.URL(`/invite/confirm?token=${message.token}`, config.get('appURL'))
+  const link = new url.URL(`/auth/invitation?token=${message.token}`, config.get('appURL'))
 
   const html = template({
     org: message.org,
@@ -106,7 +106,6 @@ const sendInviteToOrg = async (message) => {
 const sendInviteNewUserToOrg = async (message) => {
   const source = fs.readFileSync(path.join(__dirname, 'templates/confirm_invite.hbs'))
   const template = handlebars.compile(source.toString())
-  // const link = new url.URL(`/auth/signup?token=${message.token}`, config.get('appURL'))
   const link = new url.URL(`/auth/invitation?token=${message.token}`, config.get('appURL'))
 
   const html = template({
