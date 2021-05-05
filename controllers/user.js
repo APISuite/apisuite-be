@@ -205,11 +205,12 @@ const inviteUserToOrganization = async (req, res) => {
       token: invite.confirmation_token,
     }
 
+    const ownerOrg = await models.Organization.getOwnerOrganization()
     if (!user) {
       // if user does not exist send invitation to register into organization skipping organization step
-      await emailService.sendInviteNewUserToOrg(invitationData)
+      await emailService.sendInviteNewUserToOrg(invitationData, { logo: ownerOrg?.logo })
     } else {
-      await emailService.sendInviteToOrg(invitationData)
+      await emailService.sendInviteToOrg(invitationData, { logo: ownerOrg?.logo })
     }
 
     delete invite.confirmation_token
@@ -480,7 +481,8 @@ const setupMainAccount = async (req, res) => {
       token: invite.confirmation_token,
     }
 
-    await emailService.sendInviteNewUserToOrg(invitationData)
+    const ownerOrg = await models.Organization.getOwnerOrganization()
+    await emailService.sendInviteNewUserToOrg(invitationData, { logo: ownerOrg?.logo })
 
     await transaction.commit()
 
