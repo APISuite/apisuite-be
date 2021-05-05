@@ -148,11 +148,51 @@ const schema = {
       default: 'no-reply@apisuite.io',
       env: 'http://localhost:3001',
     },
-    sendgridApiKey: {
-      doc: 'Sendgrid API Key',
-      format: String,
-      default: 'secretapikey',
-      env: 'SENDGRID_API_KEY',
+    smtpConfig: {
+      pool: {
+        doc: 'Use SMTP connection pool',
+        format: Boolean,
+        default: true,
+        env: 'APISUITE_MAILER_SMTP_POOL',
+      },
+      host: {
+        doc: 'SMTP host',
+        format: String,
+        default: 'API Suite',
+        env: 'APISUITE_MAILER_SMTP_HOST',
+      },
+      port: {
+        doc: 'SMTP port',
+        format: Number,
+        default: 25,
+        env: 'APISUITE_MAILER_SMTP_PORT',
+      },
+      secure: {
+        doc: 'Use SMTP over TLS',
+        format: Boolean,
+        default: true,
+        env: 'APISUITE_MAILER_SMTP_SECURE',
+      },
+      auth: {
+        type: {
+          doc: 'SMTP authentication method',
+          format: ['login', 'oauth2'],
+          default: 'login',
+          env: 'APISUITE_MAILER_SMTP_AUTH_TYPE',
+        },
+        user: {
+          doc: 'SMTP username',
+          format: String,
+          default: 'myuser',
+          env: 'APISUITE_MAILER_SMTP_USER',
+        },
+        pass: {
+          doc: 'SMTP password',
+          format: String,
+          default: 'mypassword',
+          env: 'APISUITE_MAILER_SMTP_PASSWORD',
+        },
+      },
     },
   },
   hydra: {
