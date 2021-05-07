@@ -46,10 +46,11 @@ const forgotPassword = async (req, res) => {
     return res.status(HTTPStatus.INTERNAL_SERVER_ERROR).send({ errors: ['Failed to generate password recovery token.'] })
   }
 
+  const ownerOrg = await models.Organization.getOwnerOrganization()
   await emailService.sendRecoverPassword({
     email: user.email,
     token: recoveryToken,
-  })
+  }, { logo: ownerOrg?.logo })
 
   return res.status(HTTPStatus.OK).send({ message })
 }
