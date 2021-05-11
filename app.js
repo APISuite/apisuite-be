@@ -14,14 +14,6 @@ const { redoc } = require('./util/redoc')
 const { settingTypes, idpProviders } = require('./util/enums')
 const { sequelize } = require('./models')
 
-const app = express()
-
-// Application-Level API
-app.use(cors())
-app.use(express.json())
-app.use(express.urlencoded({ extended: true }))
-app.use(cookieParser())
-
 morgan.token('body', (req, res) => {
   const noLogRoutes = [
     '/auth/login',
@@ -31,12 +23,22 @@ morgan.token('body', (req, res) => {
   if (noLogRoutes.includes(req.originalUrl)) return
   return JSON.stringify(req.body)
 })
+
+const app = express()
+
+// Application-Level API
+app.use(cors())
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
+app.use(cookieParser())
+
 app.use(morgan(':method :url :status - :body'))
 
 app.use(middleware.internalError)
 
 // Auth middleware
-app.use(middleware.auth)
+app.use(middleware.auth.cookieAuth)
+app.use(middleware.auth.apiTokenAuth)
 
 // Routes
 app.use('/apis', routes.api)
@@ -111,5 +113,3 @@ const start = async () => {
 start().catch((err) => {
   log.error(err, '[FAILED TO START]')
 })
-
-module.exports = app // for testing

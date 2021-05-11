@@ -189,3 +189,29 @@
  *         vat:
  *           type: string
  */
+
+/** @openapi
+ * components:
+ *   schemas:
+ *     APIToken:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: number
+ *         name:
+ *           type: string
+ *         createdAt:
+ *           type: string
+ *
+ *     APITokenFull:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: number
+ *         token:
+ *           type: string
+ *         name:
+ *           type: string
+ *         createdAt:
+ *           type: string
+ */
