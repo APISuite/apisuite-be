@@ -38,6 +38,7 @@ app.use(middleware.internalError)
 
 // Auth middleware
 app.use(middleware.auth.cookieAuth)
+app.use(middleware.auth.apiTokenAuth)
 
 // Routes
 app.use('/apis', routes.api)

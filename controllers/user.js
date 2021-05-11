@@ -2,6 +2,7 @@ const SwaggerParser = require('@apidevtools/swagger-parser')
 const HTTPStatus = require('http-status-codes')
 const bcrypt = require('bcrypt')
 const path = require('path')
+const crypto = require('crypto')
 const log = require('../util/logger')
 const enums = require('../util/enums')
 const { v4: uuidv4 } = require('uuid')
@@ -673,6 +674,40 @@ const deleteAvatar = async (req, res) => {
   return res.sendStatus(HTTPStatus.NO_CONTENT)
 }
 
+const listAPITokens = async (req, res) => {
+  const tokens = await models.APIToken.findAll({
+    where: {
+      user_id: req.user.id,
+    },
+    attributes: ['id', 'name', 'createdAt'],
+  })
+
+  return res.status(HTTPStatus.OK).send({ tokens })
+}
+
+const createAPIToken = async (req, res) => {
+  const tokenValue = crypto.randomBytes(20).toString('hex')
+
+  const token = await models.APIToken.create({
+    name: req.body.name,
+    token: tokenValue,
+    userId: req.user.id,
+  })
+
+  return res.status(HTTPStatus.CREATED).send({ token })
+}
+
+const revokeAPIToken = async (req, res) => {
+  await models.APIToken.destroy({
+    where: {
+      id: req.params.id,
+      userId: req.user.id,
+    },
+  })
+
+  return res.sendStatus(HTTPStatus.NO_CONTENT)
+}
+
 module.exports = {
   getAll,
   getById,
@@ -689,4 +724,7 @@ module.exports = {
   updateUserProfile,
   updateAvatar,
   deleteAvatar,
+  listAPITokens,
+  createAPIToken,
+  revokeAPIToken,
 }

@@ -82,6 +82,10 @@ const userProfileSchema = Joi.object({
   mobile: Joi.string().optional().allow('', null),
 })
 
+const newAPITokenSchema = Joi.object({
+  name: Joi.string().required(),
+})
+
 module.exports = {
   userSchema,
   validatePassword,
@@ -90,4 +94,5 @@ module.exports = {
   validateProfileUpdateBody: validator(userProfileSchema),
   validateChangePasswordBody: validator(userChangePasswordSchema, 'body', changePasswordBodyExtraValidator),
   validateSetupBody: validator(userSetupSchema),
+  validateNewAPITokenBody: validator(newAPITokenSchema),
 }

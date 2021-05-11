@@ -9,6 +9,7 @@ const {
   validateProfileUpdateBody,
   validateChangePasswordBody,
   validateSetupBody,
+  validateNewAPITokenBody,
 } = require('./user.schema')
 const helpers = require('../../util/test-helpers')
 const Chance = require('chance')
@@ -248,6 +249,48 @@ describe('User Validations', () => {
           const next = sinon.spy()
 
           validateSetupBody(req, res, next)
+          sinon.assert.called(next)
+        })
+      })
+    })
+  })
+
+  describe('validateNewAPITokenBody', () => {
+    describe('test invalid payloads', () => {
+      const testData = [
+        { body: { } },
+        { body: { name: 12341 } },
+        { body: { name: {} } },
+        { body: { name: [] } },
+        { body: { name: '' } },
+      ]
+
+      testData.forEach((mockReq) => {
+        it('should not validate and return 400', () => {
+          const req = mockRequest(mockReq)
+          const res = mockResponse()
+          const next = sinon.spy()
+
+          validateNewAPITokenBody(req, res, next)
+          sinon.assert.notCalled(next)
+          sinon.assert.calledWith(res.status, HTTPStatus.BAD_REQUEST)
+          helpers.calledWithErrors(res.send)
+        })
+      })
+    })
+
+    describe('test valid payloads', () => {
+      const testData = [
+        { body: { name: 'mytoken' } },
+      ]
+
+      testData.forEach((mockReq) => {
+        it('should validate and call next', () => {
+          const req = mockRequest(mockReq)
+          const res = mockResponse()
+          const next = sinon.spy()
+
+          validateNewAPITokenBody(req, res, next)
           sinon.assert.called(next)
         })
       })
