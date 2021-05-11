@@ -42,7 +42,7 @@ const getTokenUserByID = async (userID) => {
   return user
 }
 
-module.exports = async (req, res, next) => {
+const cookieAuth = async (req, res, next) => {
   if (req.cookies.access_token) {
     const token = jwt.validateAccessToken(req.cookies.access_token)
     if (!token.valid) {
@@ -58,9 +58,11 @@ module.exports = async (req, res, next) => {
     res.locals.isAdmin = res.locals.loggedInUser &&
       res.locals.loggedInUser.role &&
       res.locals.loggedInUser.role.name === roles.ADMIN
-
-    return next()
   }
 
   next()
+}
+
+module.exports = {
+  cookieAuth,
 }
