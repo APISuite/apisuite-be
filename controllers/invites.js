@@ -129,7 +129,7 @@ const signup = async (req, res) => {
 
     const ownerOrg = await models.Organization.getOwnerOrganization()
     await emailService.sendRegisterConfirmation({
-      email: req.body.email,
+      email: user.email,
       token: activationToken,
     }, { logo: ownerOrg?.logo })
   } catch (err) {
