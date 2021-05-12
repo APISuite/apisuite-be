@@ -7,6 +7,7 @@ const {
   validateAppBody,
   validateSubscriptionBody,
   validatePublicAppsListQuery,
+  deleteMediaBody,
 } = require('./validation_schemas/app.schema')
 
 /**
@@ -317,6 +318,44 @@ router.putAsync('/:id/media',
   accessControl(actions.UPDATE, possessions.OWN, resources.APP, { idCarrier: 'params', idField: 'id' }),
   fileParser,
   controllers.app.uploadMedia)
+
+/**
+ * @openapi
+ * /apps/:id/media:
+ *   delete:
+ *     summary: Delete selected media objects
+ *     tags: [App]
+ *     security:
+ *       - cookieAuth: []
+ *     requestBody:
+ *       description: Media objects to delete
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               images:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *     responses:
+ *       204:
+ *         description: No content
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ */
+router.deleteAsync('/:id/media',
+  loggedIn,
+  deleteMediaBody,
+  accessControl(actions.UPDATE, possessions.OWN, resources.APP, { idCarrier: 'params', idField: 'id' }),
+  controllers.app.deleteMedia)
 
 /**
  * @openapi
