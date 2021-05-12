@@ -27,7 +27,7 @@ const {
  *             schema:
  *               type: array
  *               items:
- *                 $ref: '#/components/responses/APIToken'
+ *                 $ref: '#/components/schemas/APIToken'
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  */
@@ -59,7 +59,7 @@ router.getAsync('/api-tokens',
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/responses/APITokenFull'
+ *               $ref: '#/components/schemas/APITokenFull'
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  */

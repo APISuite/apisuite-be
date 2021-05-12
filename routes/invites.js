@@ -94,4 +94,45 @@ router.postAsync('/:token/accept',
 router.postAsync('/:token/reject',
   controllers.invites.reject)
 
+/**
+ * @openapi
+ * /invites/{token}/signup:
+ *   post:
+ *     summary: Accept organization invite and signup user
+ *     description: Accept invite to add new user to organization
+ *     tags: [Invites]
+ *     parameters:
+ *       - name: token
+ *         description: User invite token
+ *         required: true
+ *         in: path
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       description: Signup data
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *               - password
+ *             properties:
+ *               name:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       204:
+ *         description: No Content
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ */
+router.postAsync('/:token/signup',
+  controllers.invites.signup)
+
 module.exports = router
