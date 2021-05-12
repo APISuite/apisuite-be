@@ -2,6 +2,7 @@ const { decorateRouter } = require('@awaitjs/express')
 const router = decorateRouter(require('express').Router())
 const { loggedIn } = require('../middleware')
 const controllers = require('../controllers')
+const { validateSignupBody } = require('./validation_schemas/invites.schema')
 
 /**
  * @openapi
@@ -133,6 +134,7 @@ router.postAsync('/:token/reject',
  *         $ref: '#/components/responses/NotFound'
  */
 router.postAsync('/:token/signup',
+  validateSignupBody,
   controllers.invites.signup)
 
 module.exports = router
