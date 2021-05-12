@@ -258,16 +258,53 @@ router.putAsync('/:id',
 
 /**
  * @openapi
- * /apps/:id/request:
- *   post:
- *     summary: Access request
- *     description: Submits an access request for an application
+ * /apps/:id/media:
+ *   put:
+ *     summary: Upload app images/media
  *     tags: [App]
  *     security:
  *       - cookieAuth: []
+ *     requestBody:
+ *       description: App object that need to be created
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               filename:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: binary
  *     responses:
- *       204:
- *         description: No Content
+ *       200:
+ *         description: Upload results
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 savedImages:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       file:
+ *                         type: string
+ *                       url:
+ *                         type: string
+ *                 errors:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       file:
+ *                         type: string
+ *                       error:
+ *                         type: string
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  *       403:
