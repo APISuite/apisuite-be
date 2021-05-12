@@ -19,6 +19,7 @@ morgan.token('body', (req, res) => {
     '/auth/login',
     '/registration/security',
     '/users/password',
+    '/invites/:token/signup',
   ]
   if (noLogRoutes.includes(req.originalUrl)) return
   return JSON.stringify(req.body)
