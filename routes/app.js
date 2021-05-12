@@ -2,7 +2,7 @@ const { decorateRouter } = require('@awaitjs/express')
 const router = decorateRouter(require('express').Router())
 const controllers = require('../controllers')
 const { actions, possessions, resources } = require('../access-control')
-const { accessControl, loggedIn } = require('../middleware')
+const { accessControl, loggedIn, fileParser } = require('../middleware')
 const {
   validateAppBody,
   validateSubscriptionBody,
@@ -255,6 +255,31 @@ router.putAsync('/:id',
   validateAppBody,
   accessControl(actions.UPDATE, possessions.OWN, resources.APP),
   controllers.app.updateApp)
+
+/**
+ * @openapi
+ * /apps/:id/request:
+ *   post:
+ *     summary: Access request
+ *     description: Submits an access request for an application
+ *     tags: [App]
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       204:
+ *         description: No Content
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ */
+router.putAsync('/:id/media',
+  loggedIn,
+  accessControl(actions.UPDATE, possessions.OWN, resources.APP, { idCarrier: 'params', idField: 'id' }),
+  fileParser,
+  controllers.app.uploadMedia)
 
 /**
  * @openapi
