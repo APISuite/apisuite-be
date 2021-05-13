@@ -336,8 +336,6 @@ class Kong extends Gateway {
     for (const res of results) {
       if (res.status === 'rejected') {
         log.error('[subscribeAPIs] => _createConsumerSubscription', res.reason)
-      } else {
-
       }
     }
 

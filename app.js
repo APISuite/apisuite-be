@@ -14,6 +14,17 @@ const { redoc } = require('./util/redoc')
 const { settingTypes, idpProviders } = require('./util/enums')
 const { sequelize } = require('./models')
 
+morgan.token('body', (req, res) => {
+  const noLogRoutes = [
+    '/auth/login',
+    '/registration/security',
+    '/users/password',
+  ]
+  if (noLogRoutes.includes(req.originalUrl)) return
+  if (req.originalUrl.split('/').pop() === 'signup') return
+  return JSON.stringify(req.body)
+})
+
 const app = express()
 
 // Application-Level API
@@ -22,13 +33,13 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser())
 
-morgan.token('body', (req, res) => JSON.stringify(req.body))
 app.use(morgan(':method :url :status - :body'))
 
 app.use(middleware.internalError)
 
 // Auth middleware
-app.use(middleware.auth)
+app.use(middleware.auth.cookieAuth)
+app.use(middleware.auth.apiTokenAuth)
 
 // Routes
 app.use('/apis', routes.api)
@@ -42,6 +53,7 @@ app.use('/registration', routes.registration)
 app.use('/role', routes.role)
 app.use('/roles', routes.role)
 app.use('/settings', routes.settings)
+app.use('/translations', routes.translations)
 app.use('/users', routes.user)
 
 app.use(middleware.error)
@@ -56,6 +68,8 @@ app.use('/api-docs', redoc({
   specUrl: '/docs/spec.json',
   favicon: 'https://cloudcdn.apisuite.io/favicon.ico',
 }))
+
+app.use('/media', express.static('media'))
 
 const bootstrapIdPSettings = async () => {
   const settings = await models.Setting.findOne({
@@ -100,5 +114,3 @@ const start = async () => {
 start().catch((err) => {
   log.error(err, '[FAILED TO START]')
 })
-
-module.exports = app // for testing

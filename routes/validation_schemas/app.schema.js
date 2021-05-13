@@ -4,7 +4,7 @@ const validator = require('./validator')
 const appSchema = Joi.object({
   name: Joi.string().required(),
   description: Joi.string().optional().allow(null, ''),
-  shortDescription: Joi.string().optional().allow(null, ''),
+  shortDescription: Joi.string().max(60).optional().allow(null, ''),
   redirectUrl: Joi.string().uri({ scheme: ['http', 'https'] }).optional(),
   redirect_url: Joi.string().uri({ scheme: ['http', 'https'] }).optional(),
   visibility: Joi.string().valid('public', 'private').optional(),
@@ -33,6 +33,8 @@ const subscriptionSchema = Joi.object({
 
 const publicAppsQuerySchema = Joi.object({
   search: Joi.string().optional(),
+  page: Joi.number().min(1).optional(),
+  pageSize: Joi.number().min(1).optional(),
   org_id: Joi.alternatives().try(
     Joi.number(),
     Joi.array().min(1).items(Joi.number()),
@@ -45,8 +47,13 @@ const publicAppsQuerySchema = Joi.object({
   order: Joi.string().valid('asc', 'desc').optional(),
 })
 
+const deleteMediaSchema = Joi.object({
+  images: Joi.array().items(Joi.string()).min(1).required(),
+})
+
 module.exports = {
   validateAppBody: validator(appSchema),
   validateSubscriptionBody: validator(subscriptionSchema),
   validatePublicAppsListQuery: validator(publicAppsQuerySchema, 'query'),
+  deleteMediaBody: validator(deleteMediaSchema),
 }

@@ -42,7 +42,7 @@ const getTokenUserByID = async (userID) => {
   return user
 }
 
-module.exports = async (req, res, next) => {
+const cookieAuth = async (req, res, next) => {
   if (req.cookies.access_token) {
     const token = jwt.validateAccessToken(req.cookies.access_token)
     if (!token.valid) {
@@ -58,9 +58,35 @@ module.exports = async (req, res, next) => {
     res.locals.isAdmin = res.locals.loggedInUser &&
       res.locals.loggedInUser.role &&
       res.locals.loggedInUser.role.name === roles.ADMIN
-
-    return next()
   }
 
   next()
+}
+
+const apiTokenAuth = async (req, res, next) => {
+  if (req.headers.authorization) {
+    const token = await models.APIToken.findOne({
+      where: { token: req.headers.authorization.substring(7) },
+    })
+    if (!token) {
+      return res.status(HTTPStatus.UNAUTHORIZED).json({ errors: ['invalid token'] })
+    }
+
+    const user = await getTokenUserByID(token.userId)
+    if (!user) {
+      return res.status(HTTPStatus.UNAUTHORIZED).json({ errors: ['User not found'] })
+    }
+
+    res.locals.loggedInUser = user
+    res.locals.isAdmin = res.locals.loggedInUser &&
+      res.locals.loggedInUser.role &&
+      res.locals.loggedInUser.role.name === roles.ADMIN
+  }
+
+  next()
+}
+
+module.exports = {
+  cookieAuth,
+  apiTokenAuth,
 }

@@ -1,8 +1,8 @@
+const nodemailer = require('nodemailer')
 const config = require('../../config')
-const sgMail = require('@sendgrid/mail')
 const log = require('../../util/logger')
 
-sgMail.setApiKey(config.get('mailer.sendgridApiKey'))
+const transporter = nodemailer.createTransport(config.get('mailer.smtpConfig'))
 
 /**
  * Send the email
@@ -16,7 +16,7 @@ sgMail.setApiKey(config.get('mailer.sendgridApiKey'))
  */
 module.exports.send = async (message) => {
   try {
-    await sgMail.send(message)
+    await transporter.sendMail(message)
   } catch (err) {
     log.error(err, '[EMAIL SEND]')
 

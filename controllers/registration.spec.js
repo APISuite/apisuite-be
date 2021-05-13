@@ -159,6 +159,7 @@ describe('Registration', () => {
         registration_findByPk: sinon.stub(UserRegistration, 'findByPk'),
         invite_findByConfirmationToken: sinon.stub(InviteOrganization, 'findByConfirmationToken'),
         org_create: sinon.stub(Organization, 'create'),
+        org_getOwnerOrganization: sinon.stub(Organization, 'getOwnerOrganization'),
         user_create: sinon.stub(User, 'create'),
         user_org_create: sinon.stub(UserOrganization, 'create'),
         invite_destroy: sinon.stub(UserRegistration, 'destroy'),
@@ -201,6 +202,7 @@ describe('Registration', () => {
       })
       stubs.user_org_create.resolves()
       stubs.invite_destroy.resolves()
+      stubs.org_getOwnerOrganization.resolves(null)
       stubs.email_send_register_confirmation.resolves()
       stubs.role_findOne.resolves({ id: 1234 })
 
@@ -235,6 +237,7 @@ describe('Registration', () => {
       })
       stubs.user_org_create.resolves()
       stubs.invite_destroy.resolves()
+      stubs.org_getOwnerOrganization.resolves(null)
       stubs.email_send_register_confirmation.resolves()
       stubs.role_findOne.resolves({ id: 1234 })
 

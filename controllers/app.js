@@ -1,10 +1,17 @@
 const HTTPStatus = require('http-status-codes')
+const fs = require('fs').promises
 const log = require('../util/logger')
 const { Op } = require('sequelize')
+const { v4: uuidv4 } = require('uuid')
 const { models, sequelize } = require('../models')
 const Gateway = require('../services/gateway')
+const Storage = require('../services/storage')
 const { publishEvent, routingKeys } = require('../services/msg-broker')
-const { settingTypes, subscriptionModels, appStates } = require('../util/enums')
+const {
+  settingTypes,
+  subscriptionModels,
+  appStates,
+} = require('../util/enums')
 const Idp = require('../services/idp')
 
 const appAttributes = {
@@ -199,6 +206,7 @@ const updateApp = async (req, res) => {
         shortDescription: req.body.shortDescription,
         redirect_url: req.body.redirectUrl || req.body.redirect_url,
         logo: req.body.logo,
+        visibility: req.body.visibility,
         labels: req.body.labels,
         tosUrl: req.body.tosUrl,
         privacyUrl: req.body.privacyUrl,
@@ -291,6 +299,16 @@ const updateApp = async (req, res) => {
       user_id: req.user.id,
       app_id: req.params.id,
       organization_id: req.user.org.id,
+      meta: {
+        id: updated.id,
+        name: updated.name,
+        description: updated.description,
+        shortDescription: updated.shortDescription,
+        logo: updated.logo,
+        visibility: updated.visibility,
+        state: updated.state,
+        org: req.user.org,
+      },
     })
 
     return res.status(HTTPStatus.OK).send(updated)
@@ -316,6 +334,7 @@ const createDraftApp = async (req, res) => {
       org_id: req.user.org.id,
       idpProvider: idp.getProvider(),
       state: appStates.DRAFT,
+      visibility: req.body.visibility,
       labels: req.body.labels || [],
       tosUrl: req.body.tosUrl,
       privacyUrl: req.body.privacyUrl,
@@ -350,6 +369,16 @@ const createDraftApp = async (req, res) => {
       user_id: req.user.id,
       app_id: app.id,
       organization_id: req.user.org.id,
+      meta: {
+        id: app.id,
+        name: app.name,
+        description: app.description,
+        shortDescription: app.shortDescription,
+        logo: app.logo,
+        visibility: app.visibility,
+        state: app.state,
+        org: req.user.org,
+      },
     })
 
     return res.status(HTTPStatus.CREATED).send(app)
@@ -365,13 +394,16 @@ const requestAccess = async (req, res) => {
     where: {
       id: req.params.id,
       org_id: req.user.org.id,
-      state: appStates.DRAFT,
       enable: true,
     },
   })
 
   if (!app) {
     return res.status(HTTPStatus.NOT_FOUND).send({ errors: ['App not found'] })
+  }
+
+  if (app.state === appStates.APPROVED) {
+    return res.sendStatus(HTTPStatus.NO_CONTENT)
   }
 
   const subscriptionModel = await getSubscriptionModel()
@@ -406,6 +438,16 @@ const requestAccess = async (req, res) => {
     user_id: req.user.id,
     app_id: req.params.id,
     organization_id: req.user.org.id,
+    meta: {
+      id: app.id,
+      name: app.name,
+      description: app.description,
+      shortDescription: app.shortDescription,
+      logo: app.logo,
+      visibility: app.visibility,
+      state: app.state,
+      org: req.user.org,
+    },
   })
 
   return res.sendStatus(HTTPStatus.NO_CONTENT)
@@ -579,7 +621,7 @@ const listPublicApps = async (req, res, next) => {
     }
   }
 
-  const apps = await models.App.findAll({
+  const queryOptions = {
     where: { ...filters, ...search },
     include: [{
       model: models.Organization,
@@ -608,6 +650,12 @@ const listPublicApps = async (req, res, next) => {
       ['org_id', 'orgId'],
     ],
     order,
+  }
+
+  const apps = await models.App.findAllPaginated({
+    page: req.query.page,
+    pageSize: req.query.pageSize,
+    options: queryOptions,
   })
 
   return res.status(HTTPStatus.OK).json(apps)
@@ -687,6 +735,104 @@ const publicAppDetails = async (req, res) => {
   return res.status(HTTPStatus.OK).json(app)
 }
 
+const uploadMedia = async (req, res) => {
+  if (!req.formdata || !req.formdata.files) {
+    return res.status(HTTPStatus.BAD_REQUEST).send({ errors: ['no files uploaded'] })
+  }
+
+  const files = []
+  const badTypes = []
+  for (const key in req.formdata.files) {
+    const file = req.formdata.files[key]
+    if (file.type.split('/')[0] !== 'image') {
+      badTypes.push(file.name)
+    }
+    files.push(file)
+  }
+
+  if (badTypes.length) {
+    return res.status(HTTPStatus.BAD_REQUEST).send({
+      errors: badTypes.map((f) => ({
+        file: f,
+        error: 'invalid type (image expected)',
+      })),
+    })
+  }
+
+  const app = await models.App.findOne({
+    where: {
+      id: req.params.id,
+      org_id: req.user.org.id,
+      enable: true,
+    },
+  })
+
+  if (!app) return res.status(HTTPStatus.NOT_FOUND).send({ errors: ['App not found'] })
+
+  const storageClient = Storage.getStorageClient()
+  const savePromises = files.map((f) => {
+    const extension = f.name.split('.').pop()
+    return storageClient.saveFile(f.path, `app-media-${req.params.id}-${uuidv4()}.${extension}`)
+  })
+  const saveResults = await Promise.all(savePromises)
+
+  try {
+    await Promise.all(files.map((f) => fs.unlink(f.path)))
+  } catch (err) {
+    log.error(err, 'uploadMedia: failed to remove temporary files')
+  }
+
+  const response = {
+    savedImages: [],
+    errors: [],
+  }
+  const imageURLs = []
+
+  for (let i = 0; i < saveResults.length; i++) {
+    const sr = saveResults[i]
+    if (sr.objectURL && sr.objectURL.length) {
+      imageURLs.push(sr.objectURL)
+      response.savedImages.push({
+        file: files[i].name,
+        url: sr.objectURL,
+      })
+      continue
+    }
+
+    response.errors.push({
+      file: files[i].name,
+      error: 'failed to save image',
+    })
+  }
+
+  app.images = app.images.concat(imageURLs)
+  await app.save()
+
+  if (!response.errors.length) delete response.errors
+
+  return res.status(HTTPStatus.OK).send(response)
+}
+
+const deleteMedia = async (req, res) => {
+  const app = await models.App.findOne({
+    where: {
+      id: req.params.id,
+      org_id: req.user.org.id,
+      enable: true,
+    },
+  })
+
+  if (!app) return res.status(HTTPStatus.NOT_FOUND).send({ errors: ['App not found'] })
+
+  const storageClient = Storage.getStorageClient()
+  await Promise.all(req.body.images.map((img) => storageClient.deleteFile(img)))
+
+  app.images = app.images.filter((img) => !req.body.images.includes(img))
+  await app.save()
+
+  return res.sendStatus(HTTPStatus.NO_CONTENT)
+}
+
 module.exports = {
   getApp,
   createDraftApp,
@@ -699,4 +845,6 @@ module.exports = {
   listPublicApps,
   listPublicLabels,
   publicAppDetails,
+  uploadMedia,
+  deleteMedia,
 }

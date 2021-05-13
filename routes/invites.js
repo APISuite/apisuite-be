@@ -2,6 +2,7 @@ const { decorateRouter } = require('@awaitjs/express')
 const router = decorateRouter(require('express').Router())
 const { loggedIn } = require('../middleware')
 const controllers = require('../controllers')
+const { validateSignupBody } = require('./validation_schemas/invites.schema')
 
 /**
  * @openapi
@@ -81,8 +82,6 @@ router.postAsync('/:token/accept',
  *         schema:
  *           type: string
  *           format: uuid
- *     security:
- *       - cookieAuth: []
  *     responses:
  *       204:
  *         description: No Content
@@ -94,7 +93,48 @@ router.postAsync('/:token/accept',
  *         $ref: '#/components/responses/NotFound'
  */
 router.postAsync('/:token/reject',
-  loggedIn,
   controllers.invites.reject)
+
+/**
+ * @openapi
+ * /invites/{token}/signup:
+ *   post:
+ *     summary: Accept organization invite and signup user
+ *     description: Accept invite to add new user to organization
+ *     tags: [Invites]
+ *     parameters:
+ *       - name: token
+ *         description: User invite token
+ *         required: true
+ *         in: path
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       description: Signup data
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *               - password
+ *             properties:
+ *               name:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       204:
+ *         description: No Content
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ */
+router.postAsync('/:token/signup',
+  validateSignupBody,
+  controllers.invites.signup)
 
 module.exports = router

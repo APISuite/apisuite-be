@@ -16,6 +16,7 @@ const gatewayProviders = {
 }
 
 const storageProviders = {
+  LOCAL: 'local',
   S3: 's3',
 }
 
@@ -48,9 +49,15 @@ const appStates = {
   APPROVED: 'approved',
 }
 
+const appVisibility = {
+  PUBLIC: 'public',
+  PRIVATE: 'private',
+}
+
 module.exports = {
   apiTypes,
   appStates,
+  appVisibility,
   contentTargets,
   idpProviders,
   gatewayProviders,
