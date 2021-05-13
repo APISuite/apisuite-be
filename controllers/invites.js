@@ -51,7 +51,13 @@ const get = async (req, res) => {
 }
 
 const accept = async (req, res) => {
-  const invite = await models.InviteOrganization.findByConfirmationToken(req.params.token)
+  const invite = await models.InviteOrganization.findOne({
+    where: {
+      confirmation_token: req.params.token,
+      user_id: req.user.id,
+      status: 'pending',
+    },
+  })
 
   if (!invite) {
     return res.status(HTTPStatus.NOT_FOUND).send({ errors: ['Invite not found'] })
