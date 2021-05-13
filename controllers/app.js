@@ -775,7 +775,12 @@ const uploadMedia = async (req, res) => {
     return storageClient.saveFile(f.path, `app-media-${req.params.id}-${uuidv4()}.${extension}`)
   })
   const saveResults = await Promise.all(savePromises)
-  await Promise.all(files.map((f) => fs.unlink(f.path)))
+
+  try {
+    await Promise.all(files.map((f) => fs.unlink(f.path)))
+  } catch (err) {
+    log.error(err, 'uploadMedia: failed to remove temporary files')
+  }
 
   const response = {
     savedImages: [],
