@@ -2,11 +2,12 @@ const { decorateRouter } = require('@awaitjs/express')
 const router = decorateRouter(require('express').Router())
 const controllers = require('../controllers')
 const { actions, possessions, resources } = require('../access-control')
-const { accessControl, loggedIn } = require('../middleware')
+const { accessControl, loggedIn, fileParser } = require('../middleware')
 const {
   validateAppBody,
   validateSubscriptionBody,
   validatePublicAppsListQuery,
+  deleteMediaBody,
 } = require('./validation_schemas/app.schema')
 
 /**
@@ -255,6 +256,106 @@ router.putAsync('/:id',
   validateAppBody,
   accessControl(actions.UPDATE, possessions.OWN, resources.APP),
   controllers.app.updateApp)
+
+/**
+ * @openapi
+ * /apps/:id/media:
+ *   put:
+ *     summary: Upload app images/media
+ *     tags: [App]
+ *     security:
+ *       - cookieAuth: []
+ *     requestBody:
+ *       description: App object that need to be created
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               filename:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: binary
+ *     responses:
+ *       200:
+ *         description: Upload results
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 savedImages:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       file:
+ *                         type: string
+ *                       url:
+ *                         type: string
+ *                 errors:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       file:
+ *                         type: string
+ *                       error:
+ *                         type: string
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ */
+router.putAsync('/:id/media',
+  loggedIn,
+  accessControl(actions.UPDATE, possessions.OWN, resources.APP, { idCarrier: 'params', idField: 'id' }),
+  fileParser,
+  controllers.app.uploadMedia)
+
+/**
+ * @openapi
+ * /apps/:id/media:
+ *   delete:
+ *     summary: Delete selected media objects
+ *     tags: [App]
+ *     security:
+ *       - cookieAuth: []
+ *     requestBody:
+ *       description: Media objects to delete
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               images:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *     responses:
+ *       204:
+ *         description: No content
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ */
+router.deleteAsync('/:id/media',
+  loggedIn,
+  deleteMediaBody,
+  accessControl(actions.UPDATE, possessions.OWN, resources.APP, { idCarrier: 'params', idField: 'id' }),
+  controllers.app.deleteMedia)
 
 /**
  * @openapi
