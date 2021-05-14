@@ -1,3 +1,5 @@
+const bcrypt = require('bcrypt')
+
 const apiToken = (sequelize, DataTypes) => {
   const APIToken = sequelize.define('api_tokens', {
     token: {
@@ -31,6 +33,19 @@ const apiToken = (sequelize, DataTypes) => {
 
   APIToken.associate = (models) => {
     APIToken.belongsTo(models.User)
+  }
+
+  const hashToken = async function (apiToken) {
+    if (apiToken.changed('token')) {
+      apiToken.token = await bcrypt.hash(apiToken.token, 10)
+    }
+  }
+
+  APIToken.beforeCreate(hashToken)
+  APIToken.beforeUpdate(hashToken)
+
+  APIToken.prototype.checkToken = function (token) {
+    return bcrypt.compare(token, this.token)
   }
 
   return APIToken

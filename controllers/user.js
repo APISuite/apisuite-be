@@ -694,6 +694,8 @@ const createAPIToken = async (req, res) => {
     userId: req.user.id,
   })
 
+  token.token = `${token.id}_${tokenValue}`
+
   return res.status(HTTPStatus.CREATED).send({ token })
 }
 
