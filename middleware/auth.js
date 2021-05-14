@@ -65,14 +65,21 @@ const cookieAuth = async (req, res, next) => {
 
 const apiTokenAuth = async (req, res, next) => {
   if (req.headers.authorization) {
-    const token = await models.APIToken.findOne({
-      where: { token: req.headers.authorization.substring(7) },
-    })
-    if (!token) {
+    const parsedToken = req.headers.authorization.substring(7)
+
+    let [tokenId, ...tokenValue] = parsedToken.split('_')
+    tokenValue = tokenValue.join('_')
+
+    const apiToken = await models.APIToken.findByPk(tokenId)
+    if (!apiToken) {
       return res.status(HTTPStatus.UNAUTHORIZED).json({ errors: ['invalid token'] })
     }
 
-    const user = await getTokenUserByID(token.userId)
+    if (!apiToken.checkToken(tokenValue)) {
+      return res.status(HTTPStatus.UNAUTHORIZED).json({ errors: ['invalid token'] })
+    }
+
+    const user = await getTokenUserByID(apiToken.userId)
     if (!user) {
       return res.status(HTTPStatus.UNAUTHORIZED).json({ errors: ['User not found'] })
     }
