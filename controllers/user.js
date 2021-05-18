@@ -12,6 +12,7 @@ const { Op } = require('sequelize')
 const { publishEvent, routingKeys } = require('../services/msg-broker')
 const { getRevokedCookieConfig } = require('../util/cookies')
 const Storage = require('../services/storage')
+const Idp = require('../services/idp')
 const fs = require('fs').promises
 
 const getAll = async (req, res) => {
@@ -371,6 +372,7 @@ const profile = async (req, res) => {
       'avatar',
       'last_login',
       'oidcProvider',
+      'oidcId',
     ],
   })
 
@@ -407,6 +409,9 @@ const profile = async (req, res) => {
     }
     profile.orgs_member.push(orgsMember)
   }
+
+  const idp = await Idp.getIdP()
+  profile.ssoAccountURL = idp.getUserProfileURL(user.oidcId)
 
   return res.status(HTTPStatus.OK).send(profile)
 }

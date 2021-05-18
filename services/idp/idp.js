@@ -61,6 +61,15 @@ class IdP {
   async deleteClient (clientID, clientData) {
     throw new Error('IdP.deleteClient should not be called directly')
   }
+
+  /**
+   * @abstract
+   * @param {string} userID
+   * @returns {string}
+   * */
+  getUserProfileURL (userID) {
+    throw new Error('IdP.getUserProfileURL should not be called directly')
+  }
 }
 
 module.exports = IdP
