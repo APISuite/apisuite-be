@@ -35,6 +35,10 @@ const includes = () => [
     as: 'subscriptions',
     through: { attributes: [] },
   },
+  {
+    model: models.AppMetadata,
+    as: 'metadata',
+  },
 ]
 
 const getSubscriptionModel = async () => {
@@ -234,6 +238,19 @@ const updateApp = async (req, res) => {
       return res.status(HTTPStatus.NOT_FOUND).send({ errors: 'App not found' })
     }
 
+    if (req.body.metadata) {
+      await models.AppMetadata.destroy({
+        where: { appId: updated.id },
+      }, { transaction })
+
+      const metadata = req.body.metadata.map((m) => ({
+        ...m,
+        appId: updated.id,
+      }))
+
+      await models.AppMetadata.bulkCreate(metadata, { transaction })
+    }
+
     if (typeof req.body.pub_urls !== 'undefined') {
       const data = []
       for (const pubUrl of req.body.pub_urls) {
@@ -343,6 +360,15 @@ const createDraftApp = async (req, res) => {
       websiteUrl: req.body.websiteUrl,
       supportUrl: req.body.supportUrl,
     }, { transaction })
+
+    if (req.body.metadata && req.body.metadata.length) {
+      const metadata = req.body.metadata.map((m) => ({
+        ...m,
+        appId: app.id,
+      }))
+
+      await models.AppMetadata.bulkCreate(metadata, { transaction })
+    }
 
     if (typeof req.body.pub_urls !== 'undefined') {
       const data = []

@@ -1,6 +1,13 @@
 const Joi = require('joi')
 const validator = require('./validator')
 
+const appMetadata = Joi.object({
+  key: Joi.string().max(30).required(),
+  value: Joi.string().required(),
+  title: Joi.string().required(),
+  description: Joi.string().required(),
+})
+
 const appSchema = Joi.object({
   name: Joi.string().required(),
   description: Joi.string().optional().allow(null, ''),
@@ -25,6 +32,7 @@ const appSchema = Joi.object({
   youtubeUrl: Joi.string().optional().allow(null, ''),
   websiteUrl: Joi.string().optional().allow(null, ''),
   supportUrl: Joi.string().optional().allow(null, ''),
+  metadata: Joi.array().items(appMetadata).optional().allow(null),
 })
 
 const subscriptionSchema = Joi.object({
