@@ -3,7 +3,12 @@ const router = decorateRouter(require('express').Router())
 const { actions, possessions, resources } = require('../access-control')
 const { accessControl, loggedIn } = require('../middleware')
 const controllers = require('../controllers')
-const { validateSettingsBody, validateGatewaySettingsBody, validateIdPSettingsBody } = require('./validation_schemas/settings.schema')
+const {
+  validateSettingsBody,
+  validateGatewaySettingsBody,
+  validateIdPSettingsBody,
+  validatePortalSettingsBody,
+} = require('./validation_schemas/settings.schema')
 
 /**
  * @openapi
@@ -103,6 +108,7 @@ router.getAsync('/portal',
  */
 router.putAsync('/portal',
   loggedIn,
+  validatePortalSettingsBody,
   accessControl(actions.UPDATE, possessions.ANY, resources.SETTINGS),
   controllers.settings.updatePortalSettings)
 

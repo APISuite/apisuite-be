@@ -57,8 +57,14 @@ const idpSettingsSchema = Joi.object({
     }),
 })
 
+const portalSettingsSchema = Joi.object({
+  i18nOptions: Joi.array().items(Joi.object()),
+  theme: Joi.object(),
+})
+
 module.exports = {
   validateSettingsBody: validator(settingsSchema),
   validateGatewaySettingsBody: validator(gatewaySettingsSchema),
   validateIdPSettingsBody: validator(idpSettingsSchema),
+  validatePortalSettingsBody: validator(portalSettingsSchema),
 }
