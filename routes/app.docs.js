@@ -171,6 +171,26 @@
  *           type: array
  *           items:
  *             type: string
+ *         metadata:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/AppMetadata'
+ *
+ *     AppMetadata:
+ *       type: object
+ *       required:
+ *         - key
+ *         - value
+ *         - title
+ *       properties:
+ *         key:
+ *           type: string
+ *         value:
+ *           type: string
+ *         title:
+ *           type: string
+ *         description:
+ *           type: string
  */
 
 /**
