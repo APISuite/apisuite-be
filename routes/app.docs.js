@@ -191,6 +191,24 @@
  *           type: string
  *         description:
  *           type: string
+ *
+ *     AppPatch:
+ *       type: object
+ *       properties:
+ *         visibility:
+ *           type: string
+ *           description: App visibility
+ *           enum:
+ *             - public
+ *             - private
+ *         labels:
+ *           type: array
+ *           items:
+ *             type: string
+ *         metadata:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/AppMetadata'
  */
 
 /**
