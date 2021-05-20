@@ -5,7 +5,7 @@ const appMetadata = Joi.object({
   key: Joi.string().max(30).required(),
   value: Joi.string().required(),
   title: Joi.string().required(),
-  description: Joi.string().required(),
+  description: Joi.string().optional(),
 })
 
 const appSchema = Joi.object({
@@ -13,7 +13,6 @@ const appSchema = Joi.object({
   description: Joi.string().optional().allow(null, ''),
   shortDescription: Joi.string().max(60).optional().allow(null, ''),
   redirectUrl: Joi.string().uri({ scheme: ['http', 'https'] }).optional(),
-  redirect_url: Joi.string().uri({ scheme: ['http', 'https'] }).optional(),
   visibility: Joi.string().valid('public', 'private').optional(),
   logo: Joi.string().optional().allow(null, ''),
   pub_urls: Joi.array().items(
@@ -59,8 +58,15 @@ const deleteMediaSchema = Joi.object({
   images: Joi.array().items(Joi.string()).min(1).required(),
 })
 
+const appPatchSchema = Joi.object({
+  visibility: Joi.string().valid('public', 'private').optional(),
+  labels: Joi.array().items(Joi.string()).optional(),
+  metadata: Joi.array().items(appMetadata).optional(),
+})
+
 module.exports = {
   validateAppBody: validator(appSchema),
+  validateAppPatchBody: validator(appPatchSchema),
   validateSubscriptionBody: validator(subscriptionSchema),
   validatePublicAppsListQuery: validator(publicAppsQuerySchema, 'query'),
   deleteMediaBody: validator(deleteMediaSchema),

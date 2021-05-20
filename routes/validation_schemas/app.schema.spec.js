@@ -12,7 +12,6 @@ describe('Apps Validations', () => {
       description: chance.string(),
       shortDescription: chance.string({ max: 60 }),
       redirectUrl: chance.url(),
-      redirect_url: chance.url(),
       visibility: 'public',
       logo: chance.url(),
       subscriptions: [],

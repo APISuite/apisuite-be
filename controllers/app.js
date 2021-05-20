@@ -1,6 +1,7 @@
 const HTTPStatus = require('http-status-codes')
 const fs = require('fs').promises
 const log = require('../util/logger')
+const { roles } = require('../util/enums')
 const { Op } = require('sequelize')
 const { v4: uuidv4 } = require('uuid')
 const { models, sequelize } = require('../models')
@@ -203,12 +204,14 @@ const deleteApp = async (req, res) => {
 const updateApp = async (req, res) => {
   const transaction = await sequelize.transaction()
   try {
+    if (req.user.role.name !== roles.ADMIN) req.body.labels = undefined
+
     const [rowsUpdated, [updated]] = await models.App.update(
       {
         name: req.body.name,
         description: req.body.description,
         shortDescription: req.body.shortDescription,
-        redirect_url: req.body.redirectUrl || req.body.redirect_url,
+        redirect_url: req.body.redirectUrl,
         logo: req.body.logo,
         visibility: req.body.visibility,
         labels: req.body.labels,
@@ -341,11 +344,13 @@ const createDraftApp = async (req, res) => {
   try {
     const idp = await Idp.getIdP()
 
+    if (req.user.role.name !== roles.ADMIN) req.body.labels = []
+
     let app = await models.App.create({
       name: req.body.name,
       description: req.body.description,
       shortDescription: req.body.shortDescription,
-      redirect_url: req.body.redirectUrl || req.body.redirect_url,
+      redirect_url: req.body.redirectUrl,
       logo: req.body.logo,
       enable: true,
       org_id: req.user.org.id,
@@ -860,6 +865,75 @@ const deleteMedia = async (req, res) => {
   return res.sendStatus(HTTPStatus.NO_CONTENT)
 }
 
+const patchApp = async (req, res) => {
+  const transaction = await sequelize.transaction()
+  try {
+    const [rowsUpdated, [updated]] = await models.App.update(
+      req.body,
+      {
+        transaction,
+        returning: true,
+        include: [
+          ...includes(),
+        ],
+        where: {
+          id: req.params.appId,
+          org_id: req.params.id,
+          enable: true,
+        },
+        attributes: appAttributes,
+      },
+    )
+
+    if (!rowsUpdated) {
+      await transaction.rollback()
+      return res.status(HTTPStatus.NOT_FOUND).send({ errors: 'App not found' })
+    }
+
+    if (req.body.metadata) {
+      await models.AppMetadata.destroy({
+        where: { appId: updated.id },
+      }, { transaction })
+
+      const metadata = req.body.metadata.map((m) => ({
+        ...m,
+        appId: updated.id,
+      }))
+
+      await models.AppMetadata.bulkCreate(metadata, { transaction })
+    }
+
+    await transaction.commit()
+
+    const app = await models.App.findOne({
+      where: { id: req.params.appId },
+      attributes: appAttributes,
+      include: includes(),
+    })
+
+    publishEvent(routingKeys.APP_UPDATED, {
+      user_id: req.user.id,
+      app_id: req.params.id,
+      organization_id: req.user.org.id,
+      meta: {
+        id: updated.id,
+        name: updated.name,
+        description: updated.description,
+        shortDescription: updated.shortDescription,
+        logo: updated.logo,
+        visibility: updated.visibility,
+        state: updated.state,
+      },
+    })
+
+    return res.status(HTTPStatus.OK).send(app)
+  } catch (err) {
+    if (transaction) await transaction.rollback()
+    log.error(err, '[UPDATE APP]')
+    return res.status(HTTPStatus.INTERNAL_SERVER_ERROR).send({ errors: ['Failed to update the app'] })
+  }
+}
+
 module.exports = {
   getApp,
   createDraftApp,
@@ -874,4 +948,5 @@ module.exports = {
   publicAppDetails,
   uploadMedia,
   deleteMedia,
+  patchApp,
 }
