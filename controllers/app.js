@@ -673,6 +673,7 @@ const listPublicApps = async (req, res, next) => {
       'logo',
       'labels',
       'tosUrl',
+      'images',
       'privacyUrl',
       'youtubeUrl',
       'websiteUrl',
