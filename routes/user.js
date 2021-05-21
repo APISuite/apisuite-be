@@ -7,54 +7,12 @@ const { validateForgotPasswordBody, validateRecoverPasswordBody } = require('./v
 const { validateInviteBody } = require('./validation_schemas/invite_organization.schema')
 const apiTokensRouter = require('./user.api-tokens')
 const {
-  deprecatedValidateProfileUpdateBody,
   validateProfileUpdateBody,
   validateChangePasswordBody,
   validateSetupBody,
 } = require('./validation_schemas/user.schema')
 
 router.use('/api-tokens', apiTokensRouter)
-
-/**
- * @openapi
- * /users/profile/update:
- *   put:
- *     deprecated: true
- *     description: Edit user profile.
- *     tags: [User]
- *     requestBody:
- *       description: User profile details.
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/UserProfile'
- *     security:
- *       - cookieAuth: []
- *     responses:
- *       200:
- *         description: Profile edited successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                 message:
- *                   type: string
- *       400:
- *         $ref: '#/components/responses/BadRequest'
- *       401:
- *         $ref: '#/components/responses/Unauthorized'
- *       500:
- *         $ref: '#/components/responses/Internal'
- */
-router.putAsync('/profile/update',
-  loggedIn,
-  deprecatedValidateProfileUpdateBody,
-  accessControl(actions.UPDATE, possessions.OWN, resources.PROFILE),
-  controllers.user.profileUpdate)
 
 /**
  * @openapi

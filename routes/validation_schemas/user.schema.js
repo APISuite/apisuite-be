@@ -7,15 +7,6 @@ const userSchema = Joi.object({
   password: Joi.string().required(),
 })
 
-// TODO deprecate
-const deprecatedUserProfileSchema = Joi.object({
-  name: Joi.string().required(),
-  bio: Joi.string().optional().allow('', null),
-  org_id: Joi.string().optional().allow('', null),
-  avatar: Joi.string().optional().allow('', null),
-  mobile: Joi.string().optional().allow('', null),
-})
-
 const userChangePasswordSchema = Joi.object({
   old_password: Joi.string().required(),
   new_password: Joi.string().required(),
@@ -90,7 +81,6 @@ module.exports = {
   userSchema,
   validatePassword,
   validateRegisterBody: validator(userSchema, 'body', registerBodyExtraValidator),
-  deprecatedValidateProfileUpdateBody: validator(deprecatedUserProfileSchema),
   validateProfileUpdateBody: validator(userProfileSchema),
   validateChangePasswordBody: validator(userChangePasswordSchema, 'body', changePasswordBodyExtraValidator),
   validateSetupBody: validator(userSetupSchema),

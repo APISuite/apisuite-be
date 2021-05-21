@@ -275,83 +275,6 @@ const confirmInvite = async (req, res) => {
   return res.status(HTTPStatus.OK).send({ success: true, message: 'Invite confirmed with success.' })
 }
 
-const profileUpdate = async (req, res) => {
-  const transaction = await sequelize.transaction()
-  try {
-    if (typeof req.body.org_id !== 'undefined' && req.body.org_id !== '') {
-      const ownsOrg = req.user.organizations.find((o) => o.id === parseInt(req.body.org_id))
-      if (!ownsOrg) {
-        return res.status(HTTPStatus.FORBIDDEN).send()
-      }
-
-      const updateOldOrg = await models.UserOrganization.update(
-        { current_org: false },
-        {
-          where: {
-            user_id: req.user.id,
-            current_org: true,
-          },
-          transaction,
-        },
-      )
-
-      if (!updateOldOrg) {
-        await transaction.rollback()
-        return res.sendInternalError('Failed to update profile data')
-      }
-
-      const updateNewOrg = await models.UserOrganization.update(
-        { current_org: true },
-        {
-          where: {
-            org_id: req.body.org_id,
-            user_id: req.user.id,
-            current_org: false,
-          },
-          transaction,
-        },
-      )
-
-      if (!updateNewOrg) {
-        await transaction.rollback()
-        return res.sendInternalError('Failed to update profile data')
-      }
-    }
-
-    const user = await models.User.update(
-      {
-        name: req.body.name,
-        bio: req.body.bio,
-        avatar: req.body.avatar,
-        mobile: req.body.mobile,
-      },
-      {
-        where: { id: req.user.id },
-        transaction,
-      },
-    )
-
-    if (!user) {
-      await transaction.rollback()
-      return res.sendInternalError('Failed to update profile data')
-    }
-
-    await transaction.commit()
-
-    return res.status(HTTPStatus.OK).send({
-      success: true,
-      message: 'Profile updated successfully',
-    })
-  } catch (error) {
-    if (transaction) await transaction.rollback()
-    log.error(error, '[PROFILE UPDATE]')
-    return {
-      success: false,
-      message: 'Failed to update profile',
-    }
-  }
-}
-
 const profile = async (req, res) => {
   const profile = {
     user: {},
@@ -688,7 +611,6 @@ module.exports = {
   inviteUserToOrganization,
   getListInvitations,
   confirmInvite,
-  profileUpdate,
   profile,
   setupMainAccount,
   setActiveOrganization,
