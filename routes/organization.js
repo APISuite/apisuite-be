@@ -266,34 +266,6 @@ router.postAsync('/assign',
 
 /**
  * @openapi
- * /organizations/members/list:
- *   get:
- *     description: Get list of organization members
- *     tags: [Organization]
- *     deprecated: true
- *     security:
- *       - cookieAuth: []
- *     responses:
- *       200:
- *         description: List of members
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/OrganizationMembers'
- *       401:
- *         $ref: '#/components/responses/Unauthorized'
- *       404:
- *         $ref: '#/components/responses/NotFound'
- *       500:
- *         $ref: '#/components/responses/Internal'
- */
-router.getAsync('/members/list',
-  loggedIn,
-  accessControl(actions.READ, possessions.OWN, resources.ORGANIZATION),
-  controllers.organization.getAllMembers)
-
-/**
- * @openapi
  * /organizations/{id}/users:
  *   get:
  *     description: Get list of organization users
