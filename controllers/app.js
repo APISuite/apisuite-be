@@ -750,6 +750,7 @@ const publicAppDetails = async (req, res) => {
       'logo',
       'labels',
       'tosUrl',
+      'images',
       'privacyUrl',
       'youtubeUrl',
       'websiteUrl',

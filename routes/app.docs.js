@@ -42,6 +42,10 @@
  *           type: array
  *           items:
  *             type: string
+ *         images:
+ *           type: array
+ *           items:
+ *             type: string
  *         tosUrl:
  *           type: string
  *           format: uri
@@ -108,6 +112,10 @@
  *             type: number
  *             minimum: 0
  *         labels:
+ *           type: array
+ *           items:
+ *             type: string
+ *         images:
  *           type: array
  *           items:
  *             type: string
