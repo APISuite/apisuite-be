@@ -315,33 +315,6 @@ router.postAsync('/invite',
 
 /**
  * @openapi
- * /users/invitations/list:
- *   get:
- *     description: Get a list of invites.
- *     tags: [User]
- *     security:
- *       - cookieAuth: []
- *     responses:
- *       200:
- *         description: List of invitations.
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/InviteCompact'
- *       401:
- *         $ref: '#/components/responses/Unauthorized'
- *       500:
- *         $ref: '#/components/responses/Internal'
- */
-router.getAsync('/invitations/list',
-  loggedIn,
-  accessControl(actions.READ, possessions.OWN, resources.ORGANIZATION),
-  controllers.user.getListInvitations)
-
-/**
- * @openapi
  * /users/invite/confirm:
  *   post:
  *     description: Confirm user invitation.

@@ -230,20 +230,6 @@ const inviteUserToOrganization = async (req, res) => {
   }
 }
 
-const getListInvitations = async (req, res) => {
-  try {
-    const list = await models.InviteOrganization.findAll({
-      where: { org_id: req.user.org.id },
-      attributes: ['user_id', 'email', 'status'],
-    })
-
-    return res.status(HTTPStatus.OK).send(list)
-  } catch (error) {
-    log.error(error, '[USERS getListInvitations]')
-    return res.sendInternalError()
-  }
-}
-
 const confirmInvite = async (req, res) => {
   const invite = await models.InviteOrganization.findByConfirmationToken(req.body.token)
 
@@ -609,7 +595,6 @@ module.exports = {
   deleteUser,
   changePassword,
   inviteUserToOrganization,
-  getListInvitations,
   confirmInvite,
   profile,
   setupMainAccount,
