@@ -15,15 +15,6 @@ const appSchema = Joi.object({
   redirectUrl: Joi.string().uri({ scheme: ['http', 'https'] }).optional(),
   visibility: Joi.string().valid('public', 'private').optional(),
   logo: Joi.string().optional().allow(null, ''),
-  pub_urls: Joi.array().items(
-    Joi.object({
-      url: Joi.alternatives().try(
-        Joi.string(),
-        Joi.string().email({ tlds: { allow: false } }),
-      ).required(),
-      type: Joi.string().valid('client', 'tos', 'policy', 'support', 'support_email').required(),
-    }).optional(),
-  ).optional().allow(null),
   labels: Joi.array().items(Joi.string()).optional(),
   subscriptions: Joi.array().items(Joi.number().min(0).optional()).optional().allow(null),
   tosUrl: Joi.string().optional().allow(null, ''),

@@ -30,7 +30,6 @@ const models = {
   InviteOrganization: importModel('./invite_organization'),
   Organization: importModel('./organization'),
   PasswordRecovery: importModel('./password_recovery'),
-  PubURLApp: importModel('./puburl_app'),
   RefreshToken: importModel('./refresh_token'),
   Role: importModel('./role'),
   Setting: importModel('./setting'),

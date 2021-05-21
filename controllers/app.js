@@ -28,10 +28,6 @@ const appAttributes = {
 
 const includes = () => [
   {
-    model: models.PubURLApp,
-    as: 'pub_urls',
-  },
-  {
     model: models.Api,
     as: 'subscriptions',
     through: { attributes: [] },
@@ -254,47 +250,6 @@ const updateApp = async (req, res) => {
       await models.AppMetadata.bulkCreate(metadata, { transaction })
     }
 
-    if (typeof req.body.pub_urls !== 'undefined') {
-      const data = []
-      for (const pubUrl of req.body.pub_urls) {
-        const puburlData = {
-          url: pubUrl.url,
-          app_id: updated.dataValues.id,
-          type: pubUrl.type,
-        }
-        if (pubUrl.id) {
-          puburlData.id = pubUrl.id
-        }
-        data.push(puburlData)
-      }
-
-      // find urls to remove
-      const removeUrls = await models.PubURLApp.findAll({
-        where: {
-          [Op.and]: [{
-            app_id: updated.dataValues.id,
-          }, {
-            id: { [Op.notIn]: req.body.pub_urls.map(u => u.id) },
-          }],
-        },
-      }, { transaction })
-
-      if (removeUrls.length > 0) {
-        // remove urls
-        await models.PubURLApp.destroy({
-          where: {
-            id: removeUrls.map(u => u.id),
-          },
-        }, { transaction })
-      }
-      if (data.length > 0) {
-        // add or update urls
-        await models.PubURLApp.bulkCreate(data, {
-          updateOnDuplicate: ['url'],
-        }, { transaction })
-      }
-    }
-
     const subscriptionModel = await getSubscriptionModel()
 
     if (subscriptionModel === subscriptionModels.DETAILED && typeof req.body.subscriptions !== 'undefined') {
@@ -375,21 +330,6 @@ const createDraftApp = async (req, res) => {
       await models.AppMetadata.bulkCreate(metadata, { transaction })
     }
 
-    if (typeof req.body.pub_urls !== 'undefined') {
-      const data = []
-      for (const pubUrl of req.body.pub_urls) {
-        const puburlData = {
-          url: pubUrl.url,
-          app_id: app.id,
-          type: pubUrl.type,
-        }
-        data.push(puburlData)
-      }
-
-      if (data.length > 0) {
-        await models.PubURLApp.bulkCreate(data, { transaction })
-      }
-    }
     await transaction.commit()
 
     app = await models.App.findByPk(app.id, {

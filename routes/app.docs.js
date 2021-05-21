@@ -243,25 +243,6 @@
  *           type: string
  *         clientSecret:
  *           type: string
- *         pub_urls:
- *           type: array
- *           items:
- *             type: object
- *             required:
- *               - url
- *               - type
- *             properties:
- *               url:
- *                 type: string
- *                 format: uri
- *               type:
- *                 type: string
- *                 enum:
- *                   - client
- *                   - tos
- *                   - policy
- *                   - support
- *                   - support_email
  *         subscriptions:
  *           type: array
  *           items:
