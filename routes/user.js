@@ -5,93 +5,15 @@ const { accessControl, loggedIn, setup, fileParser } = require('../middleware')
 const { actions, possessions, resources } = require('../util/enums')
 const { validateForgotPasswordBody, validateRecoverPasswordBody } = require('./validation_schemas/auth.schema')
 const { validateInviteBody } = require('./validation_schemas/invite_organization.schema')
+const apiTokensRouter = require('./user.api-tokens')
 const {
   deprecatedValidateProfileUpdateBody,
   validateProfileUpdateBody,
   validateChangePasswordBody,
   validateSetupBody,
-  validateNewAPITokenBody,
 } = require('./validation_schemas/user.schema')
 
-/**
- * @openapi
- * /users/api-tokens:
- *   get:
- *     description: Generates a new API token for the user.
- *     tags: [User]
- *     responses:
- *       200:
- *         description: Recovery email result.
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/APIToken'
- *       401:
- *         $ref: '#/components/responses/Unauthorized'
- */
-router.getAsync('/api-tokens',
-  loggedIn,
-  controllers.user.listAPITokens)
-
-/**
- * @openapi
- * /users/api-tokens:
- *   post:
- *     description: Generates a new API token for the user.
- *     tags: [User]
- *     requestBody:
- *       description: API Token payload.
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - name
- *             properties:
- *               name:
- *                 type: string
- *     responses:
- *       201:
- *         description: API Token data
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/APITokenFull'
- *       401:
- *         $ref: '#/components/responses/Unauthorized'
- */
-router.postAsync('/api-tokens',
-  loggedIn,
-  validateNewAPITokenBody,
-  controllers.user.createAPIToken)
-
-/**
- * @openapi
- * /users/api-tokens:id:
- *   delete:
- *     description: Revoke API token.
- *     tags: [User]
- *     parameters:
- *       - name: id
- *         description: API token id
- *         required: true
- *         in: path
- *         schema:
- *           type: number
- *     responses:
- *       204:
- *         description: No Content
- *       401:
- *         $ref: '#/components/responses/Unauthorized'
- *       403:
- *         $ref: '#/components/responses/Forbidden'
- */
-router.deleteAsync('/api-tokens/:id',
-  loggedIn,
-  controllers.user.revokeAPIToken)
+router.use('/api-tokens', apiTokensRouter)
 
 /**
  * @openapi
