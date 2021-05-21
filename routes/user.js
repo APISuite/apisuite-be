@@ -2,7 +2,7 @@ const { decorateRouter } = require('@awaitjs/express')
 const router = decorateRouter(require('express').Router())
 const controllers = require('../controllers')
 const { accessControl, loggedIn, setup, fileParser } = require('../middleware')
-const { actions, possessions, resources } = require('../access-control')
+const { actions, possessions, resources } = require('../util/enums')
 const { validateForgotPasswordBody, validateRecoverPasswordBody } = require('./validation_schemas/auth.schema')
 const { validateInviteBody } = require('./validation_schemas/invite_organization.schema')
 const {

@@ -1,6 +1,6 @@
 const HTTPStatus = require('http-status-codes')
 const AccessControl = require('accesscontrol')
-const { resources, possessions } = require('../access-control')
+const { resources, possessions } = require('../util/enums')
 const { models } = require('../models')
 
 const fetchGrants = async () => {
