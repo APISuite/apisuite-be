@@ -10,7 +10,7 @@ describe('Apps Validations', () => {
   describe('validateAppBody', () => {
     const optionals = {
       description: chance.string(),
-      shortDescription: chance.string(),
+      shortDescription: chance.string({ max: 60 }),
       redirectUrl: chance.url(),
       redirect_url: chance.url(),
       visibility: 'public',

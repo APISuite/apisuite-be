@@ -3,7 +3,7 @@ version: 2.1
 jobs:
   test:
     docker:
-      - image: cimg/node:12.20.1
+      - image: cimg/node:14.16
     steps:
       - checkout
       - run: npm install
@@ -16,7 +16,7 @@ jobs:
 
   release:
     docker:
-      - image: cimg/node:12.20.1
+      - image: cimg/node:14.16
     steps:
       - attach_workspace:
           at: ~/

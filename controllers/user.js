@@ -2,6 +2,7 @@ const SwaggerParser = require('@apidevtools/swagger-parser')
 const HTTPStatus = require('http-status-codes')
 const bcrypt = require('bcrypt')
 const path = require('path')
+const crypto = require('crypto')
 const log = require('../util/logger')
 const enums = require('../util/enums')
 const { v4: uuidv4 } = require('uuid')
@@ -205,11 +206,12 @@ const inviteUserToOrganization = async (req, res) => {
       token: invite.confirmation_token,
     }
 
+    const ownerOrg = await models.Organization.getOwnerOrganization()
     if (!user) {
       // if user does not exist send invitation to register into organization skipping organization step
-      await emailService.sendInviteNewUserToOrg(invitationData)
+      await emailService.sendInviteNewUserToOrg(invitationData, { logo: ownerOrg?.logo })
     } else {
-      await emailService.sendInviteToOrg(invitationData)
+      await emailService.sendInviteToOrg(invitationData, { logo: ownerOrg?.logo })
     }
 
     delete invite.confirmation_token
@@ -480,7 +482,8 @@ const setupMainAccount = async (req, res) => {
       token: invite.confirmation_token,
     }
 
-    await emailService.sendInviteNewUserToOrg(invitationData)
+    const ownerOrg = await models.Organization.getOwnerOrganization()
+    await emailService.sendInviteNewUserToOrg(invitationData, { logo: ownerOrg?.logo })
 
     await transaction.commit()
 
@@ -671,6 +674,42 @@ const deleteAvatar = async (req, res) => {
   return res.sendStatus(HTTPStatus.NO_CONTENT)
 }
 
+const listAPITokens = async (req, res) => {
+  const tokens = await models.APIToken.findAll({
+    where: {
+      user_id: req.user.id,
+    },
+    attributes: ['id', 'name', 'createdAt'],
+  })
+
+  return res.status(HTTPStatus.OK).send({ tokens })
+}
+
+const createAPIToken = async (req, res) => {
+  const tokenValue = crypto.randomBytes(20).toString('hex')
+
+  const token = await models.APIToken.create({
+    name: req.body.name,
+    token: tokenValue,
+    userId: req.user.id,
+  })
+
+  token.token = `${token.id}_${tokenValue}`
+
+  return res.status(HTTPStatus.CREATED).send({ token })
+}
+
+const revokeAPIToken = async (req, res) => {
+  await models.APIToken.destroy({
+    where: {
+      id: req.params.id,
+      userId: req.user.id,
+    },
+  })
+
+  return res.sendStatus(HTTPStatus.NO_CONTENT)
+}
+
 module.exports = {
   getAll,
   getById,
@@ -687,4 +726,7 @@ module.exports = {
   updateUserProfile,
   updateAvatar,
   deleteAvatar,
+  listAPITokens,
+  createAPIToken,
+  revokeAPIToken,
 }

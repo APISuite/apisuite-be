@@ -92,6 +92,11 @@ const app = (sequelize, DataTypes) => {
       allowNull: false,
       default: [],
     },
+    images: {
+      type: DataTypes.ARRAY(DataTypes.TEXT),
+      allowNull: true,
+      default: [],
+    },
   }, {
     timestamps: true,
     underscored: true,

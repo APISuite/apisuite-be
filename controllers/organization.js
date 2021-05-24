@@ -140,6 +140,10 @@ const updateOrg = async (req, res) => {
   publishEvent(routingKeys.ORG_UPDATED, {
     user_id: req.user.id,
     organization_id: req.params.id,
+    meta: {
+      id: updated.id,
+      name: updated.name,
+    },
   })
 
   return res.status(HTTPStatus.OK).send(updated)

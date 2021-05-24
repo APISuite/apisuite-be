@@ -147,10 +147,11 @@ const completeRegistration = async (req, res) => {
       transaction,
     })
 
+    const ownerOrg = await models.Organization.getOwnerOrganization()
     await emailService.sendRegisterConfirmation({
       email: user.email,
       token: activationToken,
-    })
+    }, { logo: ownerOrg?.logo })
 
     await transaction.commit()
 

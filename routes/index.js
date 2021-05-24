@@ -8,6 +8,7 @@ const role = require('./role')
 const settings = require('./settings')
 const invites = require('./invites')
 const owner = require('./owner')
+const translations = require('./translations')
 
 module.exports = {
   api,
@@ -19,5 +20,6 @@ module.exports = {
   registration,
   role,
   settings,
+  translations,
   user,
 }

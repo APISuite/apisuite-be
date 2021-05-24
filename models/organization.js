@@ -111,6 +111,15 @@ const organization = (sequelize, DataTypes) => {
     }
   }
 
+  Organization.getOwnerOrganization = async () => {
+    const ownerOrg = await sequelize.query('SELECT organization_id FROM owner_organization', { type: sequelize.QueryTypes.SELECT })
+    if (!ownerOrg || ownerOrg.length !== 1) {
+      return null
+    }
+
+    return Organization.findByPk(ownerOrg[0].organization_id)
+  }
+
   return Organization
 }
 
