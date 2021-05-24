@@ -1,12 +1,9 @@
 const HTTPStatus = require('http-status-codes')
-const fs = require('fs').promises
 const log = require('../util/logger')
 const { roles } = require('../util/enums')
 const { Op } = require('sequelize')
-const { v4: uuidv4 } = require('uuid')
 const { models, sequelize } = require('../models')
 const Gateway = require('../services/gateway')
-const Storage = require('../services/storage')
 const { publishEvent, routingKeys } = require('../services/msg-broker')
 const {
   settingTypes,
