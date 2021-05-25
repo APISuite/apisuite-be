@@ -5,7 +5,7 @@ const appMetadata = Joi.object({
   key: Joi.string().max(30).required(),
   value: Joi.string().required(),
   title: Joi.string().required(),
-  description: Joi.string().optional(),
+  description: Joi.string().optional().allow(null, ''),
 })
 
 const appSchema = Joi.object({
