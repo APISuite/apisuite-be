@@ -285,7 +285,12 @@ const updateApp = async (req, res) => {
       },
     })
 
-    return res.status(HTTPStatus.OK).send(updated)
+    const app = await models.App.findByPk(updated.id, {
+      attributes: appAttributes,
+      include: includes(),
+    })
+
+    return res.status(HTTPStatus.OK).send(app)
   } catch (err) {
     if (transaction) await transaction.rollback()
     log.error(err, '[UPDATE APP]')
