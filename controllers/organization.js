@@ -57,7 +57,6 @@ const addOrg = async (req, res) => {
       name: req.body.name,
       description: req.body.description,
       vat: req.body.vat,
-      website: req.body.website,
       terms: req.body.terms,
       logo: req.body.logo,
       org_code: uuidv4(),

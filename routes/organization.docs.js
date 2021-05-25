@@ -15,9 +15,6 @@
  *           type: string
  *         vat:
  *           type: string
- *         website:
- *           type: string
- *           format: uri
  *         logo:
  *           type: string
  *           format: uri

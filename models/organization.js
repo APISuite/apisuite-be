@@ -15,14 +15,6 @@ const organization = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true,
     },
-    website: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    terms: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
     logo: {
       type: DataTypes.STRING,
       allowNull: true,
