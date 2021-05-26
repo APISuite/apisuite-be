@@ -60,7 +60,10 @@ const idpSettingsSchema = Joi.object({
 const portalSettingsSchema = Joi.object({
   i18nOptions: Joi.array().items(Joi.object()),
   theme: Joi.object(),
-  navigation: Joi.object().optional(),
+  navigation: Joi.object({
+    tabs: Joi.array().items(Joi.object()).optional(),
+    events: Joi.object().optional(),
+  }).optional(),
 })
 
 module.exports = {
