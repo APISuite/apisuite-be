@@ -92,7 +92,8 @@ router.getAsync('/profile',
  * @openapi
  * /users/{id}:
  *   get:
- *     description: Get inputed user data.
+ *     summary: Retrieve user data
+ *     description: Retrieve user data based on ID or OIDC ID (see 'oidc' query param).
  *     tags: [User]
  *     parameters:
  *       - name: id
