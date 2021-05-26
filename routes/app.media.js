@@ -3,7 +3,7 @@ const router = decorateRouter(require('express').Router({ mergeParams: true }))
 const controllers = require('../controllers')
 const { actions, possessions, resources } = require('../util/enums')
 const { accessControl, loggedIn, fileParser } = require('../middleware')
-const { deleteMediaBody } = require('./validation_schemas/app.schema')
+const { deleteMediaQuery } = require('./validation_schemas/app.schema')
 
 /**
  * @openapi
@@ -89,18 +89,13 @@ router.putAsync('/',
  *         in: path
  *         schema:
  *           type: number
- *     requestBody:
- *       description: Media objects to delete
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               images:
- *                 type: array
- *                 items:
- *                   type: string
+ *       - name: mediaURL
+ *         description: URL of the media to delete
+ *         required: true
+ *         in: query
+ *         schema:
+ *           type: string
+ *           format: uri
  *     responses:
  *       204:
  *         description: No content
@@ -115,7 +110,7 @@ router.putAsync('/',
  */
 router.deleteAsync('/',
   loggedIn,
-  deleteMediaBody,
+  deleteMediaQuery,
   accessControl(actions.UPDATE, possessions.OWN, resources.APP, { idCarrier: 'params', idField: 'id' }),
   controllers.app.deleteMedia)
 

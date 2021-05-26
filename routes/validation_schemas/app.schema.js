@@ -46,7 +46,7 @@ const publicAppsQuerySchema = Joi.object({
 })
 
 const deleteMediaSchema = Joi.object({
-  images: Joi.array().items(Joi.string()).min(1).required(),
+  mediaURL: Joi.string().uri().required(),
 })
 
 const appPatchSchema = Joi.object({
@@ -60,5 +60,5 @@ module.exports = {
   validateAppPatchBody: validator(appPatchSchema),
   validateSubscriptionBody: validator(subscriptionSchema),
   validatePublicAppsListQuery: validator(publicAppsQuerySchema, 'query'),
-  deleteMediaBody: validator(deleteMediaSchema),
+  deleteMediaQuery: validator(deleteMediaSchema, 'query'),
 }

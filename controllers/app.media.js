@@ -95,9 +95,9 @@ const deleteMedia = async (req, res) => {
   if (!app) return res.status(HTTPStatus.NOT_FOUND).send({ errors: ['App not found'] })
 
   const storageClient = Storage.getStorageClient()
-  await Promise.all(req.body.images.map((img) => storageClient.deleteFile(img)))
+  await storageClient.deleteFile(req.query.mediaURL)
 
-  app.images = app.images.filter((img) => !req.body.images.includes(img))
+  app.images = app.images.filter((img) => img !== req.query.mediaURL)
   await app.save()
 
   return res.sendStatus(HTTPStatus.NO_CONTENT)
