@@ -15,12 +15,14 @@ const Idp = require('../services/idp')
 const fs = require('fs').promises
 const apiTokensControllers = require('./user.api-tokens')
 
+const excludedUserFields = ['password', 'activation_token']
+
 const getAll = async (req, res) => {
   try {
     const users = await models.User.findAllPaginated({
       page: req.query.page || req.body.page,
       pageSize: req.query.pageSize || req.body.pageSize,
-      options: { attributes: { exclude: ['password', 'activationToken'] } },
+      options: { attributes: { exclude: excludedUserFields } },
     })
     return res.status(HTTPStatus.OK).send(users)
   } catch (error) {
@@ -30,46 +32,20 @@ const getAll = async (req, res) => {
 }
 
 const getById = async (req, res) => {
-  const user = await models.User.findByPk(
-    req.params.userId,
-    { attributes: { exclude: ['password', 'activationToken'] } },
-  )
+  let where = { id: req.params.id }
+
+  if (req.query && req.query.oidc === 'true') {
+    if (!res.locals.isAdmin) {
+      return res.status(HTTPStatus.FORBIDDEN).send({ errors: ['You are not allowed to perform this action.'] })
+    }
+
+    where = { oidcId: req.params.id }
+  }
+  const user = await models.User.findOne({ where }, { attributes: { exclude: excludedUserFields } })
   if (!user) {
     return res.status(HTTPStatus.NOT_FOUND).send({ errors: ['User does not exist.'] })
   }
   return res.status(HTTPStatus.OK).send(user)
-}
-
-const getByLogin = async (req, res) => {
-  const errorObj = { errors: ['The username / password combination is not correct'] }
-
-  const user = await models.User.findByLogin(
-    req.body.email,
-  )
-
-  if (!user || (user && user.activationToken)) {
-    return res.status(HTTPStatus.UNAUTHORIZED).send(errorObj)
-  }
-
-  try {
-    const passwordMatch = await checkPassword(req.body.password, user.password)
-
-    if (passwordMatch.error) {
-      return res.status(HTTPStatus.BAD_REQUEST).send({ errors: [passwordMatch.error] })
-    }
-
-    const response = {
-      id: user.id,
-      role_id: user.role_id,
-      name: user.name,
-      email: user.email,
-    }
-
-    return res.status(HTTPStatus.OK).send(response)
-  } catch (e) {
-    log.error(e, '[USERS login]')
-    return res.status(HTTPStatus.UNAUTHORIZED).send({ errors: ['Failed to login.'] })
-  }
 }
 
 const changePassword = async (req, res) => {
@@ -591,7 +567,6 @@ const deleteAvatar = async (req, res) => {
 module.exports = {
   getAll,
   getById,
-  getByLogin,
   deleteUser,
   changePassword,
   inviteUserToOrganization,

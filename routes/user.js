@@ -133,17 +133,22 @@ router.getAsync('/',
 
 /**
  * @openapi
- * /users/{userId}:
+ * /users/{id}:
  *   get:
  *     description: Get inputed user data.
  *     tags: [User]
  *     parameters:
- *       - name: userId
- *         description: The user id.
+ *       - name: id
+ *         description: The user id
  *         required: true
  *         in: path
  *         schema:
  *           type: string
+ *       - name: oidc
+ *         description: Flag that enabled search by OIDC ID (admin only)
+ *         in: query
+ *         schema:
+ *           type: boolean
  *     security:
  *       - cookieAuth: []
  *     responses:
@@ -155,12 +160,14 @@ router.getAsync('/',
  *               $ref: '#/components/schemas/User'
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
  *       404:
  *         $ref: '#/components/responses/NotFound'
  *       500:
  *         $ref: '#/components/responses/Internal'
  */
-router.getAsync('/:userId',
+router.getAsync('/:id',
   loggedIn,
   accessControl(actions.READ, possessions.ANY, resources.PROFILE),
   controllers.user.getById)
