@@ -8,7 +8,7 @@ const { validateNewAPITokenBody } = require('./validation_schemas/user.schema')
  * @openapi
  * /users/api-tokens:
  *   get:
- *     description: Generates a new API token for the user.
+ *     summary: List user's API tokens
  *     tags: [User]
  *     responses:
  *       200:
@@ -30,7 +30,7 @@ router.getAsync('/',
  * @openapi
  * /users/api-tokens:
  *   post:
- *     description: Generates a new API token for the user.
+ *     summary: Generate an API token for the user
  *     tags: [User]
  *     requestBody:
  *       description: API Token payload.
