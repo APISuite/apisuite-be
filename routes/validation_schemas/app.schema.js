@@ -1,8 +1,18 @@
 const Joi = require('joi')
 const validator = require('./validator')
 
+const snakeCaseRegex = /^(?:[a-z]+_)*[a-z]+$/
+
 const appMetadata = Joi.object({
-  key: Joi.string().max(30).required(),
+  key: Joi.string().max(30).required().custom((value, helpers) => {
+    if (!value.startsWith('meta_')) {
+      return helpers.message('key must have "meta_" prefix')
+    }
+    if (!snakeCaseRegex.test(value)) {
+      return helpers.message('key must be snake_case')
+    }
+    return true
+  }),
   value: Joi.string().required(),
   title: Joi.string().required(),
   description: Joi.string().optional().allow(null, ''),
