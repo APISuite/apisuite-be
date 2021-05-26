@@ -61,7 +61,7 @@ router.postAsync('/',
 
 /**
  * @openapi
- * /users/api-tokens:id:
+ * /users/api-tokens/{id}:
  *   delete:
  *     description: Revoke API token.
  *     tags: [User]

@@ -7,12 +7,19 @@ const { deleteMediaBody } = require('./validation_schemas/app.schema')
 
 /**
  * @openapi
- * /apps/:id/media:
+ * /apps/{id}/media:
  *   put:
  *     summary: Upload app images/media
  *     tags: [App]
  *     security:
  *       - cookieAuth: []
+ *     parameters:
+ *       - name: id
+ *         description: App id
+ *         required: true
+ *         in: path
+ *         schema:
+ *           type: number
  *     requestBody:
  *       description: App object that need to be created
  *       required: true
@@ -69,12 +76,19 @@ router.putAsync('/',
 
 /**
  * @openapi
- * /apps/:id/media:
+ * /apps/{id}/media:
  *   delete:
  *     summary: Delete selected media objects
  *     tags: [App]
  *     security:
  *       - cookieAuth: []
+ *     parameters:
+ *       - name: id
+ *         description: App id
+ *         required: true
+ *         in: path
+ *         schema:
+ *           type: number
  *     requestBody:
  *       description: Media objects to delete
  *       required: true
