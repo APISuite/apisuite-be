@@ -90,49 +90,6 @@ router.getAsync('/profile',
 
 /**
  * @openapi
- * /users:
- *   get:
- *     description: Get list of user.
- *     tags: [User]
- *     parameters:
- *       - name: page
- *         description: The page we are at.
- *         in: query
- *         schema:
- *           type: number
- *       - name: pageSize
- *         description: The number of documents per page.
- *         in: query
- *         schema:
- *           type: number
- *     security:
- *       - cookieAuth: []
- *     responses:
- *       200:
- *         description: List of users.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 rows:
- *                   type: array
- *                   items:
- *                     $ref: '#/components/schemas/User'
- *                 pagination:
- *                   $ref: '#/components/schemas/Pagination'
- *       401:
- *         $ref: '#/components/responses/Unauthorized'
- *       500:
- *         $ref: '#/components/responses/Internal'
- */
-router.getAsync('/',
-  loggedIn,
-  accessControl(actions.READ, possessions.ANY, resources.PROFILE),
-  controllers.user.getAll)
-
-/**
- * @openapi
  * /users/{id}:
  *   get:
  *     description: Get inputed user data.

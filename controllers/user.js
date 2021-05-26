@@ -17,20 +17,6 @@ const apiTokensControllers = require('./user.api-tokens')
 
 const excludedUserFields = ['password', 'activation_token']
 
-const getAll = async (req, res) => {
-  try {
-    const users = await models.User.findAllPaginated({
-      page: req.query.page || req.body.page,
-      pageSize: req.query.pageSize || req.body.pageSize,
-      options: { attributes: { exclude: excludedUserFields } },
-    })
-    return res.status(HTTPStatus.OK).send(users)
-  } catch (error) {
-    log.error(error, '[USERS getAll]')
-    return res.sendInternalError()
-  }
-}
-
 const getById = async (req, res) => {
   let where = { id: req.params.id }
 
@@ -565,7 +551,6 @@ const deleteAvatar = async (req, res) => {
 }
 
 module.exports = {
-  getAll,
   getById,
   deleteUser,
   changePassword,
