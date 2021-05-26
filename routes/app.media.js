@@ -1,5 +1,5 @@
 const { decorateRouter } = require('@awaitjs/express')
-const router = decorateRouter(require('express').Router())
+const router = decorateRouter(require('express').Router({ mergeParams: true }))
 const controllers = require('../controllers')
 const { actions, possessions, resources } = require('../util/enums')
 const { accessControl, loggedIn, fileParser } = require('../middleware')
