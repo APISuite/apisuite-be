@@ -273,6 +273,12 @@ const schema = {
       },
     },
   },
+  maxFileSizeUpload: {
+    doc: 'Max file size upload (mb)',
+    format: Number,
+    default: 2 * 1024 * 1024, // 2mb
+    env: 'APISUITE_MAX_FILE_SIZE_UPLOAD',
+  },
 }
 
 module.exports = schema
