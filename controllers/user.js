@@ -11,7 +11,7 @@ const { Op } = require('sequelize')
 const { publishEvent, routingKeys } = require('../services/msg-broker')
 const { getRevokedCookieConfig } = require('../util/cookies')
 const Storage = require('../services/storage')
-const Idp = require('../services/idp')
+const { getUserProfile } = require('./user-helper')
 const fs = require('fs').promises
 const apiTokensControllers = require('./user.api-tokens')
 
@@ -224,65 +224,10 @@ const confirmInvite = async (req, res) => {
 }
 
 const profile = async (req, res) => {
-  const profile = {
-    user: {},
-    orgs_member: [],
-    current_org: {},
-  }
-
-  const user = await models.User.findOne({
-    where: {
-      id: req.user.id,
-    },
-    attributes: [
-      'id',
-      'name',
-      'bio',
-      'email',
-      'mobile',
-      'avatar',
-      'last_login',
-      'oidcProvider',
-      'oidcId',
-    ],
-  })
-
+  const user = await getUserProfile(req.user.id)
   if (!user) {
     return res.status(HTTPStatus.NOT_FOUND).send({ errors: ['User not found'] })
   }
-
-  profile.user = user.get({ plain: true })
-
-  const orgs = await models.UserOrganization.findAll({
-    where: { user_id: user.id },
-    attributes: ['org_id', 'current_org', 'created_at'],
-    include: [{
-      model: models.Role,
-      as: 'Role',
-      attributes: ['name', 'id'],
-    }, {
-      model: models.Organization,
-      as: 'Organization',
-      attributes: ['name', 'id'],
-    }],
-  })
-
-  for (const org of orgs) {
-    if (org.dataValues.current_org) {
-      profile.current_org = org.dataValues.Organization.dataValues
-      profile.current_org.member_since = org.dataValues.created_at
-      profile.current_org.role = org.dataValues.Role.dataValues
-    }
-
-    const orgsMember = {
-      id: org.dataValues.Organization.dataValues.id,
-      name: org.dataValues.Organization.dataValues.name,
-    }
-    profile.orgs_member.push(orgsMember)
-  }
-
-  const idp = await Idp.getIdP()
-  profile.ssoAccountURL = idp.getUserProfileURL(user.oidcId)
 
   return res.status(HTTPStatus.OK).send(profile)
 }
