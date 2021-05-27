@@ -61,8 +61,15 @@ const portalSettingsSchema = Joi.object({
   i18nOptions: Joi.array().items(Joi.object()),
   theme: Joi.object(),
   navigation: Joi.object({
-    tabs: Joi.array().items(Joi.object()).optional(),
-    events: Joi.object().optional(),
+    title: Joi.object({
+      route: Joi.string().allow(''),
+      iconFallbackName: Joi.string().allow('').optional(),
+    }),
+    admin: Joi.object().optional(),
+    organizationOwner: Joi.object().optional(),
+    developer: Joi.object().optional(),
+    baseUser: Joi.object().optional(),
+    anonymous: Joi.object().optional(),
   }).optional(),
 })
 
