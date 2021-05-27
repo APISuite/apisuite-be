@@ -2,137 +2,17 @@ const { decorateRouter } = require('@awaitjs/express')
 const router = decorateRouter(require('express').Router())
 const controllers = require('../controllers')
 const { accessControl, loggedIn, setup, fileParser } = require('../middleware')
-const { actions, possessions, resources } = require('../access-control')
+const { actions, possessions, resources } = require('../util/enums')
 const { validateForgotPasswordBody, validateRecoverPasswordBody } = require('./validation_schemas/auth.schema')
 const { validateInviteBody } = require('./validation_schemas/invite_organization.schema')
+const apiTokensRouter = require('./user.api-tokens')
 const {
-  deprecatedValidateProfileUpdateBody,
   validateProfileUpdateBody,
   validateChangePasswordBody,
   validateSetupBody,
-  validateNewAPITokenBody,
 } = require('./validation_schemas/user.schema')
 
-/**
- * @openapi
- * /users/api-tokens:
- *   get:
- *     description: Generates a new API token for the user.
- *     tags: [User]
- *     responses:
- *       200:
- *         description: Recovery email result.
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/APIToken'
- *       401:
- *         $ref: '#/components/responses/Unauthorized'
- */
-router.getAsync('/api-tokens',
-  loggedIn,
-  controllers.user.listAPITokens)
-
-/**
- * @openapi
- * /users/api-tokens:
- *   post:
- *     description: Generates a new API token for the user.
- *     tags: [User]
- *     requestBody:
- *       description: API Token payload.
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - name
- *             properties:
- *               name:
- *                 type: string
- *     responses:
- *       201:
- *         description: API Token data
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/APITokenFull'
- *       401:
- *         $ref: '#/components/responses/Unauthorized'
- */
-router.postAsync('/api-tokens',
-  loggedIn,
-  validateNewAPITokenBody,
-  controllers.user.createAPIToken)
-
-/**
- * @openapi
- * /users/api-tokens:id:
- *   delete:
- *     description: Revoke API token.
- *     tags: [User]
- *     parameters:
- *       - name: id
- *         description: API token id
- *         required: true
- *         in: path
- *         schema:
- *           type: number
- *     responses:
- *       204:
- *         description: No Content
- *       401:
- *         $ref: '#/components/responses/Unauthorized'
- *       403:
- *         $ref: '#/components/responses/Forbidden'
- */
-router.deleteAsync('/api-tokens/:id',
-  loggedIn,
-  controllers.user.revokeAPIToken)
-
-/**
- * @openapi
- * /users/profile/update:
- *   put:
- *     deprecated: true
- *     description: Edit user profile.
- *     tags: [User]
- *     requestBody:
- *       description: User profile details.
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/UserProfile'
- *     security:
- *       - cookieAuth: []
- *     responses:
- *       200:
- *         description: Profile edited successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                 message:
- *                   type: string
- *       400:
- *         $ref: '#/components/responses/BadRequest'
- *       401:
- *         $ref: '#/components/responses/Unauthorized'
- *       500:
- *         $ref: '#/components/responses/Internal'
- */
-router.putAsync('/profile/update',
-  loggedIn,
-  deprecatedValidateProfileUpdateBody,
-  accessControl(actions.UPDATE, possessions.OWN, resources.PROFILE),
-  controllers.user.profileUpdate)
+router.use('/api-tokens', apiTokensRouter)
 
 /**
  * @openapi
@@ -210,60 +90,23 @@ router.getAsync('/profile',
 
 /**
  * @openapi
- * /users:
+ * /users/{id}:
  *   get:
- *     description: Get list of user.
+ *     summary: Retrieve user data
+ *     description: Retrieve user data based on ID or OIDC ID (see 'oidc' query param).
  *     tags: [User]
  *     parameters:
- *       - name: page
- *         description: The page we are at.
- *         in: query
- *         schema:
- *           type: number
- *       - name: pageSize
- *         description: The number of documents per page.
- *         in: query
- *         schema:
- *           type: number
- *     security:
- *       - cookieAuth: []
- *     responses:
- *       200:
- *         description: List of users.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 rows:
- *                   type: array
- *                   items:
- *                     $ref: '#/components/schemas/User'
- *                 pagination:
- *                   $ref: '#/components/schemas/Pagination'
- *       401:
- *         $ref: '#/components/responses/Unauthorized'
- *       500:
- *         $ref: '#/components/responses/Internal'
- */
-router.getAsync('/',
-  loggedIn,
-  accessControl(actions.READ, possessions.ANY, resources.PROFILE),
-  controllers.user.getAll)
-
-/**
- * @openapi
- * /users/{userId}:
- *   get:
- *     description: Get inputed user data.
- *     tags: [User]
- *     parameters:
- *       - name: userId
- *         description: The user id.
+ *       - name: id
+ *         description: The user id
  *         required: true
  *         in: path
  *         schema:
  *           type: string
+ *       - name: oidc
+ *         description: Flag that enabled search by OIDC ID (admin only)
+ *         in: query
+ *         schema:
+ *           type: boolean
  *     security:
  *       - cookieAuth: []
  *     responses:
@@ -275,12 +118,14 @@ router.getAsync('/',
  *               $ref: '#/components/schemas/User'
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
  *       404:
  *         $ref: '#/components/responses/NotFound'
  *       500:
  *         $ref: '#/components/responses/Internal'
  */
-router.getAsync('/:userId',
+router.getAsync('/:id',
   loggedIn,
   accessControl(actions.READ, possessions.ANY, resources.PROFILE),
   controllers.user.getById)
@@ -432,33 +277,6 @@ router.postAsync('/invite',
   validateInviteBody,
   accessControl(actions.UPDATE, possessions.OWN, resources.ORGANIZATION),
   controllers.user.inviteUserToOrganization)
-
-/**
- * @openapi
- * /users/invitations/list:
- *   get:
- *     description: Get a list of invites.
- *     tags: [User]
- *     security:
- *       - cookieAuth: []
- *     responses:
- *       200:
- *         description: List of invitations.
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/InviteCompact'
- *       401:
- *         $ref: '#/components/responses/Unauthorized'
- *       500:
- *         $ref: '#/components/responses/Internal'
- */
-router.getAsync('/invitations/list',
-  loggedIn,
-  accessControl(actions.READ, possessions.OWN, resources.ORGANIZATION),
-  controllers.user.getListInvitations)
 
 /**
  * @openapi

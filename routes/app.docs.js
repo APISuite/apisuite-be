@@ -42,6 +42,10 @@
  *           type: array
  *           items:
  *             type: string
+ *         images:
+ *           type: array
+ *           items:
+ *             type: string
  *         tosUrl:
  *           type: string
  *           format: uri
@@ -111,6 +115,10 @@
  *           type: array
  *           items:
  *             type: string
+ *         images:
+ *           type: array
+ *           items:
+ *             type: string
  *         tosUrl:
  *           type: string
  *           format: uri
@@ -171,6 +179,44 @@
  *           type: array
  *           items:
  *             type: string
+ *         metadata:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/AppMetadata'
+ *
+ *     AppMetadata:
+ *       type: object
+ *       required:
+ *         - key
+ *         - value
+ *         - title
+ *       properties:
+ *         key:
+ *           type: string
+ *         value:
+ *           type: string
+ *         title:
+ *           type: string
+ *         description:
+ *           type: string
+ *
+ *     AppPatch:
+ *       type: object
+ *       properties:
+ *         visibility:
+ *           type: string
+ *           description: App visibility
+ *           enum:
+ *             - public
+ *             - private
+ *         labels:
+ *           type: array
+ *           items:
+ *             type: string
+ *         metadata:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/AppMetadata'
  */
 
 /**
@@ -197,25 +243,6 @@
  *           type: string
  *         clientSecret:
  *           type: string
- *         pub_urls:
- *           type: array
- *           items:
- *             type: object
- *             required:
- *               - url
- *               - type
- *             properties:
- *               url:
- *                 type: string
- *                 format: uri
- *               type:
- *                 type: string
- *                 enum:
- *                   - client
- *                   - tos
- *                   - policy
- *                   - support
- *                   - support_email
  *         subscriptions:
  *           type: array
  *           items:

@@ -1,11 +1,9 @@
 const HTTPStatus = require('http-status-codes')
-const fs = require('fs').promises
 const log = require('../util/logger')
+const { roles } = require('../util/enums')
 const { Op } = require('sequelize')
-const { v4: uuidv4 } = require('uuid')
 const { models, sequelize } = require('../models')
 const Gateway = require('../services/gateway')
-const Storage = require('../services/storage')
 const { publishEvent, routingKeys } = require('../services/msg-broker')
 const {
   settingTypes,
@@ -13,6 +11,8 @@ const {
   appStates,
 } = require('../util/enums')
 const Idp = require('../services/idp')
+const publicAppsController = require('./app.public')
+const appMediaController = require('./app.media')
 
 const appAttributes = {
   include: [
@@ -27,13 +27,13 @@ const appAttributes = {
 
 const includes = () => [
   {
-    model: models.PubURLApp,
-    as: 'pub_urls',
-  },
-  {
     model: models.Api,
     as: 'subscriptions',
     through: { attributes: [] },
+  },
+  {
+    model: models.AppMetadata,
+    as: 'metadata',
   },
 ]
 
@@ -199,12 +199,14 @@ const deleteApp = async (req, res) => {
 const updateApp = async (req, res) => {
   const transaction = await sequelize.transaction()
   try {
+    if (req.user.role.name !== roles.ADMIN) req.body.labels = undefined
+
     const [rowsUpdated, [updated]] = await models.App.update(
       {
         name: req.body.name,
         description: req.body.description,
         shortDescription: req.body.shortDescription,
-        redirect_url: req.body.redirectUrl || req.body.redirect_url,
+        redirect_url: req.body.redirectUrl,
         logo: req.body.logo,
         visibility: req.body.visibility,
         labels: req.body.labels,
@@ -234,45 +236,17 @@ const updateApp = async (req, res) => {
       return res.status(HTTPStatus.NOT_FOUND).send({ errors: 'App not found' })
     }
 
-    if (typeof req.body.pub_urls !== 'undefined') {
-      const data = []
-      for (const pubUrl of req.body.pub_urls) {
-        const puburlData = {
-          url: pubUrl.url,
-          app_id: updated.dataValues.id,
-          type: pubUrl.type,
-        }
-        if (pubUrl.id) {
-          puburlData.id = pubUrl.id
-        }
-        data.push(puburlData)
-      }
-
-      // find urls to remove
-      const removeUrls = await models.PubURLApp.findAll({
-        where: {
-          [Op.and]: [{
-            app_id: updated.dataValues.id,
-          }, {
-            id: { [Op.notIn]: req.body.pub_urls.map(u => u.id) },
-          }],
-        },
+    if (req.body.metadata) {
+      await models.AppMetadata.destroy({
+        where: { appId: updated.id },
       }, { transaction })
 
-      if (removeUrls.length > 0) {
-        // remove urls
-        await models.PubURLApp.destroy({
-          where: {
-            id: removeUrls.map(u => u.id),
-          },
-        }, { transaction })
-      }
-      if (data.length > 0) {
-        // add or update urls
-        await models.PubURLApp.bulkCreate(data, {
-          updateOnDuplicate: ['url'],
-        }, { transaction })
-      }
+      const metadata = req.body.metadata.map((m) => ({
+        ...m,
+        appId: updated.id,
+      }))
+
+      await models.AppMetadata.bulkCreate(metadata, { transaction })
     }
 
     const subscriptionModel = await getSubscriptionModel()
@@ -311,7 +285,12 @@ const updateApp = async (req, res) => {
       },
     })
 
-    return res.status(HTTPStatus.OK).send(updated)
+    const app = await models.App.findByPk(updated.id, {
+      attributes: appAttributes,
+      include: includes(),
+    })
+
+    return res.status(HTTPStatus.OK).send(app)
   } catch (err) {
     if (transaction) await transaction.rollback()
     log.error(err, '[UPDATE APP]')
@@ -324,11 +303,13 @@ const createDraftApp = async (req, res) => {
   try {
     const idp = await Idp.getIdP()
 
+    if (req.user.role.name !== roles.ADMIN) req.body.labels = []
+
     let app = await models.App.create({
       name: req.body.name,
       description: req.body.description,
       shortDescription: req.body.shortDescription,
-      redirect_url: req.body.redirectUrl || req.body.redirect_url,
+      redirect_url: req.body.redirectUrl,
       logo: req.body.logo,
       enable: true,
       org_id: req.user.org.id,
@@ -344,21 +325,15 @@ const createDraftApp = async (req, res) => {
       supportUrl: req.body.supportUrl,
     }, { transaction })
 
-    if (typeof req.body.pub_urls !== 'undefined') {
-      const data = []
-      for (const pubUrl of req.body.pub_urls) {
-        const puburlData = {
-          url: pubUrl.url,
-          app_id: app.id,
-          type: pubUrl.type,
-        }
-        data.push(puburlData)
-      }
+    if (req.body.metadata && req.body.metadata.length) {
+      const metadata = req.body.metadata.map((m) => ({
+        ...m,
+        appId: app.id,
+      }))
 
-      if (data.length > 0) {
-        await models.PubURLApp.bulkCreate(data, { transaction })
-      }
+      await models.AppMetadata.bulkCreate(metadata, { transaction })
     }
+
     await transaction.commit()
 
     app = await models.App.findByPk(app.id, {
@@ -568,270 +543,73 @@ const isSubscribedTo = async (req, res) => {
   }
 }
 
-const listPublicApps = async (req, res, next) => {
-  const filters = {
-    visibility: 'public',
-    enable: true,
-    state: appStates.APPROVED,
-  }
-
-  if (req.query.org_id) {
-    filters.org_id = {
-      [Op.in]: Array.isArray(req.query.org_id) ? req.query.org_id : [req.query.org_id],
-    }
-  }
-
-  if (req.query.label) {
-    filters.labels = {
-      [Op.overlap]: Array.isArray(req.query.label) ? req.query.label : [req.query.label],
-    }
-  }
-
-  let search = {}
-  if (req.query.search && typeof req.query.search === 'string') {
-    const matchSearch = `%${req.query.search}%`
-    search = {
-      [Op.or]: [
-        { name: { [Op.iLike]: matchSearch } },
-        { '$organization.name$': { [Op.iLike]: matchSearch } },
-        sequelize.literal(`EXISTS (SELECT * FROM unnest(labels) AS label WHERE label ILIKE '${matchSearch}')`),
-      ],
-    }
-  }
-
-  let order = []
-  const sortOrder = req.query.order || 'asc'
-  switch (req.query.sort_by) {
-    case 'updated': {
-      order = [
-        ['updated_at', sortOrder],
-        ['name', sortOrder],
-      ]
-      break
-    }
-    case 'org': {
-      order = [
-        [models.Organization, 'name', sortOrder],
-        ['name', sortOrder],
-      ]
-      break
-    }
-    default: {
-      order = [['name', sortOrder]]
-      break
-    }
-  }
-
-  const queryOptions = {
-    where: { ...filters, ...search },
-    include: [{
-      model: models.Organization,
-      attributes: [
-        'id',
-        'name',
-        'tosUrl',
-        'privacyUrl',
-        'supportUrl',
-      ],
-    }],
-    attributes: [
-      'id',
-      'name',
-      'description',
-      'shortDescription',
-      'logo',
-      'labels',
-      'tosUrl',
-      'privacyUrl',
-      'youtubeUrl',
-      'websiteUrl',
-      'supportUrl',
-      'createdAt',
-      'updatedAt',
-      ['org_id', 'orgId'],
-    ],
-    order,
-  }
-
-  const apps = await models.App.findAllPaginated({
-    page: req.query.page,
-    pageSize: req.query.pageSize,
-    options: queryOptions,
-  })
-
-  return res.status(HTTPStatus.OK).json(apps)
-}
-
-const listPublicLabels = async (req, res) => {
-  // const sql = `
-  //   SELECT DISTINCT unnest(labels) AS label
-  //   FROM app
-  //   WHERE visibility = 'public'
-  //   AND enable = true
-  //   AND state = 'approved'
-  // ORDER BY label`
-  // const labels = await sequelize.query(sql, { type: sequelize.QueryTypes.SELECT })
-
-  const labels = await models.App.findAll({
-    attributes: [
-      [
-        sequelize.fn('distinct',
-          sequelize.fn('unnest',
-            sequelize.literal('labels'),
-          ),
-        ), 'label'],
-    ],
-    raw: true,
-    where: {
-      visibility: 'public',
-      enable: true,
-      state: appStates.APPROVED,
-    },
-    order: [[sequelize.literal('label')]],
-  })
-
-  return res.status(HTTPStatus.OK).json(labels.map((l) => l.label))
-}
-
-const publicAppDetails = async (req, res) => {
-  const app = await models.App.findOne({
-    where: {
-      id: req.params.id,
-      visibility: 'public',
-      enable: true,
-      state: appStates.APPROVED,
-    },
-    include: [{
-      model: models.Organization,
-      attributes: [
-        'id',
-        'name',
-        'tosUrl',
-        'privacyUrl',
-        'supportUrl',
-      ],
-    }],
-    attributes: [
-      'id',
-      'name',
-      'description',
-      'shortDescription',
-      'logo',
-      'labels',
-      'tosUrl',
-      'privacyUrl',
-      'youtubeUrl',
-      'websiteUrl',
-      'supportUrl',
-      'createdAt',
-      'updatedAt',
-      ['org_id', 'orgId'],
-    ],
-  })
-
-  if (!app) {
-    return res.status(HTTPStatus.NOT_FOUND).send({ errors: ['App not found'] })
-  }
-
-  return res.status(HTTPStatus.OK).json(app)
-}
-
-const uploadMedia = async (req, res) => {
-  if (!req.formdata || !req.formdata.files) {
-    return res.status(HTTPStatus.BAD_REQUEST).send({ errors: ['no files uploaded'] })
-  }
-
-  const files = []
-  const badTypes = []
-  for (const key in req.formdata.files) {
-    const file = req.formdata.files[key]
-    if (file.type.split('/')[0] !== 'image') {
-      badTypes.push(file.name)
-    }
-    files.push(file)
-  }
-
-  if (badTypes.length) {
-    return res.status(HTTPStatus.BAD_REQUEST).send({
-      errors: badTypes.map((f) => ({
-        file: f,
-        error: 'invalid type (image expected)',
-      })),
-    })
-  }
-
-  const app = await models.App.findOne({
-    where: {
-      id: req.params.id,
-      org_id: req.user.org.id,
-      enable: true,
-    },
-  })
-
-  if (!app) return res.status(HTTPStatus.NOT_FOUND).send({ errors: ['App not found'] })
-
-  const storageClient = Storage.getStorageClient()
-  const savePromises = files.map((f) => {
-    const extension = f.name.split('.').pop()
-    return storageClient.saveFile(f.path, `app-media-${req.params.id}-${uuidv4()}.${extension}`)
-  })
-  const saveResults = await Promise.all(savePromises)
-
+const patchApp = async (req, res) => {
+  const transaction = await sequelize.transaction()
   try {
-    await Promise.all(files.map((f) => fs.unlink(f.path)))
-  } catch (err) {
-    log.error(err, 'uploadMedia: failed to remove temporary files')
-  }
+    const [rowsUpdated, [updated]] = await models.App.update(
+      req.body,
+      {
+        transaction,
+        returning: true,
+        include: [
+          ...includes(),
+        ],
+        where: {
+          id: req.params.appId,
+          org_id: req.params.id,
+          enable: true,
+        },
+        attributes: appAttributes,
+      },
+    )
 
-  const response = {
-    savedImages: [],
-    errors: [],
-  }
-  const imageURLs = []
-
-  for (let i = 0; i < saveResults.length; i++) {
-    const sr = saveResults[i]
-    if (sr.objectURL && sr.objectURL.length) {
-      imageURLs.push(sr.objectURL)
-      response.savedImages.push({
-        file: files[i].name,
-        url: sr.objectURL,
-      })
-      continue
+    if (!rowsUpdated) {
+      await transaction.rollback()
+      return res.status(HTTPStatus.NOT_FOUND).send({ errors: 'App not found' })
     }
 
-    response.errors.push({
-      file: files[i].name,
-      error: 'failed to save image',
+    if (req.body.metadata) {
+      await models.AppMetadata.destroy({
+        where: { appId: updated.id },
+      }, { transaction })
+
+      const metadata = req.body.metadata.map((m) => ({
+        ...m,
+        appId: updated.id,
+      }))
+
+      await models.AppMetadata.bulkCreate(metadata, { transaction })
+    }
+
+    await transaction.commit()
+
+    const app = await models.App.findOne({
+      where: { id: req.params.appId },
+      attributes: appAttributes,
+      include: includes(),
     })
+
+    publishEvent(routingKeys.APP_UPDATED, {
+      user_id: req.user.id,
+      app_id: req.params.id,
+      organization_id: req.user.org.id,
+      meta: {
+        id: updated.id,
+        name: updated.name,
+        description: updated.description,
+        shortDescription: updated.shortDescription,
+        logo: updated.logo,
+        visibility: updated.visibility,
+        state: updated.state,
+      },
+    })
+
+    return res.status(HTTPStatus.OK).send(app)
+  } catch (err) {
+    if (transaction) await transaction.rollback()
+    log.error(err, '[UPDATE APP]')
+    return res.status(HTTPStatus.INTERNAL_SERVER_ERROR).send({ errors: ['Failed to update the app'] })
   }
-
-  app.images = app.images.concat(imageURLs)
-  await app.save()
-
-  if (!response.errors.length) delete response.errors
-
-  return res.status(HTTPStatus.OK).send(response)
-}
-
-const deleteMedia = async (req, res) => {
-  const app = await models.App.findOne({
-    where: {
-      id: req.params.id,
-      org_id: req.user.org.id,
-      enable: true,
-    },
-  })
-
-  if (!app) return res.status(HTTPStatus.NOT_FOUND).send({ errors: ['App not found'] })
-
-  const storageClient = Storage.getStorageClient()
-  await Promise.all(req.body.images.map((img) => storageClient.deleteFile(img)))
-
-  app.images = app.images.filter((img) => !req.body.images.includes(img))
-  await app.save()
-
-  return res.sendStatus(HTTPStatus.NO_CONTENT)
 }
 
 module.exports = {
@@ -843,9 +621,7 @@ module.exports = {
   subscribeToAPI,
   listApps,
   isSubscribedTo,
-  listPublicApps,
-  listPublicLabels,
-  publicAppDetails,
-  uploadMedia,
-  deleteMedia,
+  patchApp,
+  ...publicAppsController,
+  ...appMediaController,
 }

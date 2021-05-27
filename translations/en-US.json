@@ -55,7 +55,7 @@
     },
     "notice": {
       "maintainedBy": "is maintained by",
-      "visitUs": "You can visit us at"
+      "visitUs": "You can visit us at "
     }
   },
   "cookiesConsentBanner": {
@@ -319,7 +319,7 @@
         "appClientSecretFieldLabel": "Client Secret",
         "appFullDescriptionFieldLabel": "Full description",
         "appLabelsFieldLabel": "Labels",
-        "appLabelsFieldHelperText": "Each provided label should be separated by a space.",
+        "appLabelsFieldHelperText": "Each provided label should be separated by a comma.",
         "appNameFieldLabel": "Application name",
         "appPrivacyPolicyFieldLabel": "Privacy Policy URL",
         "appPrivacyPolicyURLFieldLabel": "Privacy Policy URL",

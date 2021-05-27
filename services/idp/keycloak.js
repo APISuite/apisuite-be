@@ -56,6 +56,16 @@ class Keycloak extends IdP {
       throw new Error('Failed to delete Keycloak Client')
     }
   }
+
+  getUserProfileURL (userID) {
+    if (!userID || !userID.length) return ''
+    const discovery = this.config.configuration.discoveryURL
+    const base = discovery.substring(0, discovery.indexOf('.well-known'))
+    const accountURL = new URL('account', base)
+    const params = accountURL.searchParams
+    params.append('referrer', userID)
+    return accountURL.href
+  }
 }
 
 module.exports = Keycloak

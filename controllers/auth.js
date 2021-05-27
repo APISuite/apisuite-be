@@ -12,6 +12,7 @@ const { settingTypes } = require('../util/enums')
 const config = require('../config')
 const { getRevokedCookieConfig } = require('../util/cookies')
 const { oidcDiscovery } = require('../util/oidc')
+const { getUserProfile } = require('./user-helper')
 
 const isRecoveryValid = (createdAt) => {
   return new Date(createdAt.getTime() + config.get('passwordRecoveryTTL') * 60 * 1000) >= Date.now()
@@ -122,13 +123,14 @@ const login = async (req, res) => {
 
     await transaction.commit()
 
+    const profile = await getUserProfile(user.id)
     const cookieConfigs = getCookieConfigs()
 
     return res
       .status(HTTPStatus.OK)
       .cookie('access_token', accessToken, cookieConfigs.accessToken)
       .cookie('refresh_token', refreshToken.token, cookieConfigs.refreshToken)
-      .send()
+      .send(profile)
   } catch (err) {
     await transaction.rollback()
     log.error(err, '[AUTH LOGIN]')
@@ -279,13 +281,14 @@ const oidcToken = async (req, res) => {
 
     await transaction.commit()
 
+    const profile = await getUserProfile(user.id)
     const cookieConfigs = getCookieConfigs()
 
     return res
       .status(HTTPStatus.OK)
       .cookie('access_token', accessToken, cookieConfigs.accessToken)
       .cookie('refresh_token', refreshToken.token, cookieConfigs.refreshToken)
-      .send()
+      .send(profile)
   } catch (err) {
     await transaction.rollback()
     log.error(err, '[AUTH LOGIN]')

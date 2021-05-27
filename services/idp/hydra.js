@@ -77,6 +77,10 @@ class Hydra extends IdP {
       throw new Error('Failed to delete Hydra Client')
     }
   }
+
+  getUserProfileURL (userID) {
+    return ''
+  }
 }
 
 module.exports = Hydra
