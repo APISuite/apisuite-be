@@ -229,7 +229,7 @@ const profile = async (req, res) => {
     return res.status(HTTPStatus.NOT_FOUND).send({ errors: ['User not found'] })
   }
 
-  return res.status(HTTPStatus.OK).send(profile)
+  return res.status(HTTPStatus.OK).send(user)
 }
 
 const setupMainAccount = async (req, res) => {
