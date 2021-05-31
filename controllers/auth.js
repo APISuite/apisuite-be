@@ -271,6 +271,17 @@ const oidcToken = async (req, res) => {
     user.last_login = Date.now()
     await user.save({ transaction })
 
+    await models.InviteOrganization.update(
+      { user_id: user.id },
+      {
+        where: {
+          user_id: null,
+          status: 'pending',
+          email: user.email,
+        },
+        transaction,
+      })
+
     const { accessToken, refreshToken } = await jwt.generateTokenSet(user.id)
 
     await models.RefreshToken.create({
