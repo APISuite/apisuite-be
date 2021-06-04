@@ -1,7 +1,7 @@
 const Joi = require('joi')
 const validator = require('./validator')
 
-const snakeCaseRegex = /^(?:[a-z]+_)*[a-z]+$/
+const snakeCaseRegex = /^[a-z](?:[a-z0-9]+_)*[a-z0-9]+$/
 
 const appMetadata = Joi.object({
   key: Joi.string().max(30).required().custom((value, helpers) => {
