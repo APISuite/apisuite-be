@@ -1,5 +1,5 @@
 const Kong = require('./kong')
-
+const { NoGatewayError } = require('./errors')
 const { models } = require('../../models')
 const { settingTypes, gatewayProviders, subscriptionModels } = require('../../util/enums')
 
@@ -25,7 +25,7 @@ const getGateway = async () => {
 
   switch (config.provider) {
     case gatewayProviders.KONG: return new Kong(config.configuration)
-    default: throw new Error('Gateway Provider not supported.')
+    default: throw new NoGatewayError('Gateway Provider not supported.')
   }
 }
 
