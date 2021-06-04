@@ -4,6 +4,7 @@ const { roles } = require('../util/enums')
 const { Op } = require('sequelize')
 const { models, sequelize } = require('../models')
 const Gateway = require('../services/gateway')
+const { NoGatewayError } = require('../services/gateway/errors')
 const { publishEvent, routingKeys } = require('../services/msg-broker')
 const {
   settingTypes,
@@ -46,7 +47,15 @@ const getSubscriptionModel = async () => {
 }
 
 const handleGatewaySubscriptions = async (app, currentSubs, newSubs) => {
-  const gateway = await Gateway()
+  let gateway
+  try {
+    gateway = await Gateway()
+  } catch (error) {
+    if (error instanceof NoGatewayError) {
+      return
+    }
+    log.error('[handleGatewaySubscriptions] => getGateway', error)
+  }
 
   const subsToDelete = currentSubs
     .filter((cs) => !newSubs.includes(cs.id))
@@ -175,8 +184,10 @@ const deleteApp = async (req, res) => {
         const gateway = await Gateway()
         await gateway.removeApp(updated.id)
       } catch (error) {
-        if (transaction) await transaction.rollback()
         log.error('[deleteApp] => removeApp', error)
+        if (!(error instanceof NoGatewayError)) {
+          if (transaction) await transaction.rollback()
+        }
       }
     }
 
@@ -397,8 +408,16 @@ const requestAccess = async (req, res) => {
       app.client_data = client.extra
       app.idpProvider = idp.getProvider()
 
-      const gateway = await Gateway()
-      await gateway.subscribeAll(app.id, app.clientId)
+      let gateway
+      try {
+        gateway = await Gateway()
+      } catch (error) {
+        log.error('[requestAccess] => getGateway', error)
+        if (!(error instanceof NoGatewayError)) {
+          return res.status(HTTPStatus.INTERNAL_SERVER_ERROR).send({ errors: ['gateway communication issue'] })
+        }
+      }
+      if (gateway) await gateway.subscribeAll(app.id, app.clientId)
 
       await app.save()
       break

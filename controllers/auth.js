@@ -389,6 +389,7 @@ const getCookieConfigs = () => {
 }
 
 const introspect = async (req, res) => {
+  if (!req.user.role) req.user.role = { name: 'baseUser' }
   return res.status(HTTPStatus.OK).send(req.user)
 }
 
