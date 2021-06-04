@@ -7,7 +7,7 @@ const getConfig = async () => {
   const settings = await models.Setting.findOne({
     where: { type: settingTypes.GATEWAY },
   })
-  if (!settings || !settings.values) throw new Error('Gateway configuration missing.')
+  if (!settings || !settings.values) throw new NoGatewayError('Gateway configuration missing.')
 
   const planSettings = await models.Setting.findOne({
     where: { type: settingTypes.PLAN },
