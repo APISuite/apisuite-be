@@ -146,7 +146,7 @@ const schema = {
       doc: '"from" email address for outgoing emails',
       format: String,
       default: 'no-reply@apisuite.io',
-      env: 'http://localhost:3001',
+      env: 'APISUITE_FROM_EMAIL',
     },
     smtpConfig: {
       pool: {
