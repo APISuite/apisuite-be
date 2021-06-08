@@ -29,8 +29,8 @@ const validations = require('./validation_schemas/api.schema')
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/APIsPaginated'
- *       401:
- *         description: Unauthorized
+ *       400:
+ *         description: BadRequest
  *         content:
  *           application/json:
  *             schema:
@@ -43,6 +43,7 @@ const validations = require('./validation_schemas/api.schema')
  *               $ref: '#/components/schemas/Error'
  */
 router.getAsync('/',
+  validations.validateAPIPagination,
   controllers.api.getAll)
 
 /**

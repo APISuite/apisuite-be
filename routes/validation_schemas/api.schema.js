@@ -27,8 +27,14 @@ const APIversionSchema = Joi.object({
   live: Joi.boolean().required(),
 })
 
+const apiPaginationSchema = Joi.object({
+  page: Joi.number().min(1).optional(),
+  pageSize: Joi.number().min(1).optional(),
+})
+
 module.exports = {
   validateAPIBody: validator(APISchema),
   validateAPIversionBody: validator(APIversionSchema, 'formdata.fields'),
   validateApiVersionPatchBody: validator(apiVersionPatchSchema),
+  validateAPIPagination: validator(apiPaginationSchema, 'query'),
 }
