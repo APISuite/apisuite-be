@@ -1,6 +1,6 @@
 const HTTPStatus = require('http-status-codes')
 const AccessControl = require('accesscontrol')
-const { resources, possessions } = require('../access-control')
+const { resources, possessions } = require('../util/enums')
 const { models } = require('../models')
 
 const fetchGrants = async () => {
@@ -27,6 +27,7 @@ const sendForbidden = (res) => {
  * @param {Object} options
  * @param {String} options.idCarrier - Express request field that carries the resource ID (params, body, etc)
  * @param {String} options.idField - Field name that corresponds to the resource ID in the idCarrier (ex.: /:userId)
+ * @param {Boolean} options.adminOverride - If true, 'admin' role gets access to the resource, independently of grants. Default false
  * */
 const accessControl = (action, possession, resource, options = {}) => {
   return async (req, res, next) => {
@@ -40,7 +41,9 @@ const accessControl = (action, possession, resource, options = {}) => {
     })
     if (!permission.granted) return sendForbidden(res)
 
-    const { idCarrier, idField } = options
+    const { idCarrier, idField, adminOverride = false } = options
+
+    if (adminOverride) return next()
 
     switch (resource) {
       case resources.ORGANIZATION: {

@@ -63,6 +63,8 @@
  *           format: date-time
  *         oidcProvider:
  *           type: string
+ *         oidcId:
+ *           type: string
  */
 
 /** @openapi
@@ -96,6 +98,9 @@
  *       properties:
  *         user:
  *           $ref: '#/components/schemas/UserCompact'
+ *         ssoAccountURL:
+ *           type: string
+ *           format: uri
  *         org_member:
  *           type: array
  *           items:

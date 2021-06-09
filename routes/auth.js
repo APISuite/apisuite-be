@@ -18,8 +18,12 @@ const { loggedIn, refreshToken } = require('../middleware')
  *           schema:
  *             $ref: '#/components/schemas/UserCredentials'
  *     responses:
- *       204:
- *         description: No Content
+ *       200:
+ *         description: User profile data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Profile'
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  *       500:
@@ -142,8 +146,12 @@ router.getAsync('/oidc/:provider',
  *               code:
  *                 type: string
  *     responses:
- *       204:
- *         description: No Content
+ *       200:
+ *         description: The user profile data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Profile'
  *       404:
  *         $ref: '#/components/responses/NotFound'
  */

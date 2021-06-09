@@ -104,7 +104,7 @@ const app = (sequelize, DataTypes) => {
   })
 
   App.associate = (models) => {
-    App.hasMany(models.PubURLApp, { as: 'pub_urls', foreignKey: 'app_id', onDelete: 'CASCADE' })
+    App.hasMany(models.AppMetadata, { as: 'metadata' })
     App.belongsTo(models.Organization, { foreignKey: 'org_id' })
     App.belongsToMany(models.Api, { as: 'subscriptions', through: models.AppSubscription, foreignKey: 'app_id' })
   }

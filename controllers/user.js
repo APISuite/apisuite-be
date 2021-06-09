@@ -2,7 +2,6 @@ const SwaggerParser = require('@apidevtools/swagger-parser')
 const HTTPStatus = require('http-status-codes')
 const bcrypt = require('bcrypt')
 const path = require('path')
-const crypto = require('crypto')
 const log = require('../util/logger')
 const enums = require('../util/enums')
 const { v4: uuidv4 } = require('uuid')
@@ -12,63 +11,27 @@ const { Op } = require('sequelize')
 const { publishEvent, routingKeys } = require('../services/msg-broker')
 const { getRevokedCookieConfig } = require('../util/cookies')
 const Storage = require('../services/storage')
+const { getUserProfile } = require('./user-helper')
 const fs = require('fs').promises
+const apiTokensControllers = require('./user.api-tokens')
 
-const getAll = async (req, res) => {
-  try {
-    const users = await models.User.findAllPaginated({
-      page: req.query.page || req.body.page,
-      pageSize: req.query.pageSize || req.body.pageSize,
-      options: { attributes: { exclude: ['password', 'activationToken'] } },
-    })
-    return res.status(HTTPStatus.OK).send(users)
-  } catch (error) {
-    log.error(error, '[USERS getAll]')
-    return res.sendInternalError()
-  }
-}
+const excludedUserFields = ['password', 'activation_token']
 
 const getById = async (req, res) => {
-  const user = await models.User.findByPk(
-    req.params.userId,
-    { attributes: { exclude: ['password', 'activationToken'] } },
-  )
+  let where = { id: req.params.id }
+
+  if (req.query && req.query.oidc === 'true') {
+    if (!res.locals.isAdmin) {
+      return res.status(HTTPStatus.FORBIDDEN).send({ errors: ['You are not allowed to perform this action.'] })
+    }
+
+    where = { oidcId: req.params.id }
+  }
+  const user = await models.User.findOne({ where }, { attributes: { exclude: excludedUserFields } })
   if (!user) {
     return res.status(HTTPStatus.NOT_FOUND).send({ errors: ['User does not exist.'] })
   }
   return res.status(HTTPStatus.OK).send(user)
-}
-
-const getByLogin = async (req, res) => {
-  const errorObj = { errors: ['The username / password combination is not correct'] }
-
-  const user = await models.User.findByLogin(
-    req.body.email,
-  )
-
-  if (!user || (user && user.activationToken)) {
-    return res.status(HTTPStatus.UNAUTHORIZED).send(errorObj)
-  }
-
-  try {
-    const passwordMatch = await checkPassword(req.body.password, user.password)
-
-    if (passwordMatch.error) {
-      return res.status(HTTPStatus.BAD_REQUEST).send({ errors: [passwordMatch.error] })
-    }
-
-    const response = {
-      id: user.id,
-      role_id: user.role_id,
-      name: user.name,
-      email: user.email,
-    }
-
-    return res.status(HTTPStatus.OK).send(response)
-  } catch (e) {
-    log.error(e, '[USERS login]')
-    return res.status(HTTPStatus.UNAUTHORIZED).send({ errors: ['Failed to login.'] })
-  }
 }
 
 const changePassword = async (req, res) => {
@@ -229,20 +192,6 @@ const inviteUserToOrganization = async (req, res) => {
   }
 }
 
-const getListInvitations = async (req, res) => {
-  try {
-    const list = await models.InviteOrganization.findAll({
-      where: { org_id: req.user.org.id },
-      attributes: ['user_id', 'email', 'status'],
-    })
-
-    return res.status(HTTPStatus.OK).send(list)
-  } catch (error) {
-    log.error(error, '[USERS getListInvitations]')
-    return res.sendInternalError()
-  }
-}
-
 const confirmInvite = async (req, res) => {
   const invite = await models.InviteOrganization.findByConfirmationToken(req.body.token)
 
@@ -274,141 +223,13 @@ const confirmInvite = async (req, res) => {
   return res.status(HTTPStatus.OK).send({ success: true, message: 'Invite confirmed with success.' })
 }
 
-const profileUpdate = async (req, res) => {
-  const transaction = await sequelize.transaction()
-  try {
-    if (typeof req.body.org_id !== 'undefined' && req.body.org_id !== '') {
-      const ownsOrg = req.user.organizations.find((o) => o.id === parseInt(req.body.org_id))
-      if (!ownsOrg) {
-        return res.status(HTTPStatus.FORBIDDEN).send()
-      }
-
-      const updateOldOrg = await models.UserOrganization.update(
-        { current_org: false },
-        {
-          where: {
-            user_id: req.user.id,
-            current_org: true,
-          },
-          transaction,
-        },
-      )
-
-      if (!updateOldOrg) {
-        await transaction.rollback()
-        return res.sendInternalError('Failed to update profile data')
-      }
-
-      const updateNewOrg = await models.UserOrganization.update(
-        { current_org: true },
-        {
-          where: {
-            org_id: req.body.org_id,
-            user_id: req.user.id,
-            current_org: false,
-          },
-          transaction,
-        },
-      )
-
-      if (!updateNewOrg) {
-        await transaction.rollback()
-        return res.sendInternalError('Failed to update profile data')
-      }
-    }
-
-    const user = await models.User.update(
-      {
-        name: req.body.name,
-        bio: req.body.bio,
-        avatar: req.body.avatar,
-        mobile: req.body.mobile,
-      },
-      {
-        where: { id: req.user.id },
-        transaction,
-      },
-    )
-
-    if (!user) {
-      await transaction.rollback()
-      return res.sendInternalError('Failed to update profile data')
-    }
-
-    await transaction.commit()
-
-    return res.status(HTTPStatus.OK).send({
-      success: true,
-      message: 'Profile updated successfully',
-    })
-  } catch (error) {
-    if (transaction) await transaction.rollback()
-    log.error(error, '[PROFILE UPDATE]')
-    return {
-      success: false,
-      message: 'Failed to update profile',
-    }
-  }
-}
-
 const profile = async (req, res) => {
-  const profile = {
-    user: {},
-    orgs_member: [],
-    current_org: {},
-  }
-
-  const user = await models.User.findOne({
-    where: {
-      id: req.user.id,
-    },
-    attributes: [
-      'id',
-      'name',
-      'bio',
-      'email',
-      'mobile',
-      'avatar',
-      'last_login',
-      'oidcProvider',
-    ],
-  })
-
+  const user = await getUserProfile(req.user.id)
   if (!user) {
     return res.status(HTTPStatus.NOT_FOUND).send({ errors: ['User not found'] })
   }
 
-  profile.user = user.get({ plain: true })
-
-  const orgs = await models.UserOrganization.findAll({
-    where: { user_id: user.id },
-    attributes: ['org_id', 'current_org', 'created_at'],
-    include: [{
-      model: models.Role,
-      as: 'Role',
-      attributes: ['name', 'id'],
-    }, {
-      model: models.Organization,
-      as: 'Organization',
-      attributes: ['name', 'id'],
-    }],
-  })
-
-  for (const org of orgs) {
-    if (org.dataValues.current_org) {
-      profile.current_org = org.dataValues.Organization.dataValues
-      profile.current_org.member_since = org.dataValues.created_at
-      profile.current_org.role = org.dataValues.Role.dataValues
-    }
-
-    const orgsMember = {
-      id: org.dataValues.Organization.dataValues.id,
-      name: org.dataValues.Organization.dataValues.name,
-    }
-    profile.orgs_member.push(orgsMember)
-  }
-
-  return res.status(HTTPStatus.OK).send(profile)
+  return res.status(HTTPStatus.OK).send(user)
 }
 
 const setupMainAccount = async (req, res) => {
@@ -674,59 +495,17 @@ const deleteAvatar = async (req, res) => {
   return res.sendStatus(HTTPStatus.NO_CONTENT)
 }
 
-const listAPITokens = async (req, res) => {
-  const tokens = await models.APIToken.findAll({
-    where: {
-      user_id: req.user.id,
-    },
-    attributes: ['id', 'name', 'createdAt'],
-  })
-
-  return res.status(HTTPStatus.OK).send({ tokens })
-}
-
-const createAPIToken = async (req, res) => {
-  const tokenValue = crypto.randomBytes(20).toString('hex')
-
-  const token = await models.APIToken.create({
-    name: req.body.name,
-    token: tokenValue,
-    userId: req.user.id,
-  })
-
-  token.token = `${token.id}_${tokenValue}`
-
-  return res.status(HTTPStatus.CREATED).send({ token })
-}
-
-const revokeAPIToken = async (req, res) => {
-  await models.APIToken.destroy({
-    where: {
-      id: req.params.id,
-      userId: req.user.id,
-    },
-  })
-
-  return res.sendStatus(HTTPStatus.NO_CONTENT)
-}
-
 module.exports = {
-  getAll,
   getById,
-  getByLogin,
   deleteUser,
   changePassword,
   inviteUserToOrganization,
-  getListInvitations,
   confirmInvite,
-  profileUpdate,
   profile,
   setupMainAccount,
   setActiveOrganization,
   updateUserProfile,
   updateAvatar,
   deleteAvatar,
-  listAPITokens,
-  createAPIToken,
-  revokeAPIToken,
+  ...apiTokensControllers,
 }

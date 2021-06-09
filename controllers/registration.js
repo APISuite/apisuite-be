@@ -109,7 +109,7 @@ const completeRegistration = async (req, res) => {
     } else if (registration.organizationName && registration.organizationName.length) {
       organization = await models.Organization.create({
         name: registration.organizationName,
-        website: registration.organizationWebsite,
+        websiteUrl: registration.organizationWebsite,
         org_code: uuidv4(),
       }, { transaction })
     }

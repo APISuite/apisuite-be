@@ -1,6 +1,6 @@
 const { decorateRouter } = require('@awaitjs/express')
 const router = decorateRouter(require('express').Router())
-const { actions, possessions, resources } = require('../access-control')
+const { actions, possessions, resources } = require('../util/enums')
 const controllers = require('../controllers')
 const { accessControl, loggedIn } = require('../middleware')
 const {
@@ -8,6 +8,9 @@ const {
   validateAssignUserBody,
   validateOrganizationUpdateBody,
 } = require('./validation_schemas/organization.schema')
+const {
+  validateAppPatchBody,
+} = require('./validation_schemas/app.schema')
 
 /**
  * @openapi
@@ -263,34 +266,6 @@ router.postAsync('/assign',
 
 /**
  * @openapi
- * /organizations/members/list:
- *   get:
- *     description: Get list of organization members
- *     tags: [Organization]
- *     deprecated: true
- *     security:
- *       - cookieAuth: []
- *     responses:
- *       200:
- *         description: List of members
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/OrganizationMembers'
- *       401:
- *         $ref: '#/components/responses/Unauthorized'
- *       404:
- *         $ref: '#/components/responses/NotFound'
- *       500:
- *         $ref: '#/components/responses/Internal'
- */
-router.getAsync('/members/list',
-  loggedIn,
-  accessControl(actions.READ, possessions.OWN, resources.ORGANIZATION),
-  controllers.organization.getAllMembers)
-
-/**
- * @openapi
  * /organizations/{id}/users:
  *   get:
  *     description: Get list of organization users
@@ -354,5 +329,53 @@ router.getAsync('/:id/invites',
   loggedIn,
   accessControl(actions.READ, possessions.OWN, resources.ORGANIZATION, { idCarrier: 'params', idField: 'id' }),
   controllers.organization.getPendingInvites)
+
+/**
+ * @openapi
+ * /organizations/{id}/apps/{appId}:
+ *   patch:
+ *     description: Partial update app fields
+ *     tags: [App]
+ *     parameters:
+ *       - name: id
+ *         description: The organization id
+ *         required: true
+ *         in: path
+ *         schema:
+ *           type: string
+ *       - name: appId
+ *         description: The application id
+ *         required: true
+ *         in: path
+ *         schema:
+ *           type: string
+ *     security:
+ *       - cookieAuth: []
+ *     requestBody:
+ *       description: App fields to update
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: "#/components/schemas/AppPatch"
+ *     responses:
+ *       200:
+ *         description: App details
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/AppV2'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/NotFound'
+ */
+router.patchAsync('/:id/apps/:appId',
+  loggedIn,
+  validateAppPatchBody,
+  accessControl(actions.UPDATE, possessions.OWN, resources.APP, { idCarrier: 'params', idField: 'id', adminOverride: true }),
+  controllers.app.patchApp)
 
 module.exports = router
