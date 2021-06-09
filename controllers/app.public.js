@@ -33,7 +33,6 @@ const listPublicApps = async (req, res, next) => {
   const filters = {
     visibility: 'public',
     enable: true,
-    state: appStates.APPROVED,
   }
 
   if (req.query.org_id) {
@@ -125,7 +124,6 @@ const listPublicLabels = async (req, res) => {
     where: {
       visibility: 'public',
       enable: true,
-      state: appStates.APPROVED,
     },
     order: [[sequelize.literal('label')]],
   })
@@ -139,7 +137,6 @@ const publicAppDetails = async (req, res) => {
       id: req.params.id,
       visibility: 'public',
       enable: true,
-      state: appStates.APPROVED,
     },
     include: [{
       model: models.Organization,
