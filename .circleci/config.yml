@@ -20,8 +20,10 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/
+      - run: ./scripts/get_version.sh .orig_version
       - run: cp -r .ssh ../.ssh && rm -rf .ssh
       - run: GH_TOKEN=$GH_TOKEN npx semantic-release
+      - run: ./scripts/get_version.sh .new_version
       - persist_to_workspace:
           root: ~/
           paths:
@@ -34,7 +36,7 @@ jobs:
       - attach_workspace:
           at: ~/
       - setup_remote_docker
-      - run: ./build.sh
+      - run: ./.scripts/build.sh
       - persist_to_workspace:
           root: ~/
           paths:
@@ -49,7 +51,7 @@ jobs:
             - 31:96:89:eb:aa:ee:09:68:3a:6b:10:ad:d0:95:81:80
       - attach_workspace:
           at: ~/
-      - run: ./deploy.sh
+      - run: ./.scripts/deploy.sh
 
 workflows:
   version: 2
