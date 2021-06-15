@@ -1,3 +1,4 @@
+const fs = require('fs').promises
 const HTTPStatus = require('http-status-codes')
 const { Op } = require('sequelize')
 const log = require('../util/logger')
@@ -204,11 +205,14 @@ const createAPIversion = async (req, res) => {
     return res.status(HTTPStatus.NOT_FOUND).send({ errors: ['API not found'] })
   }
 
+  const jsonFile = await fs.readFile(req.formdata.files.file.path)
+  const parsedAPI = JSON.parse(jsonFile)
+
   const apiVersion = await models.ApiVersion.create({
     title: validationRes.api.info.title,
     version: validationRes.api.info.version,
     apiId: api.dataValues.id,
-    spec: validationRes.api,
+    spec: parsedAPI,
   })
 
   return res.status(HTTPStatus.CREATED).send(apiVersion)
