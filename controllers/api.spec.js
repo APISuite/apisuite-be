@@ -1,3 +1,4 @@
+const path = require('path')
 const sinon = require('sinon')
 const HTTPStatus = require('http-status-codes')
 const { mockRequest, mockResponse } = require('mock-req-res')
@@ -308,7 +309,7 @@ describe('APIs', () => {
         apiId: 1,
       },
       formdata: {
-        files: { file: { path: 'foobar' } },
+        files: { file: { path: path.join(__dirname, '../util/petstore3.json') } },
       },
     }
 
