@@ -3,6 +3,7 @@ node_modules
 .compose-utils/db/data
 .compose-utils/rabbitmq/data
 media
-
 .idea
 .vscode
+.orig_version
+.new_version
