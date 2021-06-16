@@ -99,7 +99,7 @@ const recoverPassword = async (req, res) => {
 const login = async (req, res) => {
   const errors = { errors: ['Invalid credentials'] }
   const user = await models.User.findByLogin(req.body.email.toLowerCase())
-  if (!user || (user && user.activationToken)) {
+  if (!user || (user && (user.activationToken || user.oidcId))) {
     return res.status(HTTPStatus.UNAUTHORIZED).send(errors)
   }
 
