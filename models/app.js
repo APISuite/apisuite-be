@@ -87,6 +87,10 @@ const app = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true,
     },
+    directUrl: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
     labels: {
       type: DataTypes.ARRAY(DataTypes.TEXT),
       allowNull: false,

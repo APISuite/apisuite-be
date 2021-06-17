@@ -61,6 +61,9 @@
  *         supportUrl:
  *           type: string
  *           format: uri
+ *         directUrl:
+ *           type: string
+ *           format: uri
  *         createdAt:
  *           type: string
  *         updatedAt:
@@ -134,6 +137,9 @@
  *         supportUrl:
  *           type: string
  *           format: uri
+ *         directUrl:
+ *           type: string
+ *           format: uri
  *         createdAt:
  *           type: string
  *         updatedAt:
@@ -173,6 +179,9 @@
  *           type: string
  *           format: uri
  *         supportUrl:
+ *           type: string
+ *           format: uri
+ *         directUrl:
  *           type: string
  *           format: uri
  *         labels:

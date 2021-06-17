@@ -32,6 +32,7 @@ const appSchema = Joi.object({
   youtubeUrl: Joi.string().optional().allow(null, ''),
   websiteUrl: Joi.string().optional().allow(null, ''),
   supportUrl: Joi.string().optional().allow(null, ''),
+  directUrl: Joi.string().optional().allow(null, ''),
   metadata: Joi.array().items(appMetadata).optional().allow(null),
 })
 

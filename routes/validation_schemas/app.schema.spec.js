@@ -21,6 +21,7 @@ describe('Apps Validations', () => {
       youtubeUrl: chance.url(),
       websiteUrl: chance.url(),
       supportUrl: chance.url(),
+      directUrl: chance.url(),
     }
 
     describe('test invalid payloads', () => {

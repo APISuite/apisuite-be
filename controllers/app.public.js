@@ -16,6 +16,7 @@ const publicAppAttributes = [
   'youtubeUrl',
   'websiteUrl',
   'supportUrl',
+  'directUrl',
   'createdAt',
   'updatedAt',
   ['org_id', 'orgId'],

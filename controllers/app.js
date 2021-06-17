@@ -226,6 +226,7 @@ const updateApp = async (req, res) => {
         youtubeUrl: req.body.youtubeUrl,
         websiteUrl: req.body.websiteUrl,
         supportUrl: req.body.supportUrl,
+        directUrl: req.body.directUrl,
       },
       {
         transaction,
@@ -334,6 +335,7 @@ const createDraftApp = async (req, res) => {
       youtubeUrl: req.body.youtubeUrl,
       websiteUrl: req.body.websiteUrl,
       supportUrl: req.body.supportUrl,
+      directUrl: req.body.directUrl,
     }, { transaction })
 
     if (req.body.metadata && req.body.metadata.length) {
