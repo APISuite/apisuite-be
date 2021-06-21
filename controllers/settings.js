@@ -24,6 +24,13 @@ const createDefaultPortalSettings = (txn) => {
   }, { transaction: txn })
 }
 
+const createDefaultNavigationSettings = (txn) => {
+  return models.Setting.create({
+    type: settingTypes.NAVIGATION,
+    values: {},
+  }, { transaction: txn })
+}
+
 const upsertSettings = async (payload, type) => {
   const settings = await models.Setting.findOne({
     where: { type },
@@ -345,14 +352,14 @@ const getPortalSettings = async (req, res) => {
   return res.status(HTTPStatus.OK).send(settings.values)
 }
 
-const updatePortalSettings = async (req, res) => {
+const updateSubSettings = (type) => async (req, res) => {
   let settings = await models.Setting.findOne({
-    where: { type: settingTypes.PORTAL },
+    where: { type },
   })
 
   if (!settings) {
     settings = await models.Setting.create({
-      type: settingTypes.PORTAL,
+      type,
       values: req.body,
     }, {
       returning: true,
@@ -366,6 +373,27 @@ const updatePortalSettings = async (req, res) => {
   return res.status(HTTPStatus.OK).send(settings.values)
 }
 
+const updatePortalSettings = updateSubSettings(settingTypes.PORTAL)
+
+const updateNavigationSettings = updateSubSettings(settingTypes.NAVIGATION)
+
+const getNavigation = async (req, res) => {
+  try {
+    let settings = await models.Setting.findOne({
+      where: { type: settingTypes.NAVIGATION },
+    })
+
+    if (!settings) {
+      settings = await createDefaultNavigationSettings()
+    }
+
+    return res.status(HTTPStatus.OK).send(settings.values)
+  } catch (error) {
+    log.error(error, '[SETTINGS getIdp]')
+    return res.sendInternalError()
+  }
+}
+
 module.exports = {
   get,
   upsert,
@@ -376,4 +404,6 @@ module.exports = {
   getGateway,
   setGateway,
   syncGateway,
+  getNavigation,
+  updateNavigationSettings,
 }

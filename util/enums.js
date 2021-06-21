@@ -4,6 +4,7 @@ const settingTypes = {
   GATEWAY: 'gateway',
   PLAN: 'plan',
   PORTAL: 'portal',
+  NAVIGATION: 'navigation',
 }
 
 const idpProviders = {

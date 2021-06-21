@@ -268,4 +268,53 @@ router.postAsync('/gateway/sync',
   accessControl(actions.UPDATE, possessions.ANY, resources.SETTINGS),
   controllers.settings.syncGateway)
 
+/**
+ * @openapi
+ * /settings/navigation:
+ *   get:
+ *     description: Get navigation settings
+ *     tags: [Settings]
+ *     responses:
+ *       200:
+ *         description: Navigation settings
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ */
+router.getAsync('/navigation',
+  controllers.settings.getNavigation)
+
+/**
+ * @openapi
+ * /settings/navigation:
+ *   put:
+ *     description: Upsert (fully or partially) the list of navigation settings
+ *     tags: [Settings]
+ *     requestBody:
+ *       description: Navigation settings to update
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: Navigation settings
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ */
+router.putAsync('/navigation',
+  loggedIn,
+  accessControl(actions.UPDATE, possessions.ANY, resources.SETTINGS),
+  controllers.settings.updateNavigationSettings)
+
 module.exports = router
