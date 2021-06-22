@@ -51,7 +51,25 @@ const upsertSettings = async (payload, type) => {
   })
 }
 
+const partialGet = async (req, res) => {
+  const include = Array.isArray(req.query.include) ? req.query.include : [req.query.include]
+
+  const types = []
+  if (include.includes('theme')) types.push({ type: settingTypes.PORTAL })
+  if (include.includes('navigation')) types.push({ type: settingTypes.NAVIGATION })
+
+  const settings = await models.Setting.findAll({
+    where: { [Op.or]: types },
+  })
+
+  return res.status(HTTPStatus.OK).send(settings)
+}
+
 const get = async (req, res) => {
+  if (req.query.include) {
+    return partialGet(req, res)
+  }
+
   try {
     let mergedSettings = {}
     const settings = await models.Setting.findAll({

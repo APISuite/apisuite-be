@@ -16,6 +16,15 @@ const {
  *   get:
  *     description: Get list of account settings
  *     tags: [Settings]
+ *     parameters:
+ *       - name: include
+ *         description: Settings components to include in the response
+ *         in: query
+ *         schema:
+ *           type: array
+ *           items:
+ *             type: string
+ *             enum: [theme,navigation]
  *     responses:
  *       200:
  *         description: Object with all configured account settings
