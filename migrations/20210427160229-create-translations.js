@@ -1,5 +1,4 @@
 'use strict'
-const enUS = require('../translations/en-US.json')
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
@@ -16,7 +15,7 @@ module.exports = {
 
     return queryInterface.bulkInsert('translations', [{
       locale: 'en-US',
-      translations: JSON.stringify(enUS),
+      translations: JSON.stringify({}),
     }])
   },
 
