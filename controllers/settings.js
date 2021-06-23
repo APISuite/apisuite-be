@@ -8,7 +8,8 @@ const msgBroker = require('../services/msg-broker')
 const { settingTypes, idpProviders } = require('../util/enums')
 const Gateway = require('../services/gateway')
 const Idp = require('../services/idp')
-const portalSettings = require('../util/portal-settings')
+const portalSettings = require('../util/portal-settings.json')
+const navigationSettings = require('../util/navigation-settings.json')
 
 const createDefaultAccountSettings = (txn) => {
   return models.Setting.create({
@@ -27,7 +28,7 @@ const createDefaultPortalSettings = (txn) => {
 const createDefaultNavigationSettings = (txn) => {
   return models.Setting.create({
     type: settingTypes.NAVIGATION,
-    values: {},
+    values: navigationSettings,
   }, { transaction: txn })
 }
 
@@ -53,16 +54,39 @@ const upsertSettings = async (payload, type) => {
 
 const partialGet = async (req, res) => {
   const include = Array.isArray(req.query.include) ? req.query.include : [req.query.include]
-
   const types = []
-  if (include.includes('theme')) types.push({ type: settingTypes.PORTAL })
+  let ssoClient
+
+  if (include.includes('portal')) types.push({ type: settingTypes.PORTAL })
   if (include.includes('navigation')) types.push({ type: settingTypes.NAVIGATION })
+  if (include.includes('sso')) {
+    types.push({ type: settingTypes.IDP })
+    const idp = await Idp.getIdP()
+    if (idp.getProvider() !== idpProviders.INTERNAL) {
+      ssoClient = await models.SSOClient.findOne({
+        where: { provider: idp.getProvider() },
+      })
+    }
+  }
 
   const settings = await models.Setting.findAll({
     where: { [Op.or]: types },
   })
 
-  return res.status(HTTPStatus.OK).send(settings)
+  const settingsRes = {}
+  for (const s of settings) {
+    if (s.type === settingTypes.IDP) {
+      settingsRes.sso = {
+        providers: ssoClient ? [ssoClient.provider] : [],
+        providerSignupURL: s.values.configuration.providerSignupURL ?? '',
+      }
+      continue
+    }
+
+    settingsRes[s.type] = s.values
+  }
+
+  return res.status(HTTPStatus.OK).send(settingsRes)
 }
 
 const get = async (req, res) => {

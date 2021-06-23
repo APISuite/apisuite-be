@@ -1,0 +1,499 @@
+{
+  "title": {
+    "route": "/",
+    "iconFallbackName": "circle"
+  },
+  "anonymous": {
+    "tabs": [
+      {
+        "fixed": false,
+        "label": {
+          "type": "text",
+          "fallback": "Marketplace"
+        },
+        "action": "/marketplace"
+      },
+      {
+        "fixed": false,
+        "label": {
+          "type": "text",
+          "fallback": "API Products"
+        },
+        "action": "/api-products"
+      },
+      {
+        "fixed": false,
+        "label": {
+          "type": "text",
+          "fallback": "Documentation"
+        },
+        "action": "/documentation"
+      },
+      {
+        "fixed": false,
+        "label": {
+          "type": "text",
+          "fallback": "Support"
+        },
+        "action": "https://intercom.help/api-suite/en"
+      },
+      {
+        "fixed": false,
+        "label": {
+          "type": "text",
+          "fallback": "Sign up"
+        },
+        "action": "/auth/signup"
+      },
+      {
+        "fixed": false,
+        "label": {
+          "type": "text",
+          "fallback": "Sign in"
+        },
+        "action": "/auth/signin"
+      }
+    ],
+    "events": {
+      "afterLogin": "/dashboard"
+    }
+  },
+  "baseUser": {
+    "tabs": [
+      {
+        "fixed": false,
+        "label": {
+          "type": "text",
+          "fallback": "Marketplace"
+        },
+        "action": "/marketplace"
+      },
+      {
+        "fixed": false,
+        "label": {
+          "type": "text",
+          "fallback": "Support"
+        },
+        "action": "https://intercom.help/api-suite/en"
+      },
+      {
+        "fixed": false,
+        "label": {
+          "type": "text",
+          "fallback": "Billing"
+        },
+        "action": "/billing"
+      },
+      {
+        "fixed": false,
+        "label": {
+          "type": "text",
+          "fallback": "My Applications"
+        },
+        "action": "/dashboard/apps"
+      },
+      {
+        "fixed": true,
+        "label": {
+          "type": "avatar"
+        },
+        "action": "/profile",
+        "subTabs": [
+          {
+            "fixed": false,
+            "label": {
+              "type": "text",
+              "fallback": "Overview"
+            },
+            "action": "/profile"
+          },
+          {
+            "fixed": false,
+            "label": {
+              "type": "text",
+              "fallback": "Security"
+            },
+            "action": "/profile/security"
+          }
+        ]
+      }
+    ],
+    "events": {
+      "afterLogin": "/marketplace"
+    }
+  },
+  "developer": {
+    "tabs": [
+      {
+        "fixed": false,
+        "label": {
+          "type": "text",
+          "fallback": "Marketplace"
+        },
+        "action": "/marketplace"
+      },
+      {
+        "fixed": false,
+        "label": {
+          "type": "text",
+          "fallback": "API Products"
+        },
+        "action": "/api-products"
+      },
+      {
+        "fixed": false,
+        "label": {
+          "type": "text",
+          "fallback": "Documentation"
+        },
+        "action": "/documentation"
+      },
+      {
+        "fixed": false,
+        "label": {
+          "type": "text",
+          "fallback": "Support"
+        },
+        "action": "https://intercom.help/api-suite/en"
+      },
+      {
+        "fixed": false,
+        "label": {
+          "type": "text",
+          "fallback": "Dashboard"
+        },
+        "action": "/dashboard",
+        "subTabs": [
+          {
+            "fixed": false,
+            "label": {
+              "type": "text",
+              "fallback": "Overview"
+            },
+            "action": "/dashboard"
+          },
+          {
+            "fixed": false,
+            "label": {
+              "type": "text",
+              "fallback": "Subscriptions"
+            },
+            "action": "/dashboard/subscriptions"
+          },
+          {
+            "fixed": false,
+            "label": {
+              "type": "text",
+              "fallback": "Billing"
+            },
+            "action": "/billing"
+          },
+          {
+            "fixed": false,
+            "label": {
+              "type": "text",
+              "fallback": "Applications"
+            },
+            "action": "/dashboard/apps"
+          }
+        ]
+      },
+      {
+        "fixed": true,
+        "label": {
+          "type": "avatar"
+        },
+        "action": "/profile",
+        "subTabs": [
+          {
+            "fixed": false,
+            "label": {
+              "type": "text",
+              "fallback": "Overview"
+            },
+            "action": "/profile"
+          },
+          {
+            "fixed": false,
+            "label": {
+              "type": "text",
+              "fallback": "Security"
+            },
+            "action": "/profile/security"
+          },
+          {
+            "fixed": false,
+            "label": {
+              "type": "text",
+              "fallback": "Team"
+            },
+            "action": "/profile/team"
+          },
+          {
+            "fixed": false,
+            "label": {
+              "type": "text",
+              "fallback": "Organisation"
+            },
+            "action": "/profile/organisation"
+          }
+        ]
+      }
+    ],
+    "events": {
+      "afterLogin": "/dashboard"
+    }
+  },
+  "organizationOwner": {
+    "tabs": [
+      {
+        "fixed": false,
+        "label": {
+          "type": "text",
+          "fallback": "Marketplace"
+        },
+        "action": "/marketplace"
+      },
+      {
+        "fixed": false,
+        "label": {
+          "type": "text",
+          "fallback": "API Products"
+        },
+        "action": "/api-products"
+      },
+      {
+        "fixed": false,
+        "label": {
+          "type": "text",
+          "fallback": "Documentation"
+        },
+        "action": "/documentation"
+      },
+      {
+        "fixed": false,
+        "label": {
+          "type": "text",
+          "fallback": "Support"
+        },
+        "action": "https://intercom.help/api-suite/en"
+      },
+      {
+        "fixed": false,
+        "label": {
+          "type": "text",
+          "fallback": "Dashboard"
+        },
+        "action": "/dashboard",
+        "subTabs": [
+          {
+            "fixed": false,
+            "label": {
+              "type": "text",
+              "fallback": "Overview"
+            },
+            "action": "/dashboard"
+          },
+          {
+            "fixed": false,
+            "label": {
+              "type": "text",
+              "fallback": "Subscriptions"
+            },
+            "action": "/dashboard/subscriptions"
+          },
+          {
+            "fixed": false,
+            "label": {
+              "type": "text",
+              "fallback": "Billing"
+            },
+            "action": "/billing"
+          },
+          {
+            "fixed": false,
+            "label": {
+              "type": "text",
+              "fallback": "Applications"
+            },
+            "action": "/dashboard/apps"
+          }
+        ]
+      },
+      {
+        "fixed": true,
+        "label": {
+          "type": "avatar"
+        },
+        "action": "/profile",
+        "subTabs": [
+          {
+            "fixed": false,
+            "label": {
+              "type": "text",
+              "fallback": "Overview"
+            },
+            "action": "/profile"
+          },
+          {
+            "fixed": false,
+            "label": {
+              "type": "text",
+              "fallback": "Security"
+            },
+            "action": "/profile/security"
+          },
+          {
+            "fixed": false,
+            "label": {
+              "type": "text",
+              "fallback": "Team"
+            },
+            "action": "/profile/team"
+          },
+          {
+            "fixed": false,
+            "label": {
+              "type": "text",
+              "fallback": "Organisation"
+            },
+            "action": "/profile/organisation"
+          }
+        ]
+      }
+    ],
+    "events": {
+      "afterLogin": "/dashboard"
+    }
+  },
+  "admin": {
+    "tabs": [
+      {
+        "fixed": false,
+        "label": {
+          "type": "text",
+          "fallback": "Marketplace"
+        },
+        "action": "/marketplace"
+      },
+      {
+        "fixed": false,
+        "label": {
+          "type": "text",
+          "fallback": "API Products"
+        },
+        "action": "/api-products"
+      },
+      {
+        "fixed": false,
+        "label": {
+          "type": "text",
+          "fallback": "Documentation"
+        },
+        "action": "/documentation"
+      },
+      {
+        "fixed": false,
+        "label": {
+          "type": "text",
+          "fallback": "Support"
+        },
+        "action": "https://intercom.help/api-suite/en"
+      },
+      {
+        "fixed": false,
+        "label": {
+          "type": "text",
+          "fallback": "Dashboard"
+        },
+        "action": "/dashboard",
+        "subTabs": [
+          {
+            "fixed": false,
+            "label": {
+              "type": "text",
+              "fallback": "Overview"
+            },
+            "action": "/dashboard"
+          },
+          {
+            "fixed": false,
+            "label": {
+              "type": "text",
+              "fallback": "Subscriptions"
+            },
+            "action": "/dashboard/subscriptions"
+          },
+          {
+            "fixed": false,
+            "label": {
+              "type": "text",
+              "fallback": "Billing"
+            },
+            "action": "/billing"
+          },
+          {
+            "fixed": false,
+            "label": {
+              "type": "text",
+              "fallback": "Applications"
+            },
+            "action": "/dashboard/apps"
+          },
+          {
+            "fixed": false,
+            "label": {
+              "type": "text",
+              "fallback": "Admin Area"
+            },
+            "action": "/dashboard/admin"
+          }
+        ]
+      },
+      {
+        "fixed": true,
+        "label": {
+          "type": "avatar"
+        },
+        "action": "/profile",
+        "subTabs": [
+          {
+            "fixed": false,
+            "label": {
+              "type": "text",
+              "fallback": "Overview"
+            },
+            "action": "/profile"
+          },
+          {
+            "fixed": false,
+            "label": {
+              "type": "text",
+              "fallback": "Security"
+            },
+            "action": "/profile/security"
+          },
+          {
+            "fixed": false,
+            "label": {
+              "type": "text",
+              "fallback": "Team"
+            },
+            "action": "/profile/team"
+          },
+          {
+            "fixed": false,
+            "label": {
+              "type": "text",
+              "fallback": "Organisation"
+            },
+            "action": "/profile/organisation"
+          }
+        ]
+      }
+    ],
+    "events": {
+      "afterLogin": "/dashboard"
+    }
+  }
+}
