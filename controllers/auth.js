@@ -37,15 +37,10 @@ const forgotPassword = async (req, res) => {
   }
 
   const recoveryToken = uuidv4()
-  try {
-    await models.PasswordRecovery.create({
-      user_id: user.id,
-      token: recoveryToken,
-    })
-  } catch (error) {
-    log.error(error, '[CREATE RECOVERY TOKEN]')
-    return res.status(HTTPStatus.INTERNAL_SERVER_ERROR).send({ errors: ['Failed to generate password recovery token.'] })
-  }
+  await models.PasswordRecovery.create({
+    user_id: user.id,
+    token: recoveryToken,
+  })
 
   const ownerOrg = await models.Organization.getOwnerOrganization()
   await emailService.sendRecoverPassword({
