@@ -39,6 +39,9 @@ jobs:
       - run: ./.scripts/get_version.sh .orig_version
       - run: cp -r .ssh ../.ssh && rm -rf .ssh
       - run: GH_TOKEN=$GH_TOKEN npx semantic-release
+      - slack/notify:
+          event: fail
+          template: basic_fail_1
       - run: ./.scripts/get_version.sh .new_version
       - persist_to_workspace:
           root: ~/
@@ -53,6 +56,9 @@ jobs:
           at: ~/
       - setup_remote_docker
       - run: ./.scripts/build.sh
+      - slack/notify:
+          event: fail
+          template: basic_fail_1
       - persist_to_workspace:
           root: ~/
           paths:
@@ -82,7 +88,9 @@ workflows:
       - test:
           context: slack
       - release:
-          context: docker
+          context:
+            - docker
+            - slack
           filters:
             branches:
               only:
@@ -92,7 +100,9 @@ workflows:
           requires:
             - test
       - build:
-          context: docker
+          context:
+            - docker
+            - slack
           filters:
             branches:
               only:
