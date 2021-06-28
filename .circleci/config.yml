@@ -102,7 +102,9 @@ workflows:
           requires:
             - release
       - deploy:
-          context: vmachines
+          context:
+            - vmachines
+            - slack
           filters:
             branches:
               only:
