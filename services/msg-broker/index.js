@@ -24,7 +24,12 @@ const publishEvent = (routingKey, event) => {
     .catch(err => log.error('Message Broker: message rejected:', err))
 }
 
+const checkConnection = () => {
+  return connection.isConnected()
+}
+
 module.exports = {
   publishEvent,
   routingKeys,
+  checkConnection,
 }

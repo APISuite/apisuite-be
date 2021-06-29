@@ -2,6 +2,7 @@ const user = require('./user')
 const api = require('./api')
 const app = require('./app')
 const auth = require('./auth')
+const health = require('./health')
 const organization = require('./organization')
 const registration = require('./registration')
 const role = require('./role')
@@ -14,6 +15,7 @@ module.exports = {
   api,
   app,
   auth,
+  health,
   invites,
   organization,
   owner,

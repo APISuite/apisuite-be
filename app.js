@@ -13,6 +13,7 @@ const { specs } = require('./util/swagger-docs')
 const { redoc } = require('./util/redoc')
 const { settingTypes, idpProviders } = require('./util/enums')
 const { sequelize } = require('./models')
+const promBundle = require('express-prom-bundle')
 
 morgan.token('body', (req, res) => {
   const noLogRoutes = [
@@ -35,6 +36,7 @@ app.use(cookieParser())
 
 app.use(morgan(':method :url :status - :body'))
 
+app.use(promBundle({ includeMethod: true }))
 app.use(middleware.internalError)
 
 // Auth middleware
@@ -46,6 +48,7 @@ app.use('/apis', routes.api)
 app.use('/app', routes.app)
 app.use('/apps', routes.app)
 app.use('/auth', routes.auth)
+app.use('/health', routes.health)
 app.use('/invites', routes.invites)
 app.use('/organizations', routes.organization)
 app.use('/owner', routes.owner)

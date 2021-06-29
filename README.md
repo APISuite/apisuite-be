@@ -43,6 +43,12 @@ Documentation is done via [JSDoc](https://jsdoc.app/) comments on the routes dec
 
 When the server is running, API documentation is served on `/api-docs`.
 
+## Observability
+
+This API has an health check endpoint in `/health`. Check the API spec for more details.
+
+It also provides Prometheus parsable metrics in `/metrics`.
+
 ## Development
 
 - Node.js version is kept in `.nvmrc`. Running `nvm use` in the terminal should give you the right version
