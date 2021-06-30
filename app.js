@@ -28,7 +28,7 @@ morgan.token('body', (req, res) => {
 const app = express()
 
 // Application-Level API
-app.use(cors())
+app.use(cors(config.get('cors')))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser())

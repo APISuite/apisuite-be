@@ -237,7 +237,7 @@ const setupMainAccount = async (req, res) => {
   try {
     const org = await models.Organization.create({
       name: req.body.organization.name,
-      website: req.body.organization.website,
+      websiteUrl: req.body.organization.website,
       vat: req.body.organization.vat,
       org_code: uuidv4(),
     }, { transaction })

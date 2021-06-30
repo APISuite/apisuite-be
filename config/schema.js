@@ -17,6 +17,26 @@ const schema = {
     default: 'http://localhost:3001',
     env: 'APISUITE_APP_URL',
   },
+  cors: {
+    origin: {
+      doc: 'Access-Control-Allow-Origin',
+      format: Array,
+      default: ['http://localhost:6001'],
+      env: 'APISUITE_CORS_ALLOW_ORIGIN',
+    },
+    credentials: {
+      doc: 'Access-Control-Allow-Credentials',
+      format: Boolean,
+      default: true,
+      env: 'APISUITE_CORS_ALLOW_CREDENTIALS',
+    },
+    methods: {
+      doc: 'Access-Control-Allow-Methods',
+      format: String,
+      default: 'GET,POST,PUT,DELETE,OPTIONS,PATCH',
+      env: 'APISUITE_CORS_ALLOW_METHODS',
+    },
+  },
   apiURL: {
     doc: 'APISuite API URL',
     format: String,
@@ -146,7 +166,7 @@ const schema = {
       doc: '"from" email address for outgoing emails',
       format: String,
       default: 'no-reply@apisuite.io',
-      env: 'http://localhost:3001',
+      env: 'APISUITE_FROM_EMAIL',
     },
     smtpConfig: {
       pool: {
