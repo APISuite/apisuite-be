@@ -91,9 +91,7 @@ workflows:
           filters:
             branches:
               only:
-                - develop
-                - staging
-                - production
+                - master
           requires:
             - test
       - build:
@@ -103,9 +101,7 @@ workflows:
           filters:
             branches:
               only:
-                - develop
-                - staging
-                - production
+                - master
           requires:
             - release
       - deploy:
@@ -115,8 +111,6 @@ workflows:
           filters:
             branches:
               only:
-                - develop
-                - staging
-                - production
+                - master
           requires:
             - build

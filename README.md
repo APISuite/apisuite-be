@@ -18,7 +18,6 @@ APISuite's backend has (or can have) a few legs. Like a Kraken. This is its head
 Docker images are available in our [DockerHub](https://hub.docker.com/r/cloudokihub/apisuite-be).
 
 Every new image is tagged with:
-- commit hash
 - latest (dev-latest and stg-latest from develop and staging respectively)
 - semantic version from `package.json` (only in production)
 
