@@ -59,7 +59,7 @@ const accessControl = (action, possession, resource, options = {}) => {
           const app = await models.App.findOne({
             where: {
               id: req[idCarrier][idField],
-              org_id: req.user.org.id,
+              org_id: req.user.organizations.map((org) => org.id),
             },
           })
           if (!app) return sendForbidden(res)

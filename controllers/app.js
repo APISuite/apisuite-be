@@ -75,40 +75,36 @@ const handleGatewaySubscriptions = async (app, currentSubs, newSubs) => {
 }
 
 const listApps = async (req, res) => {
-  try {
-    let apps = await models.App.findAll({
+  const orgId = req.params.id || req.user.org.id
+  let apps = await models.App.findAll({
+    where: {
+      org_id: orgId,
+      enable: true,
+    },
+    attributes: appAttributes,
+    include: includes(),
+  })
+
+  const subscriptionModel = await getSubscriptionModel()
+  if (subscriptionModel === subscriptionModels.SIMPLIFIED) {
+    const apis = await models.Api.findAll({
       where: {
-        org_id: req.user.org.id,
-        enable: true,
+        publishedAt: { [Op.not]: null },
       },
-      attributes: appAttributes,
-      include: includes(),
+      distinct: true,
+      include: [{ model: models.ApiVersion }],
     })
 
-    const subscriptionModel = await getSubscriptionModel()
-    if (subscriptionModel === subscriptionModels.SIMPLIFIED) {
-      const apis = await models.Api.findAll({
-        where: {
-          publishedAt: { [Op.not]: null },
-        },
-        distinct: true,
-        include: [{ model: models.ApiVersion }],
-      })
+    const apiIDs = apis.map((s) => s.id)
 
-      const apiIDs = apis.map((s) => s.id)
-
-      apps = apps.map((app) => {
-        app = app.get({ plain: true })
-        app.subscriptions = app.state === appStates.APPROVED ? apiIDs : []
-        return app
-      })
-    }
-
-    return res.status(HTTPStatus.OK).send(apps)
-  } catch (err) {
-    log.error(err, '[LIST APPS]')
-    return res.status(HTTPStatus.INTERNAL_SERVER_ERROR).send({ errors: ['Failed to list apps.'] })
+    apps = apps.map((app) => {
+      app = app.get({ plain: true })
+      app.subscriptions = app.state === appStates.APPROVED ? apiIDs : []
+      return app
+    })
   }
+
+  return res.status(HTTPStatus.OK).send(apps)
 }
 
 const getApp = async (req, res) => {
