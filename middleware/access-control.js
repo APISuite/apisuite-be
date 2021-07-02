@@ -1,6 +1,6 @@
 const HTTPStatus = require('http-status-codes')
 const AccessControl = require('accesscontrol')
-const { resources, possessions } = require('../util/enums')
+const { resources, possessions, roles } = require('../util/enums')
 const { models } = require('../models')
 
 const fetchGrants = async () => {
@@ -43,7 +43,7 @@ const accessControl = (action, possession, resource, options = {}) => {
 
     const { idCarrier, idField, adminOverride = false } = options
 
-    if (adminOverride) return next()
+    if (adminOverride && req.user.role.name === roles.ADMIN) return next()
 
     switch (resource) {
       case resources.ORGANIZATION: {
