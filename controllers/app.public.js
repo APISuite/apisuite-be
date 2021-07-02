@@ -1,7 +1,6 @@
 const HTTPStatus = require('http-status-codes')
 const { Op } = require('sequelize')
 const { models, sequelize } = require('../models')
-const { appStates } = require('../util/enums')
 
 const publicAppAttributes = [
   'id',

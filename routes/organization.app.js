@@ -30,7 +30,7 @@ const { validateAppPatchBody } = require('./validation_schemas/app.schema')
  */
 router.getAsync('/',
   loggedIn,
-  accessControl(actions.READ, possessions.OWN, resources.ORGANIZATION, {idCarrier: 'params', idField: 'id', adminOverride: true }),
+  accessControl(actions.READ, possessions.OWN, resources.ORGANIZATION, { idCarrier: 'params', idField: 'id', adminOverride: true }),
   controllers.app.listApps)
 
 /**
