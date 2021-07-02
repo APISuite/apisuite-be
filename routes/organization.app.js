@@ -14,6 +14,13 @@ const { validateAppPatchBody } = require('./validation_schemas/app.schema')
  *     tags: [App]
  *     security:
  *       - cookieAuth: []
+ *     parameters:
+ *       - name: id
+ *         description: The organization id
+ *         required: true
+ *         in: path
+ *         schema:
+ *           type: string
  *     responses:
  *       200:
  *         description: Simplified app list
@@ -32,6 +39,49 @@ router.getAsync('/',
   loggedIn,
   accessControl(actions.READ, possessions.OWN, resources.ORGANIZATION, { idCarrier: 'params', idField: 'id', adminOverride: true }),
   controllers.app.listApps)
+
+/**
+ * @openapi
+ * /organizations/{id}/apps/{appId}:
+ *   get:
+ *     description: Get application
+ *     tags: [App]
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - name: id
+ *         description: The organization id
+ *         required: true
+ *         in: path
+ *         schema:
+ *           type: string
+ *       - name: appId
+ *         description: The application id
+ *         required: true
+ *         in: path
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: App details
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/AppV2'
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ */
+router.getAsync('/:appId',
+  loggedIn,
+  accessControl(actions.UPDATE, possessions.OWN, resources.ORGANIZATION, { idCarrier: 'params', idField: 'id', adminOverride: true }),
+  accessControl(actions.READ, possessions.OWN, resources.APP, { idCarrier: 'params', idField: 'appId', adminOverride: true }),
+  controllers.app.getApp)
 
 /**
  * @openapi

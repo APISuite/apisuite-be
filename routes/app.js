@@ -46,6 +46,7 @@ router.getAsync('/',
  * @openapi
  * /apps/{id}:
  *   get:
+ *     deprecated: true
  *     description: Get details of an application
  *     tags: [App]
  *     security:

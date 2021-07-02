@@ -108,45 +108,41 @@ const listApps = async (req, res) => {
 }
 
 const getApp = async (req, res) => {
-  try {
-    let app = await models.App.findOne({
+  const orgId = req.params.id || req.user.org.id
+  let app = await models.App.findOne({
+    where: {
+      id: req.params.id,
+      org_id: orgId,
+      enable: true,
+    },
+    attributes: appAttributes,
+    include: includes(),
+  })
+
+  if (!app) {
+    return res.status(HTTPStatus.NOT_FOUND).send({ errors: ['App not found'] })
+  }
+
+  app = app.get({ plain: true })
+
+  const subscriptionModel = await getSubscriptionModel()
+  if (app.state === appStates.APPROVED && subscriptionModel === subscriptionModels.SIMPLIFIED) {
+    const apis = await models.Api.findAll({
       where: {
-        id: req.params.id,
-        org_id: req.user.org.id,
-        enable: true,
+        publishedAt: { [Op.not]: null },
       },
-      attributes: appAttributes,
-      include: includes(),
+      distinct: true,
+      include: [{ model: models.ApiVersion }],
     })
 
-    if (!app) {
-      return res.status(HTTPStatus.NOT_FOUND).send({ errors: ['App not found'] })
-    }
-
-    app = app.get({ plain: true })
-
-    const subscriptionModel = await getSubscriptionModel()
-    if (app.state === appStates.APPROVED && subscriptionModel === subscriptionModels.SIMPLIFIED) {
-      const apis = await models.Api.findAll({
-        where: {
-          publishedAt: { [Op.not]: null },
-        },
-        distinct: true,
-        include: [{ model: models.ApiVersion }],
-      })
-
-      app.subscriptions = apis.map((s) => s.id)
-    }
-
-    if (app.state !== appStates.APPROVED) {
-      app.subscriptions = []
-    }
-
-    return res.status(HTTPStatus.OK).send(app)
-  } catch (err) {
-    log.error(err, '[GET APP]')
-    return res.status(HTTPStatus.INTERNAL_SERVER_ERROR).send({ errors: ['Failed to get app.'] })
+    app.subscriptions = apis.map((s) => s.id)
   }
+
+  if (app.state !== appStates.APPROVED) {
+    app.subscriptions = []
+  }
+
+  return res.status(HTTPStatus.OK).send(app)
 }
 
 const deleteApp = async (req, res) => {
