@@ -17,6 +17,7 @@ router.use('/:id/media', appMediaRoutes)
  * @openapi
  * /apps:
  *   get:
+ *     deprecated: true
  *     summary: Get list of apps
  *     description: Returns list of apps in the context of the user's current organization.
  *     tags: [App]

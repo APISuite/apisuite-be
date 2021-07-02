@@ -9,7 +9,7 @@ const { validateAppPatchBody } = require('./validation_schemas/app.schema')
  * @openapi
  * /organizations/{id}/apps:
  *   get:
- *     summary: Get list of organization apps
+ *     summary: Get organization apps
  *     description: Returns the list of all organization's apps.
  *     tags: [App]
  *     security:
