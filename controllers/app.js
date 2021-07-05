@@ -111,7 +111,7 @@ const getApp = async (req, res) => {
   const orgId = req.params.id || req.user.org.id
   let app = await models.App.findOne({
     where: {
-      id: req.params.id,
+      id: req.params.appId,
       org_id: orgId,
       enable: true,
     },
@@ -146,6 +146,7 @@ const getApp = async (req, res) => {
 }
 
 const deleteApp = async (req, res) => {
+  const orgId = req.params.id || req.user.org.id
   const transaction = await sequelize.transaction()
   try {
     const [rowsUpdated, [updated]] = await models.App.update(
@@ -156,8 +157,8 @@ const deleteApp = async (req, res) => {
       {
         returning: true,
         where: {
-          id: req.params.id,
-          org_id: req.user.org.id,
+          id: req.params.appId,
+          org_id: orgId,
         },
         transaction,
       },
@@ -187,8 +188,8 @@ const deleteApp = async (req, res) => {
 
     publishEvent(routingKeys.APP_DELETED, {
       user_id: req.user.id,
-      app_id: req.params.id,
-      organization_id: req.user.org.id,
+      app_id: req.params.appId,
+      organization_id: orgId,
     })
 
     return res.sendStatus(HTTPStatus.NO_CONTENT)
@@ -228,9 +229,9 @@ const updateApp = async (req, res) => {
           ...includes(),
         ],
         where: {
-          id: req.params.id,
+          id: req.params.appId,
           org_id: orgId,
-          enable: true, // prevent updates to disabled apps
+          enable: true,
         },
         attributes: appAttributes,
       },
@@ -276,7 +277,7 @@ const updateApp = async (req, res) => {
 
     publishEvent(routingKeys.APP_UPDATED, {
       user_id: req.user.id,
-      app_id: req.params.id,
+      app_id: req.params.appId,
       organization_id: orgId,
       meta: {
         id: updated.id,
@@ -373,10 +374,11 @@ const createDraftApp = async (req, res) => {
 }
 
 const requestAccess = async (req, res) => {
+  const orgId = req.params.id || req.user.org.id
   const app = await models.App.findOne({
     where: {
-      id: req.params.id,
-      org_id: req.user.org.id,
+      id: req.params.appId,
+      org_id: orgId,
       enable: true,
     },
   })
@@ -427,8 +429,8 @@ const requestAccess = async (req, res) => {
 
   publishEvent(routingKeys.APP_REQUESTED, {
     user_id: req.user.id,
-    app_id: req.params.id,
-    organization_id: req.user.org.id,
+    app_id: req.params.appId,
+    organization_id: orgId,
     meta: {
       id: app.id,
       name: app.name,
@@ -437,7 +439,7 @@ const requestAccess = async (req, res) => {
       logo: app.logo,
       visibility: app.visibility,
       state: app.state,
-      org: req.user.org,
+      org: req.user.organizations.find((o) => o.id === Number(orgId)),
     },
   })
 

@@ -44,7 +44,7 @@ router.getAsync('/',
 
 /**
  * @openapi
- * /apps/{id}:
+ * /apps/{appId}:
  *   get:
  *     deprecated: true
  *     description: Get details of an application
@@ -52,7 +52,7 @@ router.getAsync('/',
  *     security:
  *       - cookieAuth: []
  *     parameters:
- *       - name: id
+ *       - name: appId
  *         description: The app id.
  *         in: path
  *         required: true
@@ -74,9 +74,9 @@ router.getAsync('/',
  *       404:
  *         $ref: '#/components/responses/NotFound'
  */
-router.getAsync('/:id',
+router.getAsync('/:appId',
   loggedIn,
-  accessControl(actions.READ, possessions.OWN, resources.APP, { idCarrier: 'params', idField: 'id' }),
+  accessControl(actions.READ, possessions.OWN, resources.APP, { idCarrier: 'params', idField: 'appId' }),
   controllers.app.getApp)
 
 /**
@@ -117,13 +117,13 @@ router.postAsync('/',
 
 /**
  * @openapi
- * /apps/{id}:
+ * /apps/{appId}:
  *   put:
  *     deprecated: true
  *     description: Update app
  *     tags: [App]
  *     parameters:
- *       - name: id
+ *       - name: appId
  *         description: The app id.
  *         in: path
  *         required: true
@@ -156,7 +156,7 @@ router.postAsync('/',
  *       500:
  *         $ref: '#/components/responses/Internal'
  */
-router.putAsync('/:id',
+router.putAsync('/:appId',
   loggedIn,
   validateAppBody,
   accessControl(actions.UPDATE, possessions.OWN, resources.APP),
@@ -164,13 +164,21 @@ router.putAsync('/:id',
 
 /**
  * @openapi
- * /apps/:id/request:
+ * /apps/{appId}/request:
  *   post:
+ *     deprecated: true
  *     summary: Access request
  *     description: Submits an access request for an application
  *     tags: [App]
  *     security:
  *       - cookieAuth: []
+ *     parameters:
+ *       - name: appId
+ *         description: The app id.
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: number
  *     responses:
  *       204:
  *         description: No Content
@@ -181,19 +189,19 @@ router.putAsync('/:id',
  *       404:
  *         $ref: '#/components/responses/NotFound'
  */
-router.postAsync('/:id/request',
+router.postAsync('/:appId/request',
   loggedIn,
-  accessControl(actions.UPDATE, possessions.OWN, resources.APP, { idCarrier: 'params', idField: 'id' }),
+  accessControl(actions.UPDATE, possessions.OWN, resources.APP, { idCarrier: 'params', idField: 'appId' }),
   controllers.app.requestAccess)
 
 /**
  * @openapi
- * /apps/{id}:
+ * /apps/{appId}:
  *   delete:
  *     description: Delete app
  *     tags: [App]
  *     parameters:
- *       - name: id
+ *       - name: appId
  *         description: The app id.
  *         in: path
  *         required: true
@@ -213,7 +221,7 @@ router.postAsync('/:id/request',
  *       500:
  *         $ref: '#/components/responses/Internal'
  */
-router.deleteAsync('/:id',
+router.deleteAsync('/:appId',
   loggedIn,
   accessControl(actions.DELETE, possessions.OWN, resources.APP),
   controllers.app.deleteApp)

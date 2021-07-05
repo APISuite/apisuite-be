@@ -40,7 +40,7 @@ const {
  */
 router.getAsync('/',
   loggedIn,
-  accessControl(actions.READ, possessions.OWN, resources.ORGANIZATION, { idCarrier: 'params', idField: 'id', adminOverride: true }),
+  accessControl(actions.READ, possessions.OWN, resources.ORGANIZATION, { idCarrier: 'params', idField: 'id' }),
   controllers.app.listApps)
 
 /**
@@ -82,8 +82,8 @@ router.getAsync('/',
  */
 router.getAsync('/:appId',
   loggedIn,
-  accessControl(actions.UPDATE, possessions.OWN, resources.ORGANIZATION, { idCarrier: 'params', idField: 'id', adminOverride: true }),
-  accessControl(actions.READ, possessions.OWN, resources.APP, { idCarrier: 'params', idField: 'appId', adminOverride: true }),
+  accessControl(actions.READ, possessions.OWN, resources.ORGANIZATION, { idCarrier: 'params', idField: 'id' }),
+  accessControl(actions.READ, possessions.OWN, resources.APP, { idCarrier: 'params', idField: 'appId' }),
   controllers.app.getApp)
 
 /**
@@ -172,7 +172,7 @@ router.patchAsync('/:appId',
 router.postAsync('/',
   loggedIn,
   validateAppBody,
-  accessControl(actions.UPDATE, possessions.OWN, resources.ORGANIZATION, { idCarrier: 'params', idField: 'id', adminOverride: true }),
+  accessControl(actions.READ, possessions.OWN, resources.ORGANIZATION, { idCarrier: 'params', idField: 'id' }),
   accessControl(actions.CREATE, possessions.OWN, resources.APP),
   controllers.app.createDraftApp)
 
@@ -223,8 +223,70 @@ router.postAsync('/',
 router.putAsync('/:appId',
   loggedIn,
   validateAppBody,
-  accessControl(actions.UPDATE, possessions.OWN, resources.ORGANIZATION, { idCarrier: 'params', idField: 'id', adminOverride: true }),
-  accessControl(actions.UPDATE, possessions.OWN, resources.APP, { idCarrier: 'params', idField: 'appId', adminOverride: true }),
+  accessControl(actions.READ, possessions.OWN, resources.ORGANIZATION, { idCarrier: 'params', idField: 'id' }),
+  accessControl(actions.UPDATE, possessions.OWN, resources.APP, { idCarrier: 'params', idField: 'appId' }),
   controllers.app.updateApp)
+
+/**
+ * @openapi
+ * /organizations/{id}/apps/{appId}:
+ *   delete:
+ *     description: Delete app
+ *     tags: [App]
+ *     parameters:
+ *       - name: id
+ *         description: The organization id
+ *         required: true
+ *         in: path
+ *         schema:
+ *           type: string
+ *       - name: appId
+ *         description: The application id
+ *         required: true
+ *         in: path
+ *         schema:
+ *           type: string
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       204:
+ *         description: No Content
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ */
+router.deleteAsync('/:appId',
+  loggedIn,
+  accessControl(actions.READ, possessions.OWN, resources.ORGANIZATION, { idCarrier: 'params', idField: 'id' }),
+  accessControl(actions.DELETE, possessions.OWN, resources.APP, { idCarrier: 'params', idField: 'appId' }),
+  controllers.app.deleteApp)
+
+/**
+ * @openapi
+ * /organizations/{id}/apps/{appId}/request:
+ *   post:
+ *     summary: Access request
+ *     description: Submits an access request for an application
+ *     tags: [App]
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       204:
+ *         description: No Content
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ */
+router.postAsync('/:appId/request',
+  loggedIn,
+  accessControl(actions.READ, possessions.OWN, resources.ORGANIZATION, { idCarrier: 'params', idField: 'id' }),
+  accessControl(actions.UPDATE, possessions.OWN, resources.APP, { idCarrier: 'params', idField: 'appId' }),
+  controllers.app.requestAccess)
 
 module.exports = router
