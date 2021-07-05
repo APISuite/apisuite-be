@@ -6,6 +6,7 @@ const controllers = require('../controllers')
 const {
   validateAppPatchBody,
   validateAppBody,
+  validateSubscriptionBody,
 } = require('./validation_schemas/app.schema')
 
 /**
@@ -273,6 +274,19 @@ router.deleteAsync('/:appId',
  *     tags: [App]
  *     security:
  *       - cookieAuth: []
+ *     parameters:
+ *       - name: id
+ *         description: The organization id
+ *         required: true
+ *         in: path
+ *         schema:
+ *           type: string
+ *       - name: appId
+ *         description: The application id
+ *         required: true
+ *         in: path
+ *         schema:
+ *           type: string
  *     responses:
  *       204:
  *         description: No Content
@@ -288,5 +302,63 @@ router.postAsync('/:appId/request',
   accessControl(actions.READ, possessions.OWN, resources.ORGANIZATION, { idCarrier: 'params', idField: 'id' }),
   accessControl(actions.UPDATE, possessions.OWN, resources.APP, { idCarrier: 'params', idField: 'appId' }),
   controllers.app.requestAccess)
+
+/**
+ * @openapi
+ * /organizations/{id}/apps/{appId}/subscribe:
+ *   put:
+ *     summary: Subscribe App to APIs
+ *     description: Manage application subscriptions
+ *     tags: [App]
+ *     parameters:
+ *       - name: id
+ *         description: The organization id
+ *         required: true
+ *         in: path
+ *         schema:
+ *           type: string
+ *       - name: appId
+ *         description: The application id
+ *         required: true
+ *         in: path
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       description: Subscribe to APIs
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - subscriptions
+ *             properties:
+ *               subscriptions:
+ *                 type: array
+ *                 items:
+ *                   type: number
+ *                   minimum: 0
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: The updated app subscription
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/App'
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ */
+router.putAsync('/:appId/subscribe',
+  loggedIn,
+  validateSubscriptionBody,
+  accessControl(actions.READ, possessions.OWN, resources.ORGANIZATION, { idCarrier: 'params', idField: 'id' }),
+  accessControl(actions.UPDATE, possessions.OWN, resources.APP, { idCarrier: 'params', idField: 'appId' }),
+  controllers.app.subscribeToAPI)
 
 module.exports = router

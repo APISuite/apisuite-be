@@ -447,6 +447,7 @@ const requestAccess = async (req, res) => {
 }
 
 const subscribeToAPI = async (req, res) => {
+  const orgId = req.params.id || req.user.org.id
   const subscriptionModel = await getSubscriptionModel()
   if (subscriptionModel === subscriptionModels.SIMPLIFIED) {
     return res.status(HTTPStatus.FORBIDDEN).send({ errors: ['Current subscription model does not allow to manage subscriptions.'] })
@@ -457,8 +458,8 @@ const subscribeToAPI = async (req, res) => {
     const subscriptions = req.body.subscriptions || []
     let app = await models.App.findOne({
       where: {
-        id: req.params.id,
-        org_id: req.user.org.id,
+        id: req.params.appId,
+        org_id: orgId,
       },
       transaction,
     })
@@ -487,7 +488,7 @@ const subscribeToAPI = async (req, res) => {
 
     app = await models.App.findOne({
       where: {
-        id: req.params.id,
+        id: req.params.appId,
       },
       include: includes(),
       transaction,

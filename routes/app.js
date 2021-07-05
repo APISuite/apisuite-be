@@ -228,12 +228,13 @@ router.deleteAsync('/:appId',
 
 /**
  * @openapi
- * /app/{id}/subscribe:
+ * /app/{appId}/subscribe:
  *   put:
+ *     deprecated: true
  *     description: Subscribe App to API
  *     tags: [App]
  *     parameters:
- *       - name: id
+ *       - name: appId
  *         description: The app id.
  *         in: path
  *         required: true
@@ -269,10 +270,8 @@ router.deleteAsync('/:appId',
  *         $ref: '#/components/responses/Unauthorized'
  *       404:
  *         $ref: '#/components/responses/NotFound'
- *       500:
- *         $ref: '#/components/responses/Internal'
  */
-router.putAsync('/:id/subscribe',
+router.putAsync('/:appId/subscribe',
   loggedIn,
   validateSubscriptionBody,
   accessControl(actions.UPDATE, possessions.OWN, resources.APP),
@@ -282,6 +281,7 @@ router.putAsync('/:id/subscribe',
  * @openapi
  * /app/subscribed/{clientId}:
  *   post:
+ *     deprecated: true
  *     description: Subscribe App to API
  *     tags: [App]
  *     parameters:
