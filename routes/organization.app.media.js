@@ -7,20 +7,25 @@ const { deleteMediaQuery } = require('./validation_schemas/app.schema')
 
 /**
  * @openapi
- * /apps/{appId}/media:
+ * /organizations/{id}/apps/{appId}/media:
  *   put:
- *     deprecated: true
  *     summary: Upload app images/media
  *     tags: [App]
  *     security:
  *       - cookieAuth: []
  *     parameters:
- *       - name: appId
- *         description: App id
+ *       - name: id
+ *         description: The organization id
  *         required: true
  *         in: path
  *         schema:
- *           type: number
+ *           type: string
+ *       - name: appId
+ *         description: The application id
+ *         required: true
+ *         in: path
+ *         schema:
+ *           type: string
  *     requestBody:
  *       description: App object that need to be created
  *       required: true
@@ -71,26 +76,32 @@ const { deleteMediaQuery } = require('./validation_schemas/app.schema')
  */
 router.putAsync('/',
   loggedIn,
+  accessControl(actions.READ, possessions.OWN, resources.ORGANIZATION, { idCarrier: 'params', idField: 'id' }),
   accessControl(actions.UPDATE, possessions.OWN, resources.APP, { idCarrier: 'params', idField: 'appId' }),
   fileParser,
   controllers.app.uploadMedia)
 
 /**
  * @openapi
- * /apps/{appId}/media:
+ * /organizations/{id}/apps/{appId}/media:
  *   delete:
- *     deprecated: true
  *     summary: Delete selected media objects
  *     tags: [App]
  *     security:
  *       - cookieAuth: []
  *     parameters:
- *       - name: appId
- *         description: App id
+ *       - name: id
+ *         description: The organization id
  *         required: true
  *         in: path
  *         schema:
- *           type: number
+ *           type: string
+ *       - name: appId
+ *         description: The application id
+ *         required: true
+ *         in: path
+ *         schema:
+ *           type: string
  *       - name: mediaURL
  *         description: URL of the media to delete
  *         required: true
@@ -113,6 +124,7 @@ router.putAsync('/',
 router.deleteAsync('/',
   loggedIn,
   deleteMediaQuery,
+  accessControl(actions.READ, possessions.OWN, resources.ORGANIZATION, { idCarrier: 'params', idField: 'id' }),
   accessControl(actions.UPDATE, possessions.OWN, resources.APP, { idCarrier: 'params', idField: 'appId' }),
   controllers.app.deleteMedia)
 

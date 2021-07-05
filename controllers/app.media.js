@@ -6,6 +6,7 @@ const { models } = require('../models')
 const Storage = require('../services/storage')
 
 const uploadMedia = async (req, res) => {
+  const orgId = req.params.id || req.user.org.id
   if (!req.formdata || !req.formdata.files) {
     return res.status(HTTPStatus.BAD_REQUEST).send({ errors: ['no files uploaded'] })
   }
@@ -31,8 +32,8 @@ const uploadMedia = async (req, res) => {
 
   const app = await models.App.findOne({
     where: {
-      id: req.params.id,
-      org_id: req.user.org.id,
+      id: req.params.appId,
+      org_id: orgId,
       enable: true,
     },
   })
@@ -84,10 +85,11 @@ const uploadMedia = async (req, res) => {
 }
 
 const deleteMedia = async (req, res) => {
+  const orgId = req.params.id || req.user.org.id
   const app = await models.App.findOne({
     where: {
-      id: req.params.id,
-      org_id: req.user.org.id,
+      id: req.params.appId,
+      org_id: orgId,
       enable: true,
     },
   })

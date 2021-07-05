@@ -198,6 +198,7 @@ router.postAsync('/:appId/request',
  * @openapi
  * /apps/{appId}:
  *   delete:
+ *     deprecated: true
  *     description: Delete app
  *     tags: [App]
  *     parameters:

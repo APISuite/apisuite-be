@@ -3,11 +3,14 @@ const router = decorateRouter(require('express').Router({ mergeParams: true }))
 const { actions, possessions, resources } = require('../util/enums')
 const { accessControl, loggedIn } = require('../middleware')
 const controllers = require('../controllers')
+const appMediaRoutes = require('./app.media')
 const {
   validateAppPatchBody,
   validateAppBody,
   validateSubscriptionBody,
 } = require('./validation_schemas/app.schema')
+
+router.use('/:appId/media', appMediaRoutes)
 
 /**
  * @openapi
