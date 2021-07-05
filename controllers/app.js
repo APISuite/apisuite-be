@@ -200,6 +200,7 @@ const deleteApp = async (req, res) => {
 }
 
 const updateApp = async (req, res) => {
+  const orgId = req.params.id || req.user.org.id
   const transaction = await sequelize.transaction()
   try {
     if (req.user.role.name !== roles.ADMIN) req.body.labels = undefined
@@ -228,7 +229,7 @@ const updateApp = async (req, res) => {
         ],
         where: {
           id: req.params.id,
-          org_id: req.user.org.id,
+          org_id: orgId,
           enable: true, // prevent updates to disabled apps
         },
         attributes: appAttributes,
@@ -276,7 +277,7 @@ const updateApp = async (req, res) => {
     publishEvent(routingKeys.APP_UPDATED, {
       user_id: req.user.id,
       app_id: req.params.id,
-      organization_id: req.user.org.id,
+      organization_id: orgId,
       meta: {
         id: updated.id,
         name: updated.name,
@@ -285,7 +286,7 @@ const updateApp = async (req, res) => {
         logo: updated.logo,
         visibility: updated.visibility,
         state: updated.state,
-        org: req.user.org,
+        org: req.user.organizations.find((o) => o.id === Number(orgId)),
       },
     })
 
@@ -359,7 +360,7 @@ const createDraftApp = async (req, res) => {
         logo: app.logo,
         visibility: app.visibility,
         state: app.state,
-        org: req.user.org,
+        org: req.user.organizations.find((o) => o.id === Number(orgId)),
       },
     })
 
@@ -605,8 +606,8 @@ const patchApp = async (req, res) => {
 
     publishEvent(routingKeys.APP_UPDATED, {
       user_id: req.user.id,
-      app_id: req.params.id,
-      organization_id: req.user.org.id,
+      app_id: req.params.appId,
+      organization_id: req.params.id,
       meta: {
         id: updated.id,
         name: updated.name,

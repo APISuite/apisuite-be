@@ -119,6 +119,7 @@ router.postAsync('/',
  * @openapi
  * /apps/{id}:
  *   put:
+ *     deprecated: true
  *     description: Update app
  *     tags: [App]
  *     parameters:

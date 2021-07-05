@@ -168,8 +168,6 @@ router.patchAsync('/:appId',
  *         $ref: '#/components/responses/BadRequest'
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
- *       500:
- *         $ref: '#/components/responses/Internal'
  */
 router.postAsync('/',
   loggedIn,
@@ -177,5 +175,56 @@ router.postAsync('/',
   accessControl(actions.UPDATE, possessions.OWN, resources.ORGANIZATION, { idCarrier: 'params', idField: 'id', adminOverride: true }),
   accessControl(actions.CREATE, possessions.OWN, resources.APP),
   controllers.app.createDraftApp)
+
+/**
+ * @openapi
+ * /organizations/{id}/apps/{appId}:
+ *   put:
+ *     description: Update app
+ *     tags: [App]
+ *     parameters:
+ *       - name: id
+ *         description: The organization id
+ *         required: true
+ *         in: path
+ *         schema:
+ *           type: string
+ *       - name: appId
+ *         description: The application id
+ *         required: true
+ *         in: path
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       description: App object to update
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: "#/components/schemas/AppDraft"
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: The updated App
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/AppV2'
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ */
+router.putAsync('/:appId',
+  loggedIn,
+  validateAppBody,
+  accessControl(actions.UPDATE, possessions.OWN, resources.ORGANIZATION, { idCarrier: 'params', idField: 'id', adminOverride: true }),
+  accessControl(actions.UPDATE, possessions.OWN, resources.APP, { idCarrier: 'params', idField: 'appId', adminOverride: true }),
+  controllers.app.updateApp)
 
 module.exports = router
