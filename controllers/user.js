@@ -122,6 +122,7 @@ const checkPassword = async (reqPassword, foundPassword) => {
 }
 
 const inviteUserToOrganization = async (req, res) => {
+  const orgId = req.params.id || req.user.org.id
   try {
     const role = await models.Role.findOne({
       where: {
@@ -139,7 +140,7 @@ const inviteUserToOrganization = async (req, res) => {
       const inOrg = await models.UserOrganization.findOne({
         where: {
           user_id: user.id,
-          org_id: req.user.org.id,
+          org_id: orgId,
         },
       })
 
@@ -155,7 +156,7 @@ const inviteUserToOrganization = async (req, res) => {
     const invite = await models.InviteOrganization.create(
       {
         user_id: !user ? null : user.id,
-        org_id: req.user.org.id,
+        org_id: orgId,
         role_id: role.id,
         email: email,
         status: 'pending',
@@ -164,7 +165,7 @@ const inviteUserToOrganization = async (req, res) => {
     )
 
     const invitationData = {
-      org: req.user.org.name,
+      org: req.user.organizations.find((o) => o.id === Number(orgId))?.name,
       email: email,
       token: invite.confirmation_token,
     }
@@ -181,7 +182,7 @@ const inviteUserToOrganization = async (req, res) => {
 
     publishEvent(routingKeys.ORG_USER_INVITED, {
       user_id: req.user.id,
-      organization_id: req.user.org.id,
+      organization_id: orgId,
       log: `${req.body.email} was invited`,
     })
 

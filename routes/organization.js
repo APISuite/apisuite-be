@@ -8,6 +8,7 @@ const {
   validateAssignUserBody,
   validateOrganizationUpdateBody,
 } = require('./validation_schemas/organization.schema')
+const { validateInviteBody } = require('./validation_schemas/invite_organization.schema')
 const organizationAppRoutes = require('./organization.app')
 
 router.use('/:id/apps', organizationAppRoutes)
@@ -297,6 +298,55 @@ router.getAsync('/:id/users',
   loggedIn,
   accessControl(actions.READ, possessions.OWN, resources.ORGANIZATION, { idCarrier: 'params', idField: 'id' }),
   controllers.organization.getAllMembers)
+
+/**
+ * @openapi
+ * /{id}/users:
+ *   post:
+ *     description: Invite user to organization
+ *     tags: [User]
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - name: id
+ *         description: The organization id.
+ *         required: true
+ *         in: path
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       description: Invitation data.
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - role_id
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *               role_id:
+ *                 type: number
+ *     responses:
+ *       200:
+ *         description: Invite.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Invite'
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ */
+router.postAsync('/:id/users',
+  loggedIn,
+  validateInviteBody,
+  accessControl(actions.UPDATE, possessions.OWN, resources.ORGANIZATION, { idCarrier: 'params', idField: 'id' }),
+  controllers.user.inviteUserToOrganization)
 
 /**
  * @openapi

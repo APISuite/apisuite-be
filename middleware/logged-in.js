@@ -1,17 +1,9 @@
 const HTTPStatus = require('http-status-codes')
-const msgBroker = require('../services/msg-broker')
 
 module.exports = (req, res, next) => {
   try {
     if (res.locals.loggedInUser) {
       req.user = res.locals.loggedInUser
-
-      if (req.user.org) {
-        msgBroker.publishEvent(msgBroker.routingKeys.ORG_ACTIVITY, {
-          id: req.user.org.id,
-          name: req.user.org.name,
-        })
-      }
 
       return next()
     }

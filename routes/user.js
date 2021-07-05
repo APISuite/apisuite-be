@@ -238,6 +238,7 @@ router.postAsync('/recover',
  * @openapi
  * /users/invite:
  *   post:
+ *     deprecated: true
  *     description: Invite user.
  *     tags: [User]
  *     requestBody:
@@ -369,10 +370,13 @@ router.postAsync('/setup',
  * @openapi
  * /users/{id}/organizations/{orgId}:
  *   post:
+ *     deprecated: true
  *     summary: Change user's active organization
  *     description: >
  *        Changes the user's active organization to {orgId},
  *        as long as {orgId} is an organization the user belongs to.
+ *        This is deprecated and should be avoided at all costs. This piece of statefull data will
+ *        soon be removed from the backend and API.
  *     tags: [User]
  *     parameters:
  *       - name: id

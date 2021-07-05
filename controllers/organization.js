@@ -148,6 +148,7 @@ const updateOrg = async (req, res) => {
   return res.status(HTTPStatus.OK).send(updated)
 }
 
+// TODO: transform in changeRole
 const assignUserToOrg = async (req, res) => {
   try {
     const userId = req.body.user_id
@@ -193,8 +194,8 @@ const assignUserToOrg = async (req, res) => {
 
     publishEvent(routingKeys.ORG_USER_ROLE, {
       user_id: req.user.id,
-      organization_id: req.user.org.id,
-      log: `User ${req.body.user_id} was assigned the role ${roleId}`,
+      organization_id: orgId,
+      log: `User ${req.body.user_id} was assigned the role ${roleId} on organization ${orgId}`,
     })
 
     return res.status(HTTPStatus.OK).send(org)
@@ -205,10 +206,7 @@ const assignUserToOrg = async (req, res) => {
 }
 
 const getAllMembers = async (req, res) => {
-  const members = await models.UserOrganization.findMembers(
-    req.user.org.id,
-    models,
-  )
+  const members = await models.UserOrganization.findMembers(req.params.id, models)
 
   return res.status(HTTPStatus.OK).send(members)
 }
@@ -216,7 +214,7 @@ const getAllMembers = async (req, res) => {
 const getPendingInvites = async (req, res) => {
   const list = await models.InviteOrganization.findAll({
     where: {
-      org_id: req.user.org.id,
+      org_id: req.params.id,
       status: 'pending',
     },
     attributes: ['email'],

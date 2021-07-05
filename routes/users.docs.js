@@ -112,6 +112,7 @@
  *                 type: string
  *         current_org:
  *           type: object
+ *           deprecated: true
  *           properties:
  *             id:
  *               type: number
