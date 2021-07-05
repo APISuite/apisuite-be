@@ -83,6 +83,7 @@ router.getAsync('/:id',
  * @openapi
  * /apps:
  *   post:
+ *     deprecated: true
  *     description: Create new draft app
  *     tags: [App]
  *     security:

@@ -3,7 +3,10 @@ const router = decorateRouter(require('express').Router({ mergeParams: true }))
 const { actions, possessions, resources } = require('../util/enums')
 const { accessControl, loggedIn } = require('../middleware')
 const controllers = require('../controllers')
-const { validateAppPatchBody } = require('./validation_schemas/app.schema')
+const {
+  validateAppPatchBody,
+  validateAppBody,
+} = require('./validation_schemas/app.schema')
 
 /**
  * @openapi
@@ -131,5 +134,48 @@ router.patchAsync('/:appId',
   accessControl(actions.UPDATE, possessions.OWN, resources.ORGANIZATION, { idCarrier: 'params', idField: 'id', adminOverride: true }),
   accessControl(actions.UPDATE, possessions.OWN, resources.APP, { idCarrier: 'params', idField: 'appId', adminOverride: true }),
   controllers.app.patchApp)
+
+/**
+ * @openapi
+ * /organizations/{id}/apps:
+ *   post:
+ *     description: Create new draft app
+ *     tags: [App]
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - name: id
+ *         description: The organization id
+ *         required: true
+ *         in: path
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       description: App object that need to be created
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: "#/components/schemas/AppDraft"
+ *     responses:
+ *       201:
+ *         description: The created App
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/AppV2'
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       500:
+ *         $ref: '#/components/responses/Internal'
+ */
+router.postAsync('/',
+  loggedIn,
+  validateAppBody,
+  accessControl(actions.UPDATE, possessions.OWN, resources.ORGANIZATION, { idCarrier: 'params', idField: 'id', adminOverride: true }),
+  accessControl(actions.CREATE, possessions.OWN, resources.APP),
+  controllers.app.createDraftApp)
 
 module.exports = router

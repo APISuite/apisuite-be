@@ -303,6 +303,7 @@ const updateApp = async (req, res) => {
 }
 
 const createDraftApp = async (req, res) => {
+  const orgId = req.params.id || req.user.org.id
   const transaction = await sequelize.transaction()
   try {
     const idp = await Idp.getIdP()
@@ -316,7 +317,7 @@ const createDraftApp = async (req, res) => {
       redirect_url: req.body.redirectUrl,
       logo: req.body.logo,
       enable: true,
-      org_id: req.user.org.id,
+      org_id: orgId,
       idpProvider: idp.getProvider(),
       state: appStates.DRAFT,
       visibility: req.body.visibility,
@@ -349,7 +350,7 @@ const createDraftApp = async (req, res) => {
     publishEvent(routingKeys.APP_CREATED, {
       user_id: req.user.id,
       app_id: app.id,
-      organization_id: req.user.org.id,
+      organization_id: orgId,
       meta: {
         id: app.id,
         name: app.name,
