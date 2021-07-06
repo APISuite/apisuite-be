@@ -230,7 +230,6 @@ const listPublishers = async (req, res) => {
       where: {
         visibility: 'public',
         enable: true,
-        state: appStates.APPROVED,
       },
       attributes: [],
     }],
