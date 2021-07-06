@@ -39,6 +39,56 @@ router.getAsync('/publishers',
 
 /**
  * @openapi
+ * /organizations/publishers/{id}:
+ *   get:
+ *     summary: Get publisher details
+ *     tags: [Organization]
+ *     parameters:
+ *       - name: id
+ *         description: Publisher id
+ *         in: query
+ *         schema:
+ *           type: number
+ *     responses:
+ *       200:
+ *         description: Public app publishers details
+ *         content:
+ *           application/json:
+ *             schema:
+ *                type: array
+ *                items:
+ *                  type: object
+ *                  properties:
+ *                    id:
+ *                      type: number
+ *                    name:
+ *                     type: string
+ *                    description:
+ *                      type: string
+ *                    logo:
+ *                      type: string
+ *                      format: uri
+ *                    tosUrl:
+ *                      type: string
+ *                      format: uri
+ *                    privacyUrl:
+ *                      type: string
+ *                      format: uri
+ *                    youtubeUrl:
+ *                      type: string
+ *                      format: uri
+ *                    websiteUrl:
+ *                      type: string
+ *                      format: uri
+ *                    supportUrl:
+ *                      type: string
+ *                      format: uri
+ */
+router.getAsync('/publishers/:id',
+  controllers.organization.getPublisher)
+
+/**
+ * @openapi
  * /organizations:
  *   get:
  *     description: Get list of organizations

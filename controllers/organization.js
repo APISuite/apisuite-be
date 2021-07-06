@@ -2,7 +2,7 @@ const HTTPStatus = require('http-status-codes')
 const { v4: uuidv4 } = require('uuid')
 const log = require('../util/logger')
 const { models, sequelize } = require('../models')
-const { roles, appStates } = require('../util/enums')
+const { roles } = require('../util/enums')
 const { publishEvent, routingKeys } = require('../services/msg-broker')
 
 const getAll = async (req, res) => {
@@ -243,6 +243,36 @@ const listPublishers = async (req, res) => {
   return res.status(HTTPStatus.OK).json(publishers)
 }
 
+const getPublisher = async (req, res) => {
+  const publisher = await models.Organization.findAll({
+    include: [{
+      model: models.App,
+      where: {
+        id: req.params.id,
+        visibility: 'public',
+        enable: true,
+      },
+      attributes: [],
+    }],
+    attributes: [
+      'id',
+      'name',
+      'logo',
+      'description',
+      'privacyUrl',
+      'youtubeUrl',
+      'websiteUrl',
+      'supportUrl',
+    ],
+  })
+
+  if (!publisher) {
+    return res.status(HTTPStatus.NOT_FOUND).send({ errors: ['Publisher not found'] })
+  }
+
+  return res.status(HTTPStatus.OK).json(publisher)
+}
+
 module.exports = {
   getAll,
   getById,
@@ -253,4 +283,5 @@ module.exports = {
   getAllMembers,
   getPendingInvites,
   listPublishers,
+  getPublisher,
 }
