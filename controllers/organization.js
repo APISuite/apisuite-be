@@ -244,11 +244,11 @@ const listPublishers = async (req, res) => {
 }
 
 const getPublisher = async (req, res) => {
-  const publisher = await models.Organization.findAll({
+  const publisher = await models.Organization.findOne({
     include: [{
       model: models.App,
       where: {
-        id: req.params.id,
+        org_id: req.params.id,
         visibility: 'public',
         enable: true,
       },
