@@ -299,6 +299,12 @@ const schema = {
     default: 2 * 1024 * 1024, // 2mb
     env: 'APISUITE_MAX_FILE_SIZE_UPLOAD',
   },
+  appsCreateOauthClient: {
+    doc: 'Enable/disable self registration of OAuth clients for approved applications',
+    format: Boolean,
+    default: true,
+    env: 'APISUITE_APPS_CREATE_OAUTH_CLIENT',
+  },
 }
 
 module.exports = schema

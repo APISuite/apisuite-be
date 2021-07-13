@@ -1,4 +1,5 @@
 const HTTPStatus = require('http-status-codes')
+const config = require('../config')
 const log = require('../util/logger')
 const { roles } = require('../util/enums')
 const { Op } = require('sequelize')
@@ -394,28 +395,31 @@ const requestAccess = async (req, res) => {
   const subscriptionModel = await getSubscriptionModel()
   switch (subscriptionModel) {
     case subscriptionModels.SIMPLIFIED: {
-      const idp = await Idp.getIdP()
-      const client = await idp.createClient({
-        clientName: app.name,
-        redirectURIs: [app.redirect_url],
-      })
-
       app.state = appStates.APPROVED
-      app.clientId = client.clientId
-      app.clientSecret = client.clientSecret
-      app.client_data = client.extra
-      app.idpProvider = idp.getProvider()
 
-      let gateway
-      try {
-        gateway = await Gateway()
-      } catch (error) {
-        log.error('[requestAccess] => getGateway', error)
-        if (!(error instanceof NoGatewayError)) {
-          return res.status(HTTPStatus.INTERNAL_SERVER_ERROR).send({ errors: ['gateway communication issue'] })
+      if (config.get('appsCreateOauthClient')) {
+        const idp = await Idp.getIdP()
+        const client = await idp.createClient({
+          clientName: app.name,
+          redirectURIs: [app.redirect_url],
+        })
+
+        app.clientId = client.clientId
+        app.clientSecret = client.clientSecret
+        app.client_data = client.extra
+        app.idpProvider = idp.getProvider()
+
+        let gateway
+        try {
+          gateway = await Gateway()
+        } catch (error) {
+          log.error('[requestAccess] => getGateway', error)
+          if (!(error instanceof NoGatewayError)) {
+            return res.status(HTTPStatus.INTERNAL_SERVER_ERROR).send({ errors: ['gateway communication issue'] })
+          }
         }
+        if (gateway) await gateway.subscribeAll(app.id, app.clientId)
       }
-      if (gateway) await gateway.subscribeAll(app.id, app.clientId)
 
       await app.save()
       break
