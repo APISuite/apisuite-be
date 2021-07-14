@@ -26,6 +26,16 @@ const { validatePublicAppsListQuery } = require('./validation_schemas/app.schema
  *         in: query
  *         schema:
  *           type: string
+ *       - name: metadata_key
+ *         description: Used in conjunction with metadata_value. Metadata key to search for. Only available to admin roles.
+ *         in: query
+ *         schema:
+ *           type: string
+ *       - name: metadata_value
+ *         description: Used in conjunction with metadata_key. Metadata key to search for. Only available to admin roles.
+ *         in: query
+ *         schema:
+ *           type: string
  *       - name: sort_by
  *         description: Sorting field
  *         in: query

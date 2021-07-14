@@ -35,6 +35,20 @@ const listPublicApps = async (req, res, next) => {
     enable: true,
   }
 
+  if (req.query.metadata_key && req.query.metadata_value && res.locals.isAdmin) {
+    const appMetadata = await models.AppMetadata.findAll({
+      where: {
+        key: req.query.metadata_key,
+        value: req.query.metadata_value,
+      },
+      attributes: ['appId'],
+    })
+
+    if (appMetadata) {
+      filters.id = appMetadata.map((am) => am.appId)
+    }
+  }
+
   if (req.query.org_id) {
     filters.org_id = {
       [Op.in]: Array.isArray(req.query.org_id) ? req.query.org_id : [req.query.org_id],

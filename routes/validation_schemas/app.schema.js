@@ -41,6 +41,8 @@ const subscriptionSchema = Joi.object({
 
 const publicAppsQuerySchema = Joi.object({
   search: Joi.string().optional(),
+  metadata_key: Joi.string().optional(),
+  metadata_value: Joi.string().optional(),
   page: Joi.number().min(1).optional(),
   pageSize: Joi.number().min(1).optional(),
   org_id: Joi.alternatives().try(
