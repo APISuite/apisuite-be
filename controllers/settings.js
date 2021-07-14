@@ -252,7 +252,9 @@ const updateIdp = async (req, res) => {
     const ssoChanged = ssoEnabled !== req.body.configuration.ssoEnabled
     if (ssoChanged) {
       try {
-        await toggleSSO(settings.values.configuration.ssoEnabled)
+        await toggleSSO(
+          settings.values.configuration.ssoEnabled,
+          settings.values.configuration?.preConfiguredClient)
       } catch (err) {
         req.body.configuration.ssoEnabled = ssoEnabled
         settings.values = req.body
@@ -336,7 +338,7 @@ const cleanInternalConfig = (settings) => {
   return settings
 }
 
-const toggleSSO = async (enable) => {
+const toggleSSO = async (enable, preConfiguredClient) => {
   const idp = await Idp.getIdP()
 
   if (idp.getProvider() === idpProviders.INTERNAL) {
@@ -348,21 +350,23 @@ const toggleSSO = async (enable) => {
   })
 
   if (enable) {
-    return enableSSO(idp, ssoClient)
+    if (ssoClient) return
+    return enableSSO(idp, preConfiguredClient)
   }
   return disableSSO(idp, ssoClient)
 }
 
-const enableSSO = async (idp, ssoClient) => {
-  if (ssoClient) return
-
-  const client = await idp.createClient({
-    clientName: 'APISuite SSO Client',
-    redirectURIs: [
-      config.get('sso.signInRedirectURL'),
-      config.get('sso.inviteSignInRedirectURL'),
-    ],
-  })
+const enableSSO = async (idp, preConfiguredClient) => {
+  let client = preConfiguredClient
+  if (!client) {
+    client = await idp.createClient({
+      clientName: 'APISuite SSO Client',
+      redirectURIs: [
+        config.get('sso.signInRedirectURL'),
+        config.get('sso.inviteSignInRedirectURL'),
+      ],
+    })
+  }
 
   await models.SSOClient.create({
     provider: idp.getProvider(),

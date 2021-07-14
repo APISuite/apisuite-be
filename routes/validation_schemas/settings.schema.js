@@ -1,5 +1,6 @@
 const Joi = require('joi')
 const validator = require('./validator')
+const config = require('../../config')
 const { idpProviders } = require('../../util/enums')
 
 const validSocials = [
@@ -37,11 +38,18 @@ const gatewaySettingsSchema = Joi.object({
 
 const internalIdpConfig = Joi.object({})
 const keycloakIdpConfig = Joi.object({
-  clientRegistrationURL: Joi.string().uri({ scheme: ['http', 'https'] }).optional(),
-  discoveryURL: Joi.string().uri({ scheme: ['http', 'https'] }).optional(),
-  initialAccessToken: Joi.string().required(),
+  discoveryURL: Joi.string().uri({ scheme: ['http', 'https'] }).required(),
+  initialAccessToken: Joi.string().optional(),
   ssoEnabled: Joi.boolean().optional(),
   providerSignupURL: Joi.string().optional().allow(null, ''),
+  preConfiguredClient: Joi.object({
+    clientId: Joi.string().required(),
+    clientSecret: Joi.string().required(),
+    extra: Joi.object({
+      registration_client_uri: Joi.string().required(),
+      registration_access_token: Joi.string().required(),
+    }).required(),
+  }).optional(),
 })
 
 const idpSettingsSchema = Joi.object({

@@ -397,7 +397,7 @@ const requestAccess = async (req, res) => {
     case subscriptionModels.SIMPLIFIED: {
       app.state = appStates.APPROVED
 
-      if (config.get('appsCreateOauthClient')) {
+      if (config.get('selfRegisterAppOauthClients')) {
         const idp = await Idp.getIdP()
         const client = await idp.createClient({
           clientName: app.name,

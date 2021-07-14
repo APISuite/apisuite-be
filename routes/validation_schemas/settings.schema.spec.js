@@ -66,7 +66,7 @@ describe('Settings Validations', () => {
           body: {
             provider: 'keycloak',
             configuration: {
-              clientRegistrationURL: 'https://myurl/clients',
+              discoveryURL: 'https://abc.xpto',
               initialAccessToken: 'alsdhgfajkhdgf',
             },
           },
@@ -93,7 +93,6 @@ describe('Settings Validations', () => {
           body: {
             provider: 'keycloak',
             configuration: {
-              clientRegistrationURL: 'ftp://myurl/clients',
               initialAccessToken: 'alsdhgfajkhdgf',
             },
           },
@@ -102,7 +101,6 @@ describe('Settings Validations', () => {
           body: {
             provider: 'keycloak',
             configuration: {
-              clientRegistrationURL: 'https://myurl/clients',
               initialAccessToken: '',
             },
           },

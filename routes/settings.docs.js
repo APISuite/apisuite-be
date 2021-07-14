@@ -62,6 +62,7 @@
  *           oneOf:
  *             - $ref: '#/components/schemas/Internal'
  *             - $ref: '#/components/schemas/Keycloak'
+ *             - $ref: '#/components/schemas/KeycloakPreConfigured'
  *           discriminator:
  *             propertyName: provider
  *
@@ -70,12 +71,7 @@
  *
  *     Keycloak:
  *       type: object
- *       required:
- *         - initialAccessToken
  *       properties:
- *         clientRegistrationURL:
- *           type: string
- *           format: uri
  *         discoveryURL:
  *           type: string
  *           format: uri
@@ -86,6 +82,27 @@
  *         providerSignupURL:
  *           type: string
  *           format: uri
+ *         preConfiguredClient:
+ *           type: object
+ *           required:
+ *             - clientId
+ *             - clientSecret
+ *             - clientData
+ *           properties:
+ *             clientId:
+ *               type: string
+ *             clientSecret:
+ *               type: string
+ *             extra:
+ *               type: object
+ *               required:
+ *                 - registration_client_uri
+ *                 - registration_access_token
+ *               properties:
+ *                 registration_client_uri:
+ *                   type: string
+ *                 registration_access_token:
+ *                   type: string
  *
  *     GatewaySettings:
  *       type: object
