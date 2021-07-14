@@ -87,7 +87,7 @@
  *           required:
  *             - clientId
  *             - clientSecret
- *             - clientData
+ *             - extra
  *           properties:
  *             clientId:
  *               type: string
