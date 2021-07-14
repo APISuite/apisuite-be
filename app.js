@@ -58,6 +58,7 @@ app.use('/roles', routes.role)
 app.use('/settings', routes.settings)
 app.use('/translations', routes.translations)
 app.use('/users', routes.user)
+app.use('/pages', routes.page)
 
 app.use(middleware.error)
 

@@ -1,14 +1,13 @@
 const Joi = require('joi')
 const validator = require('./validator')
-
-const snakeCaseRegex = /^[a-z](?:[a-z0-9]+_)*[a-z0-9]+$/
+const { regex } = require('../../util/enums')
 
 const appMetadata = Joi.object({
   key: Joi.string().max(30).required().custom((value, helpers) => {
     if (!value.startsWith('meta_')) {
       return helpers.message('key must have "meta_" prefix')
     }
-    if (!snakeCaseRegex.test(value)) {
+    if (!regex.SNAKE_CASE.test(value)) {
       return helpers.message('key must be snake_case')
     }
     return true

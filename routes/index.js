@@ -9,6 +9,7 @@ const role = require('./role')
 const settings = require('./settings')
 const invites = require('./invites')
 const owner = require('./owner')
+const page = require('./page')
 const translations = require('./translations')
 
 module.exports = {
@@ -24,4 +25,5 @@ module.exports = {
   settings,
   translations,
   user,
+  page,
 }

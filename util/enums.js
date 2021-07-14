@@ -75,6 +75,10 @@ const possessions = {
   OWN: 'own',
 }
 
+const regex = {
+  SNAKE_CASE: /^[a-z](?:[a-z0-9]+_)*[a-z0-9]+$/,
+}
+
 module.exports = {
   apiTypes,
   appStates,
@@ -89,4 +93,5 @@ module.exports = {
   resources,
   actions,
   possessions,
+  regex,
 }

@@ -9,6 +9,7 @@ const health = require('./health')
 const settings = require('./settings')
 const invites = require('./invites')
 const owner = require('./owner')
+const page = require('./page')
 const translations = require('./translations')
 
 module.exports = {
@@ -19,6 +20,7 @@ module.exports = {
   invites,
   organization,
   owner,
+  page,
   role,
   registration,
   settings,
