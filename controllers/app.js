@@ -288,6 +288,7 @@ const updateApp = async (req, res) => {
         logo: updated.logo,
         visibility: updated.visibility,
         state: updated.state,
+        labels: app.labels,
         org: req.user.organizations.find((o) => o.id === Number(orgId)),
       },
     })
@@ -362,6 +363,7 @@ const createDraftApp = async (req, res) => {
         logo: app.logo,
         visibility: app.visibility,
         state: app.state,
+        labels: app.labels,
         org: req.user.organizations.find((o) => o.id === Number(orgId)),
       },
     })
@@ -443,6 +445,7 @@ const requestAccess = async (req, res) => {
       logo: app.logo,
       visibility: app.visibility,
       state: app.state,
+      labels: app.labels,
       org: req.user.organizations.find((o) => o.id === Number(orgId)),
     },
   })
@@ -623,6 +626,7 @@ const patchApp = async (req, res) => {
         logo: updated.logo,
         visibility: updated.visibility,
         state: updated.state,
+        labels: app.labels,
       },
     })
 
