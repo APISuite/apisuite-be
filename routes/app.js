@@ -11,7 +11,7 @@ const publicAppsRoutes = require('./app.public')
 const appMediaRoutes = require('./app.media')
 
 router.use('/public', publicAppsRoutes)
-router.use('/:id/media', appMediaRoutes)
+router.use('/:appId/media', appMediaRoutes)
 
 /**
  * @openapi
