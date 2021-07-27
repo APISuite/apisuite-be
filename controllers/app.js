@@ -36,6 +36,7 @@ const includes = () => [
   {
     model: models.AppMetadata,
     as: 'metadata',
+    through: { attributes: ['key', 'value', 'title', 'description'] },
   },
 ]
 
