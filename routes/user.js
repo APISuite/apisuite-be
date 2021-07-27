@@ -1,7 +1,7 @@
 const { decorateRouter } = require('@awaitjs/express')
 const router = decorateRouter(require('express').Router())
 const controllers = require('../controllers')
-const { accessControl, loggedIn, setup, fileParser } = require('../middleware')
+const { accessControl, loggedIn, fileParser } = require('../middleware')
 const { actions, possessions, resources } = require('../util/enums')
 const { validateForgotPasswordBody, validateRecoverPasswordBody } = require('./validation_schemas/auth.schema')
 const { validateInviteBody } = require('./validation_schemas/invite_organization.schema')
@@ -9,7 +9,6 @@ const apiTokensRouter = require('./user.api-tokens')
 const {
   validateProfileUpdateBody,
   validateChangePasswordBody,
-  validateSetupBody,
 } = require('./validation_schemas/user.schema')
 
 router.use('/api-tokens', apiTokensRouter)
@@ -321,50 +320,6 @@ router.postAsync('/invite',
  */
 router.postAsync('/invite/confirm',
   controllers.user.confirmInvite)
-
-/**
- * @openapi
- * /users/setup:
- *   post:
- *     summary: Creates an initial user and main organization
- *     description: Creates an initial user and main organization, triggering also an invite email to the new user.
- *     tags: [User]
- *     requestBody:
- *       description: Setup data.
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - email
- *               - organization
- *             properties:
- *               email:
- *                 type: string
- *                 format: email
- *               organization_name:
- *                 type: string
- *               organization:
- *                  $ref: '#/components/schemas/OrganizationSetup'
- *               settings:
- *                  $ref: '#/components/schemas/SettingsSetup'
- *     security:
- *       - x_setup_token: []
- *     responses:
- *       200:
- *         description: Setup completed with success
- *       400:
- *         $ref: '#/components/responses/BadRequest'
- *       401:
- *         $ref: '#/components/responses/Unauthorized'
- *       500:
- *         $ref: '#/components/responses/Internal'
- */
-router.postAsync('/setup',
-  setup,
-  validateSetupBody,
-  controllers.user.setupMainAccount)
 
 /**
  * @openapi
