@@ -10,42 +10,6 @@
           "fixed": false,
           "label": {
             "type": "text",
-            "fallback": "Marketplace"
-          },
-          "action": "/marketplace",
-          "subTabs": [
-            {
-              "fixed": false,
-              "label": {
-                "type": "text",
-                "fallback": ""
-              },
-              "action": "/marketplace/app-details/:id",
-              "backAction": {
-                "route": "/marketplace",
-                "fallback": "Go back",
-                "iconName": "navigate_before"
-              }
-            },
-            {
-              "fixed": false,
-              "label": {
-                "type": "text",
-                "fallback": ""
-              },
-              "action": "/marketplace/publisher-details/:id",
-              "backAction": {
-                "route": "/marketplace",
-                "fallback": "Go back",
-                "iconName": "navigate_before"
-              }
-            }
-          ]
-        },
-        {
-          "fixed": false,
-          "label": {
-            "type": "text",
             "fallback": "API Products"
           },
           "action": "/api-products"
@@ -93,53 +57,9 @@
           "fixed": false,
           "label": {
             "type": "text",
-            "fallback": "Marketplace"
-          },
-          "action": "/marketplace",
-          "subTabs": [
-            {
-              "fixed": false,
-              "label": {
-                "type": "text",
-                "fallback": ""
-              },
-              "action": "/marketplace/app-details/:id",
-              "backAction": {
-                "route": "/marketplace",
-                "fallback": "Go back",
-                "iconName": "navigate_before"
-              }
-            },
-            {
-              "fixed": false,
-              "label": {
-                "type": "text",
-                "fallback": ""
-              },
-              "action": "/marketplace/publisher-details/:id",
-              "backAction": {
-                "route": "/marketplace",
-                "fallback": "Go back",
-                "iconName": "navigate_before"
-              }
-            }
-          ]
-        },
-        {
-          "fixed": false,
-          "label": {
-            "type": "text",
             "fallback": "Support"
           },
           "action": "https://intercom.help/api-suite/en"
-        },
-        {
-          "fixed": false,
-          "label": {
-            "type": "text",
-            "fallback": "Billing"
-          },
-          "action": "/billing"
         },
         {
           "fixed": false,
@@ -181,42 +101,6 @@
     },
     "developer": {
       "tabs": [
-        {
-          "fixed": false,
-          "label": {
-            "type": "text",
-            "fallback": "Marketplace"
-          },
-          "action": "/marketplace",
-          "subTabs": [
-            {
-              "fixed": false,
-              "label": {
-                "type": "text",
-                "fallback": ""
-              },
-              "action": "/marketplace/app-details/:id",
-              "backAction": {
-                "route": "/marketplace",
-                "fallback": "Go back",
-                "iconName": "navigate_before"
-              }
-            },
-            {
-              "fixed": false,
-              "label": {
-                "type": "text",
-                "fallback": ""
-              },
-              "action": "/marketplace/publisher-details/:id",
-              "backAction": {
-                "route": "/marketplace",
-                "fallback": "Go back",
-                "iconName": "navigate_before"
-              }
-            }
-          ]
-        },
         {
           "fixed": false,
           "label": {
@@ -264,14 +148,6 @@
                 "fallback": "Subscriptions"
               },
               "action": "/dashboard/subscriptions"
-            },
-            {
-              "fixed": false,
-              "label": {
-                "type": "text",
-                "fallback": "Billing"
-              },
-              "action": "/billing"
             },
             {
               "fixed": false,
@@ -335,42 +211,6 @@
           "fixed": false,
           "label": {
             "type": "text",
-            "fallback": "Marketplace"
-          },
-          "action": "/marketplace",
-          "subTabs": [
-            {
-              "fixed": false,
-              "label": {
-                "type": "text",
-                "fallback": ""
-              },
-              "action": "/marketplace/app-details/:id",
-              "backAction": {
-                "route": "/marketplace",
-                "fallback": "Go back",
-                "iconName": "navigate_before"
-              }
-            },
-            {
-              "fixed": false,
-              "label": {
-                "type": "text",
-                "fallback": ""
-              },
-              "action": "/marketplace/publisher-details/:id",
-              "backAction": {
-                "route": "/marketplace",
-                "fallback": "Go back",
-                "iconName": "navigate_before"
-              }
-            }
-          ]
-        },
-        {
-          "fixed": false,
-          "label": {
-            "type": "text",
             "fallback": "API Products"
           },
           "action": "/api-products"
@@ -414,14 +254,6 @@
                 "fallback": "Subscriptions"
               },
               "action": "/dashboard/subscriptions"
-            },
-            {
-              "fixed": false,
-              "label": {
-                "type": "text",
-                "fallback": "Billing"
-              },
-              "action": "/billing"
             },
             {
               "fixed": false,
@@ -485,42 +317,6 @@
           "fixed": false,
           "label": {
             "type": "text",
-            "fallback": "Marketplace"
-          },
-          "action": "/marketplace",
-          "subTabs": [
-            {
-              "fixed": false,
-              "label": {
-                "type": "text",
-                "fallback": ""
-              },
-              "action": "/marketplace/app-details/:id",
-              "backAction": {
-                "route": "/marketplace",
-                "fallback": "Go back",
-                "iconName": "navigate_before"
-              }
-            },
-            {
-              "fixed": false,
-              "label": {
-                "type": "text",
-                "fallback": ""
-              },
-              "action": "/marketplace/publisher-details/:id",
-              "backAction": {
-                "route": "/marketplace",
-                "fallback": "Go back",
-                "iconName": "navigate_before"
-              }
-            }
-          ]
-        },
-        {
-          "fixed": false,
-          "label": {
-            "type": "text",
             "fallback": "API Products"
           },
           "action": "/api-products"
@@ -564,14 +360,6 @@
                 "fallback": "Subscriptions"
               },
               "action": "/dashboard/subscriptions"
-            },
-            {
-              "fixed": false,
-              "label": {
-                "type": "text",
-                "fallback": "Billing"
-              },
-              "action": "/billing"
             },
             {
               "fixed": false,
