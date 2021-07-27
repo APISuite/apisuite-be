@@ -288,7 +288,7 @@ const updateApp = async (req, res) => {
         logo: updated.logo,
         visibility: updated.visibility,
         state: updated.state,
-        labels: app.labels,
+        labels: updated.labels,
         org: req.user.organizations.find((o) => o.id === Number(orgId)),
       },
     })
