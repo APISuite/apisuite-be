@@ -1,6 +1,5 @@
 const Joi = require('joi')
 const validator = require('./validator')
-const config = require('../../config')
 const { idpProviders } = require('../../util/enums')
 
 const validSocials = [
