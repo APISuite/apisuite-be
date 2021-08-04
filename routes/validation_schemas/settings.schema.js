@@ -30,8 +30,8 @@ const settingsSchema = Joi.object({
 const gatewaySettingsSchema = Joi.object({
   provider: Joi.string().required().valid('kong'),
   configuration: Joi.object({
-    url: Joi.string().uri().required(),
-    apiKey: Joi.string().required(),
+    url: Joi.string().uri().required().allow('', null),
+    apiKey: Joi.string().required().allow('', null),
   }),
 })
 
