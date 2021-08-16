@@ -2,6 +2,7 @@ require('dotenv/config')
 const config = require('./config')
 const cors = require('cors')
 const express = require('express')
+const helmet = require('helmet')
 const cookieParser = require('cookie-parser')
 const morgan = require('morgan')
 const routes = require('./routes')
@@ -29,6 +30,7 @@ morgan.token('body', (req, res) => {
 const app = express()
 
 // Application-Level API
+app.use(helmet())
 app.use(cors(config.get('cors')))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
