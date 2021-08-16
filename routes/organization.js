@@ -354,7 +354,7 @@ router.getAsync('/:id/users',
  * /{id}/users:
  *   post:
  *     description: Invite user to organization
- *     tags: [User]
+ *     tags: [Organization]
  *     security:
  *       - cookieAuth: []
  *     parameters:
