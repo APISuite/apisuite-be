@@ -43,7 +43,7 @@ const uploadMedia = async (req, res) => {
   const storageClient = Storage.getStorageClient()
   const savePromises = files.map((f) => {
     const extension = f.name.split('.').pop()
-    return storageClient.saveFile(f.path, `app-media-${req.params.id}-${uuidv4()}.${extension}`)
+    return storageClient.saveFile(f.path, `app-media-${req.params.appId}-${uuidv4()}.${extension}`)
   })
   const saveResults = await Promise.all(savePromises)
 
