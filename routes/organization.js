@@ -46,7 +46,8 @@ router.getAsync('/publishers',
  *     parameters:
  *       - name: id
  *         description: Publisher id
- *         in: query
+ *         required: true
+ *         in: path
  *         schema:
  *           type: number
  *     responses:

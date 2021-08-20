@@ -62,7 +62,6 @@
  *           oneOf:
  *             - $ref: '#/components/schemas/Internal'
  *             - $ref: '#/components/schemas/Keycloak'
- *             - $ref: '#/components/schemas/KeycloakPreConfigured'
  *           discriminator:
  *             propertyName: provider
  *
