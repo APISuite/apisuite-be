@@ -352,7 +352,7 @@ router.getAsync('/:id/users',
 
 /**
  * @openapi
- * /{id}/users:
+ * /organizations/{id}/users:
  *   post:
  *     description: Invite user to organization
  *     tags: [Organization]
