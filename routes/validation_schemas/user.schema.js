@@ -78,6 +78,13 @@ const newAPITokenSchema = Joi.object({
   name: Joi.string().required(),
 })
 
+const newSSOUserSchema = Joi.object({
+  name: Joi.string().required(),
+  email: Joi.string().email().required(),
+  oidcProvider: Joi.string().valid('keycloak').required(),
+  oidcId: Joi.string().required(),
+})
+
 module.exports = {
   userSchema,
   validatePassword,
@@ -86,4 +93,5 @@ module.exports = {
   validateChangePasswordBody: validator(userChangePasswordSchema, 'body', changePasswordBodyExtraValidator),
   validateSetupBody: validator(userSetupSchema),
   validateNewAPITokenBody: validator(newAPITokenSchema),
+  validateNewSSOUserSchema: validator(newSSOUserSchema),
 }

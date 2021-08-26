@@ -2,11 +2,14 @@ const sinon = require('sinon')
 const HTTPStatus = require('http-status-codes')
 const { mockRequest, mockResponse } = require('mock-req-res')
 const { models, sequelize } = require('../models')
+const helpers = require('../util/test-helpers')
+const msgBroker = require('../services/msg-broker')
 const User = models.User
 const UserOrganization = models.UserOrganization
 const {
   setActiveOrganization,
   updateUserProfile,
+  createSSOUser,
 } = require('./user')
 
 describe('User', () => {
@@ -161,6 +164,81 @@ describe('User', () => {
       sinon.assert.called(res.sendInternalError)
       sinon.assert.notCalled(fakeTxn.commit)
       sinon.assert.calledOnce(fakeTxn.rollback)
+    })
+  })
+
+  describe('createSSOUser', () => {
+    let stubs = {}
+
+    beforeEach(() => {
+      stubs = {
+        user_findByLogin: sinon.stub(User, 'findByLogin'),
+        user_findByOIDC: sinon.stub(User, 'findByOIDC'),
+        user_create: sinon.stub(User, 'create'),
+        publishEvent: sinon.stub(msgBroker, 'publishEvent').resolves(),
+      }
+    })
+
+    afterEach(() => {
+      sinon.restore()
+    })
+
+    const mockReq = {
+      body: {
+        name: 'john',
+        email: 'email@bla.com',
+        oidcId: 'as8d765fa8d',
+        oidcProvider: 'keycloak',
+      },
+    }
+
+    it('should return 403 when user is not admin', async () => {
+      const req = mockRequest(mockReq)
+      const res = mockResponse({
+        locals: { isAdmin: false },
+      })
+
+      await createSSOUser(req, res)
+      sinon.assert.calledWith(res.status, HTTPStatus.FORBIDDEN)
+      helpers.calledWithErrors(res.send)
+    })
+
+    it('should return 409 when the email already exists', async () => {
+      const req = mockRequest(mockReq)
+      const res = mockResponse({
+        locals: { isAdmin: true },
+      })
+      stubs.user_findByLogin.resolves({})
+
+      await createSSOUser(req, res)
+      sinon.assert.calledWith(res.status, HTTPStatus.CONFLICT)
+      helpers.calledWithErrors(res.send)
+    })
+
+    it('should return 409 when the oidc ID already exists', async () => {
+      const req = mockRequest(mockReq)
+      const res = mockResponse({
+        locals: { isAdmin: true },
+      })
+      stubs.user_findByLogin.resolves(null)
+      stubs.user_findByOIDC.resolves({})
+
+      await createSSOUser(req, res)
+      sinon.assert.calledWith(res.status, HTTPStatus.CONFLICT)
+      helpers.calledWithErrors(res.send)
+    })
+
+    it('should return 201 and the created user', async () => {
+      const req = mockRequest(mockReq)
+      const res = mockResponse({
+        locals: { isAdmin: true },
+      })
+      stubs.user_findByLogin.resolves(null)
+      stubs.user_findByOIDC.resolves(null)
+      stubs.user_create.resolves(mockReq.body)
+
+      await createSSOUser(req, res)
+      sinon.assert.calledWith(res.status, HTTPStatus.CREATED)
     })
   })
 })

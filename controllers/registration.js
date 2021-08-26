@@ -5,6 +5,7 @@ const emailService = require('../services/email')
 const { models, sequelize } = require('../models')
 const { roles } = require('../util/enums')
 const config = require('../config')
+const { publishEvent, routingKeys } = require('../services/msg-broker')
 
 const isRegistrationValid = (createdAt) => {
   return new Date(createdAt).getTime() + config.get('registrationTTL') * 60 * 1000 >= Date.now()
@@ -160,6 +161,10 @@ const completeRegistration = async (req, res) => {
       invite.status = 'accepted'
       await invite.save()
     }
+
+    publishEvent(routingKeys.USER_CREATED, {
+      user_id: user.id,
+    })
 
     return res.status(HTTPStatus.CREATED).send({ message: 'User registered. Pending confirmation.' })
   } catch (error) {

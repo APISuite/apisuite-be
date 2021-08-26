@@ -407,6 +407,35 @@ const deleteAvatar = async (req, res) => {
   return res.sendStatus(HTTPStatus.NO_CONTENT)
 }
 
+const createSSOUser = async (req, res) => {
+  if (!res.locals.isAdmin) {
+    return res.status(HTTPStatus.FORBIDDEN).send({ errors: ['You are not allowed to perform this action.'] })
+  }
+
+  const emailCheck = await models.User.findByLogin(req.body.email.toLowerCase())
+  if (emailCheck) {
+    return res.status(HTTPStatus.CONFLICT).send({ errors: ['email already in use'] })
+  }
+
+  const oidcCheck = await models.User.findByOIDC(req.body.oidcId, req.body.oidcProvider, null)
+  if (oidcCheck) {
+    return res.status(HTTPStatus.CONFLICT).send({ errors: ['oidc ID already in use'] })
+  }
+
+  const user = await models.User.create({
+    name: req.body.name,
+    email: req.body.email.toLowerCase(),
+    oidcId: req.body.oidcId,
+    oidcProvider: req.body.oidcProvider,
+  })
+
+  publishEvent(routingKeys.USER_CREATED, {
+    user_id: user.id,
+  })
+
+  return res.status(HTTPStatus.CREATED).send(user)
+}
+
 module.exports = {
   getById,
   deleteUser,
@@ -418,5 +447,6 @@ module.exports = {
   updateUserProfile,
   updateAvatar,
   deleteAvatar,
+  createSSOUser,
   ...apiTokensControllers,
 }

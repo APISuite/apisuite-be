@@ -10,6 +10,7 @@ const jwt = require('../services/jwt')
 const Idp = require('../services/idp')
 const { settingTypes } = require('../util/enums')
 const config = require('../config')
+const { publishEvent, routingKeys } = require('../services/msg-broker')
 const { getRevokedCookieConfig } = require('../util/cookies')
 const { oidcDiscovery } = require('../util/oidc')
 const { getUserProfile } = require('./user-helper')
@@ -216,6 +217,7 @@ const oidcAuth = async (req, res) => {
 }
 
 const oidcToken = async (req, res) => {
+  let userCreated = false
   const settings = await models.Setting.findOne({
     where: { type: settingTypes.IDP },
   })
@@ -259,6 +261,7 @@ const oidcToken = async (req, res) => {
         oidcProvider: idp.getProvider(),
         oidcId: verified.sub,
       })
+      userCreated = true
     }
 
     user.name = verified.name || verified.email
@@ -286,6 +289,12 @@ const oidcToken = async (req, res) => {
     }, { transaction })
 
     await transaction.commit()
+
+    if (userCreated) {
+      publishEvent(routingKeys.USER_CREATED, {
+        user_id: user.id,
+      })
+    }
 
     const profile = await getUserProfile(user.id)
     const cookieConfigs = getCookieConfigs()

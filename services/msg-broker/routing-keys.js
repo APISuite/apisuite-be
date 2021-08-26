@@ -17,6 +17,7 @@ const keys = {
   ORG_USER_INVITED: 'api.organization.userInvited',
   ORG_ACTIVITY: 'api.organization.activity',
   SETTINGS_UPDATED: 'account.settings.updated',
+  USER_CREATED: 'api.user.created',
   USER_PASSWORD: 'api.user.password',
   USER_DELETED: 'api.user.deleted',
 }

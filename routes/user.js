@@ -9,6 +9,7 @@ const apiTokensRouter = require('./user.api-tokens')
 const {
   validateProfileUpdateBody,
   validateChangePasswordBody,
+  validateNewSSOUserSchema,
 } = require('./validation_schemas/user.schema')
 
 router.use('/api-tokens', apiTokensRouter)
@@ -483,5 +484,52 @@ router.postAsync('/:id/avatar',
 router.deleteAsync('/:id/avatar',
   loggedIn,
   controllers.user.deleteAvatar)
+
+/**
+ * @openapi
+ * /users:
+ *   post:
+ *     summary: Create SSO user
+ *     description: Usable by admins only. Used to directly create an OIDC user without interaction form this user.
+ *     tags: [User]
+ *     requestBody:
+ *       description: New SSO user
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *               - email
+ *               - oidcId
+ *               - oidcProvider
+ *             properties:
+ *               name:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *                 format: email
+ *             oidcId:
+ *               type: string
+ *             oidcProvider:
+ *               type: string
+ *               enum:
+ *                 - keycloak
+ *     responses:
+ *       201:
+ *         description: Created user
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ *       500:
+ *         $ref: '#/components/responses/Internal'
+ */
+router.postAsync('/',
+  validateNewSSOUserSchema,
+  controllers.user.createSSOUser)
 
 module.exports = router

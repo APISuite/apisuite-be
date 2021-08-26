@@ -4,6 +4,7 @@ const log = require('../util/logger')
 const { Op } = require('sequelize')
 const { v4: uuidv4 } = require('uuid')
 const emailService = require('../services/email')
+const { publishEvent, routingKeys } = require('../services/msg-broker')
 
 const get = async (req, res) => {
   const invite = await models.InviteOrganization.findOne({
@@ -132,6 +133,10 @@ const signup = async (req, res) => {
     await transaction.commit()
 
     res.sendStatus(HTTPStatus.NO_CONTENT)
+
+    publishEvent(routingKeys.USER_CREATED, {
+      user_id: user.id,
+    })
 
     const ownerOrg = await models.Organization.getOwnerOrganization()
     await emailService.sendRegisterConfirmation({
