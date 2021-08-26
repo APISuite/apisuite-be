@@ -510,12 +510,12 @@ router.deleteAsync('/:id/avatar',
  *               email:
  *                 type: string
  *                 format: email
- *             oidcId:
- *               type: string
- *             oidcProvider:
- *               type: string
- *               enum:
- *                 - keycloak
+ *               oidcId:
+ *                 type: string
+ *               oidcProvider:
+ *                 type: string
+ *                 enum:
+ *                   - keycloak
  *     responses:
  *       201:
  *         description: Created user
