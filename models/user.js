@@ -33,7 +33,7 @@ const user = (sequelize, DataTypes) => {
     },
     last_login: {
       type: DataTypes.DATE,
-      allowNull: false,
+      allowNull: true,
     },
     role_id: {
       type: DataTypes.INTEGER,
