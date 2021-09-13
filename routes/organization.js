@@ -401,6 +401,42 @@ router.postAsync('/:id/users',
 
 /**
  * @openapi
+ * /organizations/{id}/users/{userId}:
+ *   delete:
+ *     summary: Remove user from organization
+ *     description: Removes a user from an organization. Usable by organization owners on the target organization OR
+ *        by lower level roles if they belong to the target organization and if are self removing from it.
+ *        Organization owners (and admins) can’t remove themselves from organizations if they are the last user there (delete the organization instead).
+ *     tags: [Organization]
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - name: id
+ *         description: The organization id.
+ *         required: true
+ *         in: path
+ *         schema:
+ *           type: string
+ *       - name: userId
+ *         description: User ID
+ *         required: true
+ *         in: path
+ *         schema:
+ *           type: string
+ *     responses:
+ *       204:
+ *         description: No content
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ */
+router.deleteAsync('/:id/users/:userId',
+  loggedIn,
+  controllers.organization.removeUserFromOrganization)
+
+/**
+ * @openapi
  * /organizations/{id}/invites:
  *   get:
  *     description: Get list of organization's pending user invites

@@ -1,4 +1,5 @@
 const HTTPStatus = require('http-status-codes')
+const { Op } = require('sequelize')
 const { v4: uuidv4 } = require('uuid')
 const log = require('../util/logger')
 const { models, sequelize } = require('../models')
@@ -273,6 +274,62 @@ const getPublisher = async (req, res) => {
   return res.status(HTTPStatus.OK).json(publisher)
 }
 
+const removeUserFromOrganization = async (req, res) => {
+  const transaction = await sequelize.transaction()
+  try {
+    const orgId = Number(req.params.id)
+    const userId = Number(req.params.userId)
+
+    const userOrg = req.user.organizations.find((o) => o.id === orgId)
+    if (!userOrg || (userOrg.role.name === roles.DEVELOPER && userId !== req.user.id)) {
+      await transaction.rollback()
+      return res.status(HTTPStatus.FORBIDDEN).send({ errors: ['Not allowed'] })
+    }
+
+    if (userOrg.role.name === roles.DEVELOPER) {
+      await models.UserOrganization.destroy({
+        where: {
+          user_id: userId,
+          org_id: orgId,
+        },
+      }, { transaction })
+
+      await transaction.commit()
+      return res.sendStatus(HTTPStatus.NO_CONTENT)
+    }
+
+    // if admin or org owner and removing itself
+    if (userId === req.user.id) {
+      const orgUserCount = await models.UserOrganization.count({
+        where: {
+          user_id: {
+            [Op.ne]: userId,
+          },
+          org_id: orgId,
+        },
+      }, { transaction })
+
+      if (orgUserCount > 1) {
+        await transaction.rollback()
+        return res.status(HTTPStatus.FORBIDDEN).send({ errors: ['Not allowed'] })
+      }
+    }
+
+    await models.UserOrganization.destroy({
+      where: {
+        user_id: userId,
+        org_id: orgId,
+      },
+    }, { transaction })
+
+    await transaction.commit()
+    return res.sendStatus(HTTPStatus.NO_CONTENT)
+  } catch (error) {
+    if (transaction) await transaction.rollback()
+    return Promise.reject(error)
+  }
+}
+
 module.exports = {
   getAll,
   getById,
@@ -284,4 +341,5 @@ module.exports = {
   getPendingInvites,
   listPublishers,
   getPublisher,
+  removeUserFromOrganization,
 }
