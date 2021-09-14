@@ -292,7 +292,7 @@ const removeUserFromOrganization = async (req, res) => {
           user_id: userId,
           org_id: orgId,
         },
-      }, { transaction })
+      }, transaction)
 
       await transaction.commit()
       return res.sendStatus(HTTPStatus.NO_CONTENT)
@@ -320,7 +320,7 @@ const removeUserFromOrganization = async (req, res) => {
         user_id: userId,
         org_id: orgId,
       },
-    }, { transaction })
+    }, transaction)
 
     await transaction.commit()
     return res.sendStatus(HTTPStatus.NO_CONTENT)
