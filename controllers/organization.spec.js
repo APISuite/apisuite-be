@@ -23,6 +23,8 @@ describe('Organization', () => {
 
     beforeEach(() => {
       stubs = {
+        userOrganization_findAll: sinon.stub(UserOrganization, 'findAll'),
+        userOrganization_update: sinon.stub(UserOrganization, 'update').resolves(),
         userOrganization_destroy: sinon.stub(UserOrganization, 'destroy'),
         userOrganization_count: sinon.stub(UserOrganization, 'count'),
         transaction: sinon.stub(sequelize, 'transaction').resolves(fakeTxn),
@@ -36,6 +38,7 @@ describe('Organization', () => {
 
     it('should return 204 when an org owner removes a user', async () => {
       stubs.userOrganization_destroy.resolves()
+      stubs.userOrganization_findAll.resolves([{ org_id: 1 }])
       const mockReq = {
         params: {
           id: 1,
@@ -57,6 +60,7 @@ describe('Organization', () => {
 
     it('should return 204 when an admin/orgOwner removes itself', async () => {
       stubs.userOrganization_count.resolves(1)
+      stubs.userOrganization_findAll.resolves([{ org_id: 1 }])
       stubs.userOrganization_destroy.resolves()
       const mockReq = {
         params: {
@@ -78,6 +82,7 @@ describe('Organization', () => {
     })
 
     it('should return 204 when a developer removes itself', async () => {
+      stubs.userOrganization_findAll.resolves([{ org_id: 1 }])
       stubs.userOrganization_destroy.resolves()
       const mockReq = {
         params: {

@@ -286,20 +286,8 @@ const removeUserFromOrganization = async (req, res) => {
       return res.status(HTTPStatus.FORBIDDEN).send({ errors: ['Not allowed'] })
     }
 
-    if (userOrg.role.name === roles.DEVELOPER) {
-      await models.UserOrganization.destroy({
-        where: {
-          user_id: userId,
-          org_id: orgId,
-        },
-      }, transaction)
-
-      await transaction.commit()
-      return res.sendStatus(HTTPStatus.NO_CONTENT)
-    }
-
     // if admin or org owner and removing itself
-    if (userId === req.user.id) {
+    if (userOrg.role.name !== roles.DEVELOPER && userId === req.user.id) {
       const orgUserCount = await models.UserOrganization.count({
         where: {
           user_id: {
@@ -315,12 +303,35 @@ const removeUserFromOrganization = async (req, res) => {
       }
     }
 
+    const userOrgs = await models.UserOrganization.findAll({
+      where: { user_id: userId },
+      raw: true,
+    }, transaction)
+
     await models.UserOrganization.destroy({
       where: {
         user_id: userId,
         org_id: orgId,
       },
     }, transaction)
+
+    const deletedOrg = userOrgs.find((o) => o.org_id === orgId)
+    if (deletedOrg.current_org) {
+      const nextCurrentOrg = userOrgs.find((o) => o.org_id !== orgId)
+
+      if (nextCurrentOrg) {
+        await models.UserOrganization.update(
+          { current_org: true },
+          {
+            where: {
+              user_id: userId,
+              org_id: nextCurrentOrg.org_id,
+            },
+            transaction,
+          },
+        )
+      }
+    }
 
     await transaction.commit()
     return res.sendStatus(HTTPStatus.NO_CONTENT)
