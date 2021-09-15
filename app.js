@@ -59,10 +59,12 @@ app.use('/owner', routes.owner)
 app.use('/registration', routes.registration)
 app.use('/role', routes.role)
 app.use('/roles', routes.role)
+
 app.use('/settings', routes.settings)
 app.use('/translations', routes.translations)
 app.use('/users', routes.user)
 app.use('/pages', routes.page)
+
 
 app.use(middleware.error)
 
