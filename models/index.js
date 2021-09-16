@@ -38,7 +38,7 @@ const models = {
   User: importModel('./user'),
   UserOrganization: importModel('./user_organization'),
   UserRegistration: importModel('./user_registration'),
-  SettingsStoreFronts: importModel('./settings.storefronts'),
+  SettingsStoreFronts: importModel('./settings_storefronts'),
 }
 
 Object.keys(models).forEach(key => {

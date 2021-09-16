@@ -1,5 +1,5 @@
 
-const settingsStoreFronts = (sequelize, DataTypes) => {
+const settingsStorefronts = (sequelize, DataTypes) => {
   const SettingsStoreFronts = sequelize.define('settings_storefronts', {
     name: {
       type: DataTypes.STRING,
@@ -24,5 +24,4 @@ const settingsStoreFronts = (sequelize, DataTypes) => {
   })
   return SettingsStoreFronts
 }
-
-module.exports = settingsStoreFronts
+module.exports = settingsStorefronts

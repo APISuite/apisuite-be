@@ -4,25 +4,26 @@ const controllers = require('../controllers')
 
 /**
  * @openapi
- * /settings/storefronts/:
+ * /settings/storefronts/{name}:
  *   get:
- *     description: Get the name of the StoreFronts
+ *     description: Get StoreFronts settings
  *     tags: [Settings]
  *     parameters:
- *       - name: include
- *         description: Settings components to include in the response
- *         in: query
+ *       - name: name
+ *         description: The StoreFronts name.
+ *         in: path
+ *         required: true
  *         schema:
  *           type: string
- *           items:
- *             type: string
  *     responses:
  *       200:
- *         description: Object with all configured StoreFronts settings
+ *         description: StoreFronts settings
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Settings/StoreFronts'
+ *               type: object
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
  */
 router.getAsync('/:name',
   controllers.settingsStorefronts.get)
