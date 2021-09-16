@@ -12,7 +12,6 @@ const get = async (req, res) => {
 }
 
 const put = async (req, res) => {
-  console.log(req.body)
   if (!req.body.name || !req.body.payload) {
     return res.status(HTTPStatus.BAD_REQUEST).send({ errors: ['name and payload fields not exist. Are mandatory fields.'] })
   }
@@ -56,7 +55,7 @@ const put = async (req, res) => {
       },
     )
     if (insert) {
-      return res.status(HTTPStatus.OK).send({ errors: ['Settings Inserted'] })
+      return res.status(HTTPStatus.CREATED).send({ errors: ['Settings Inserted'] })
     }
   } catch (error) {
     if (dbOperationInsert) await dbOperationInsert.rollback()
