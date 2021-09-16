@@ -10,6 +10,9 @@ const {
   validatePortalSettingsBody,
 } = require('./validation_schemas/settings.schema')
 
+const settingsStorefronts = require('./settings.storefronts')
+
+router.use('/storefronts', settingsStorefronts)
 /**
  * @openapi
  * /settings:
