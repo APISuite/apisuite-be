@@ -28,4 +28,34 @@ const controllers = require('../controllers')
 router.getAsync('/:name',
   controllers.settingsStorefronts.get)
 
+/**
+* @openapi
+* /settings/storefronts/:
+*   put:
+*     description: Insert or Update StoreFronts settings
+*     tags: [Settings]
+*     requestBody:
+*       description: StoreFronts settings.
+*       required: true
+*       content:
+*         application/json:
+*           schema:
+*             type: object
+*             properties:
+*               name:
+*                 type: string
+*               payload:
+*                  type: object
+*     responses:
+*       200:
+*         description: StoreFronts settings
+*         content:
+*           application/json:
+*             schema:
+*               type: object
+*       500:
+*         $ref: '#/components/responses/Internal'
+*/
+router.putAsync('/',
+  controllers.settingsStorefronts.put)
 module.exports = router
