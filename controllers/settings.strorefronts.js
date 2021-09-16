@@ -4,23 +4,15 @@ const log = require('../util/logger')
 
 
 const get = async (req, res) => {
-  try {
-    let store = req.url.replace(/^\/+/, '')
 
     const settings = await models.SettingsStoreFronts.findOne({
-      where: { store: store },
+      where: { name: req.params.name },
     })
 
-    if (settings) {
+    if (settings)
       return res.status(HTTPStatus.OK).send(settings.dataValues.values)
-    } else {
-      return res.status(HTTPStatus.NOT_FOUND).send({errors: ['Store does not exist.']})
-    }
 
-  } catch (error) {
-    log.error(error, '[SETTINGS get]')
-    return res.sendInternalError()
-  }
+      return res.status(HTTPStatus.NOT_FOUND).send({errors: ['Store does not exist.']})
 }
 
 module.exports = {

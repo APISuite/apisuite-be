@@ -11,7 +11,7 @@ const invites = require('./invites')
 const owner = require('./owner')
 const page = require('./page')
 const translations = require('./translations')
-const settingsStorefronts = require('./settings_strorefronts')
+const settingsStorefronts = require('./settings.strorefronts')
 
 module.exports = {
   api,

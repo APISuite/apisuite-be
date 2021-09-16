@@ -1,19 +1,20 @@
 
 const settingsStoreFronts = (sequelize, DataTypes) => {
     const SettingsStoreFronts = sequelize.define('settings_storefronts', {
-        store: {
+        name: {
             type: DataTypes.STRING,
-            references: {
-                model: 'store',
-                key: 'store',
-            },
+            primaryKey: true,
         },
         values: {
             type: DataTypes.JSON,
-            references: {
-                model: 'values',
-                key: 'store',
-            },
+        },
+        created_at: {
+            type: DataTypes.DATE,
+            allowNull: false,
+        },
+        updated_at: {
+            type: DataTypes.DATE,
+            allowNull: false,
         },
     }, {
         timestamps: true,
@@ -21,13 +22,6 @@ const settingsStoreFronts = (sequelize, DataTypes) => {
         freezeTableName: true,
     })
 
-    SettingsStoreFronts.findStore = async (store) => {
-        return UserOrganization.findOne({
-            where: {
-                store: store,
-            },
-        })
-    }
     return SettingsStoreFronts
 }
 
