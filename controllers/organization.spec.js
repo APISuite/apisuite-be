@@ -146,7 +146,7 @@ describe('Organization', () => {
     })
 
     it('should return 403 when the user is an admin/orgOwner removing itself but is the last admin/orgOwner', async () => {
-      stubs.userOrganization_count.resolves(1)
+      stubs.userOrganization_count.resolves(0)
       stubs.userOrganization_destroy.resolves()
       const mockReq = {
         params: {
