@@ -406,7 +406,7 @@ router.postAsync('/:id/users',
  *     summary: Remove user from organization
  *     description: Removes a user from an organization. Usable by organization owners on the target organization OR
  *        by lower level roles if they belong to the target organization and if are self removing from it.
- *        Organization owners (and admins) can’t remove themselves from organizations if they are the last user there (delete the organization instead).
+ *        Organization owners (and admins) can’t remove themselves from organizations if they are the last owner/admin there (delete the organization instead).
  *     tags: [Organization]
  *     security:
  *       - cookieAuth: []
