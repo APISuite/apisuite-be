@@ -294,10 +294,11 @@ const removeUserFromOrganization = async (req, res) => {
             [Op.ne]: userId,
           },
           org_id: orgId,
+          role_id: userOrg.role.id,
         },
       }, { transaction })
 
-      if (orgUserCount > 1) {
+      if (orgUserCount === 0) {
         await transaction.rollback()
         return res.status(HTTPStatus.FORBIDDEN).send({ errors: ['Not allowed'] })
       }

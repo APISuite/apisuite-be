@@ -59,7 +59,7 @@ describe('Organization', () => {
     })
 
     it('should return 204 when an admin/orgOwner removes itself', async () => {
-      stubs.userOrganization_count.resolves(1)
+      stubs.userOrganization_count.resolves(5)
       stubs.userOrganization_findAll.resolves([{ org_id: 1 }])
       stubs.userOrganization_destroy.resolves()
       const mockReq = {
@@ -69,7 +69,7 @@ describe('Organization', () => {
         },
         user: {
           id: 666,
-          organizations: [{ id: 1, role: { name: roles.ADMIN } }],
+          organizations: [{ id: 1, role: { id: 200, name: roles.ADMIN } }],
         },
       }
       const req = mockRequest(mockReq)
@@ -145,8 +145,8 @@ describe('Organization', () => {
       sinon.assert.notCalled(fakeTxn.commit)
     })
 
-    it('should return 403 when the user is an admin/orgOwner removing itself but not the last user', async () => {
-      stubs.userOrganization_count.resolves(10)
+    it('should return 403 when the user is an admin/orgOwner removing itself but is the last admin/orgOwner', async () => {
+      stubs.userOrganization_count.resolves(0)
       stubs.userOrganization_destroy.resolves()
       const mockReq = {
         params: {
