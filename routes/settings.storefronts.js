@@ -1,6 +1,14 @@
 const { decorateRouter } = require('@awaitjs/express')
 const router = decorateRouter(require('express').Router())
 const controllers = require('../controllers')
+const { loggedIn,
+  accessControl
+} = require('../middleware')
+const {
+  actions,
+  possessions,
+  resources
+} = require('../util/enums')
 
 /**
  * @openapi
@@ -30,7 +38,7 @@ router.getAsync('/:name',
 
 /**
 * @openapi
-* /settings/storefronts/:name:
+* /settings/storefronts/{name}:
 *   put:
 *     description: Insert or Update StoreFronts settings
 *     tags: [Settings]
@@ -48,11 +56,6 @@ router.getAsync('/:name',
 *         application/json:
 *           schema:
 *             type: object
-*             properties:
-*               name:
-*                 type: string
-*               payload:
-*                  type: object
 *     responses:
 *       200:
 *         description: StoreFronts settings
@@ -64,5 +67,7 @@ router.getAsync('/:name',
 *         $ref: '#/components/responses/Internal'
 */
 router.putAsync('/:name',
+  loggedIn,
+  accessControl(actions.UPDATE, possessions.ANY, resources.SETTINGS),
   controllers.settingsStorefronts.put)
 module.exports = router
