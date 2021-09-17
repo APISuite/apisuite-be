@@ -7,6 +7,7 @@ const SettingsStoreFronts = models.SettingsStoreFronts
 
 const {
   get,
+  put,
 } = require('./settings.strorefronts')
 
 describe('Settings StoreFronts', () => {
@@ -49,6 +50,50 @@ describe('Settings StoreFronts', () => {
       await get(req, res)
       sinon.assert.calledWith(res.status, HTTPStatus.NOT_FOUND)
       helpers.calledWithErrors(res.send)
+    })
+  })
+  describe('put', () => {
+    let stubs = {}
+    beforeEach(() => {
+      stubs = {
+        create: sinon.stub(SettingsStoreFronts, 'create'),
+      }
+    })
+    afterEach(() => {
+      sinon.restore()
+    })
+    const mockReqUpdate = {
+      params: {
+        name: 'batatas',
+      },
+      body: {
+        provider: 'internal',
+        configuration: { clientsURL: 'http://apisuite-hydra-server:4445/clients6' },
+      },
+    }
+    const mockReqInsert = {
+      params: {
+        name: 'batatas1',
+      },
+      body: {
+        provider: 'internal',
+        configuration: { clientsURL: 'http://apisuite-hydra-server:4445/clients6' },
+      },
+    }
+    it('should return 200 Update', async () => {
+      const req = mockRequest(mockReqUpdate)
+      const res = mockResponse()
+      stubs.create.resolves(mockReqUpdate)
+      await put(req, res)
+      sinon.assert.calledWith(res.status, HTTPStatus.OK)
+    })
+
+    it('should return 200 Insert', async () => {
+      const req = mockRequest(mockReqInsert)
+      const res = mockResponse()
+      stubs.create.resolves(mockReqInsert)
+      await put(req, res)
+      sinon.assert.calledWith(res.status, HTTPStatus.OK)
     })
   })
 })
