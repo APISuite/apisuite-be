@@ -12,55 +12,44 @@ const get = async (req, res) => {
 }
 
 const put = async (req, res) => {
-  if (!req.body.name || !req.body.payload) {
-    return res.status(HTTPStatus.BAD_REQUEST).send({ errors: ['name and payload fields not exist. Are mandatory fields.'] })
-  }
-  const settings = await models.SettingsStoreFronts.findOne({ where: { name: req.body.name } })
-  if (settings) {
-    const dbOperationUpdate = await sequelize.transaction()
-    try {
-      const [rowsUpdated, [updated]] = await models.SettingsStoreFronts.update(
+  const settings = await models.SettingsStoreFronts.findOne({ where: { name: req.params.name } })
+  const transaction = await sequelize.transaction()
+  try {
+    if (!settings) {
+      const insert = await models.SettingsStoreFronts.create(
         {
-          values: req.body.payload,
+          name: req.params.name,
+          values: req.body,
         },
         {
-          where: { name: req.body.name },
+          where: { name: req.params.name },
           returning: true,
         },
       )
-      if (!rowsUpdated) {
-        await dbOperationUpdate.rollback()
-        return res.status(HTTPStatus.BAD_GATEWAY).send({ errors: ['Failed to Update Settings'] })
+      if (!insert) {
+        await transaction.rollback()
+        return res.status(HTTPStatus.INTERNAL_SERVER_ERROR).send({ errors: ['Failed to Insert Settings'] })
       }
-      if (updated) {
-        return res.status(HTTPStatus.OK).send({ errors: ['Settings Updated'] })
-      }
-    } catch (error) {
-      if (dbOperationUpdate) await dbOperationUpdate.rollback()
-      log.error(error, '[UPDATE STOREFRONTS SETTINGS]')
-      return res.status(HTTPStatus.BAD_GATEWAY).send({ errors: ['Failed to Update Settings'] })
+      return res.status(HTTPStatus.CREATED).send({ success: ['Settings Inserted'] })
     }
-  }
-
-  const dbOperationInsert = await sequelize.transaction()
-  try {
-    const insert = await models.SettingsStoreFronts.create(
+    const updated = await models.SettingsStoreFronts.update(
       {
-        name: req.body.name,
-        values: req.body.payload,
+        values: req.body,
       },
       {
-        where: { name: req.body.name },
+        where: { name: req.params.name },
         returning: true,
       },
     )
-    if (insert) {
-      return res.status(HTTPStatus.CREATED).send({ errors: ['Settings Inserted'] })
+    if (!updated) {
+      await transaction.rollback()
+      return res.status(HTTPStatus.INTERNAL_SERVER_ERROR).send({ errors: ['Failed to Update Settings'] })
     }
+    return res.status(HTTPStatus.OK).send({ success: ['Settings Updated'] })
   } catch (error) {
-    if (dbOperationInsert) await dbOperationInsert.rollback()
-    log.error(error, '[INSERT STOREFRONTS SETTINGS]')
-    return res.status(HTTPStatus.BAD_GATEWAY).send({ errors: ['Failed to Insert Settings'] })
+    if (transaction) await transaction.rollback()
+    log.error(error, '[UPDATE STOREFRONTS SETTINGS]')
+    return res.status(HTTPStatus.INTERNAL_SERVER_ERROR).send({ errors: ['Failed to Update Settings'] })
   }
 }
 

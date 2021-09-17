@@ -30,10 +30,17 @@ router.getAsync('/:name',
 
 /**
 * @openapi
-* /settings/storefronts/:
+* /settings/storefronts/:name:
 *   put:
 *     description: Insert or Update StoreFronts settings
 *     tags: [Settings]
+ *     parameters:
+ *       - name: name
+ *         description: The StoreFronts name.
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
 *     requestBody:
 *       description: StoreFronts settings.
 *       required: true
@@ -56,6 +63,6 @@ router.getAsync('/:name',
 *       500:
 *         $ref: '#/components/responses/Internal'
 */
-router.putAsync('/',
+router.putAsync('/:name',
   controllers.settingsStorefronts.put)
 module.exports = router
