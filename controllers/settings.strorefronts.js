@@ -29,7 +29,6 @@ const put = async (req, res) => {
         },
         {
           where: { name: req.params.name },
-          returning: true,
           transaction,
         },
       )
