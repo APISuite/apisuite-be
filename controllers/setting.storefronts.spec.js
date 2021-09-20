@@ -2,13 +2,16 @@ const sinon = require('sinon')
 const HTTPStatus = require('http-status-codes')
 const { mockRequest, mockResponse } = require('mock-req-res')
 const helpers = require('../util/test-helpers')
-const { models } = require('../models')
+const { models,
+  sequelize
+} = require('../models')
 const SettingsStoreFronts = models.SettingsStoreFronts
 
 const {
   get,
   put,
 } = require('./settings.strorefronts')
+const { stub } = require('sinon')
 
 describe('Settings StoreFronts', () => {
   describe('get', () => {
@@ -54,11 +57,24 @@ describe('Settings StoreFronts', () => {
   })
   describe('put', () => {
     let stubs = {}
+    const fakeTxn = {
+      commit: sinon.spy(async () => undefined),
+      rollback: sinon.spy(async () => undefined),
+      _reset: function () {
+        this.commit.resetHistory()
+        this.rollback.resetHistory()
+      },
+    }
+
     beforeEach(() => {
       stubs = {
+        findOne: sinon.stub(SettingsStoreFronts, 'findOne'),
         create: sinon.stub(SettingsStoreFronts, 'create'),
+        save: sinon.stub(SettingsStoreFronts, 'update'),
+        transaction: sinon.stub(sequelize, 'transaction').resolves(fakeTxn),
       }
     })
+
     afterEach(() => {
       sinon.restore()
     })

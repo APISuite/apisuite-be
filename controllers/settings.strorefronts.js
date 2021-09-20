@@ -28,7 +28,6 @@ const put = async (req, res) => {
           values: req.body,
         },
         {
-          where: { name: req.params.name },
           transaction,
         },
       )
