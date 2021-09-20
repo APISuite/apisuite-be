@@ -8,14 +8,6 @@ const settingsStorefronts = (sequelize, DataTypes) => {
     values: {
       type: DataTypes.JSON,
     },
-    created_at: {
-      type: DataTypes.DATE,
-      allowNull: false,
-    },
-    updated_at: {
-      type: DataTypes.DATE,
-      allowNull: false,
-    },
   },
   {
     timestamps: true,
