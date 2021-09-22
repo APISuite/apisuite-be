@@ -2,8 +2,9 @@ const sinon = require('sinon')
 const HTTPStatus = require('http-status-codes')
 const { mockRequest, mockResponse } = require('mock-req-res')
 const helpers = require('../util/test-helpers')
-const { models,
-  sequelize
+const {
+  models,
+  sequelize,
 } = require('../models')
 const SettingsStoreFronts = models.SettingsStoreFronts
 
@@ -11,7 +12,6 @@ const {
   get,
   put,
 } = require('./settings.strorefronts')
-const { stub } = require('sinon')
 
 describe('Settings StoreFronts', () => {
   describe('get', () => {

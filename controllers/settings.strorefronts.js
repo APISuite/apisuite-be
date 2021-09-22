@@ -12,7 +12,6 @@ const get = async (req, res) => {
 }
 
 const put = async (req, res) => {
-
   const transaction = await sequelize.transaction()
 
   try {
