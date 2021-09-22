@@ -37,7 +37,7 @@
  *         supportUrl:
  *           type: string
  *           format: uri
- *         tax_exempt:
+ *         taxExempt:
  *           type: boolean
  */
 

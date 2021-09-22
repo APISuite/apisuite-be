@@ -8,4 +8,8 @@ module.exports = {
       allowNull: false,
     })
   },
+
+  down: (queryInterface, Sequelize) => {
+    return queryInterface.removeColumn('organization', 'tax_exempt')
+  },
 }
