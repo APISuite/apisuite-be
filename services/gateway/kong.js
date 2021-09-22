@@ -44,7 +44,7 @@ class Kong extends Gateway {
 
   /**
    * Get the list of Kong services.
-   * @returns {Object} Object containing the request status code and the filtered services.
+   * @returns {Promise<Object>} Object containing the request status code and the filtered services.
    */
   async getServicesData () {
     const settings = this.config
@@ -78,7 +78,7 @@ class Kong extends Gateway {
    * Takes a list of Kong services, creates the respective APISuite core APIs and
    * configures the services in the gateway for subscription support.
    * @param {Object[]} services List of public apis in the gateway.
-   * @returns {String} Result message.
+   * @returns {Promise<String>} Result message.
    */
   async setupApisFromServices (services) {
     const apis = []
@@ -111,7 +111,7 @@ class Kong extends Gateway {
   /**
    * Configures a Kong service to support subscription in the form of ACL with api key.
    * @param {String} service The remote service name or id.
-   * @param {String|Number} subscription The subscription name tag that the app will subscribe to. If number, it will be converted to string.
+   * @param {Promise<String|Number>} subscription The subscription name tag that the app will subscribe to. If number, it will be converted to string.
    */
   async configureGatewaySubscription (service, subscription) {
     subscription = subscription.toString()
@@ -180,7 +180,7 @@ class Kong extends Gateway {
    * Check if the consumer exists and has the authentication setup in the gateway.
    * @param {String} consumerName The consumer name.
    * @param {String} clientId The app client id.
-   * @returns {Boolean} If the consumer exists and is configured properly.
+   * @returns {Promise<Boolean>} If the consumer exists and is configured properly.
    */
   async _consumerExists (consumerName, clientId) {
     const settings = this.config
@@ -282,7 +282,7 @@ class Kong extends Gateway {
    * Create a consumer subscription in the gateway.
    * @param {String} consumerName The consumer name.
    * @param {String|Number} subscription The subscription name/tag that the app will be able to subscribe to. If number, it will be converted to string.
-   * @returns {String} The subscription name in the gateway.
+   * @returns {Promise<String>} The subscription name in the gateway.
    * @throws {Error} If the request fails or the consumer is not properly created.
    */
   async _createConsumerSubscription (consumerName, subscription) {
@@ -345,7 +345,7 @@ class Kong extends Gateway {
   /**
    * Subscribes to all APIs by subscribing to the global subscription tag.
    * @param {String} consumerName The consumer name, can be the app name.
-   * @param {String} clientId The app client id.
+   * @param {Promise<String>} clientId The app client id.
    */
   async subscribeAll (consumerName, clientId) {
     return this.subscribeAPIs(consumerName, clientId, [this.globalSubscriptionTag])

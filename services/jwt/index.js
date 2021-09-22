@@ -84,7 +84,7 @@ const validateAccessToken = (token) => {
 /**
  * Generates set of access/refresh tokens for a user.
  * @param {string|number} userID - User ID to use as token subject
- * @returns {Tokens}
+ * @returns {Promise<Tokens>}
  * */
 const generateTokenSet = async (userID) => {
   return {
