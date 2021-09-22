@@ -1,6 +1,8 @@
 # APISuite Backend
 
 [![circleci](https://circleci.com/gh/APISuite/apisuite-be.svg?style=shield)](https://app.circleci.com/pipelines/github/APISuite/apisuite-be)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=APISuite_apisuite-be&metric=alert_status)](https://sonarcloud.io/dashboard?id=APISuite_apisuite-be)
+
 
 This is APISuite's core backend repository. Affectionately known as the Kraken.
 
