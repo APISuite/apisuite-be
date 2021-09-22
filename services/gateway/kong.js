@@ -26,7 +26,7 @@ class Kong extends Gateway {
    * @param {String} next URL to fetch the next services list.
    * @param {String} apiKey API key to authorize the request.
    * @param {Array<Object>} services Array with the current list of services.
-   * @returns {Array<Object>} The list of services filtered.
+   * @returns {Promise<Array<Object>>} The list of services filtered.
    */
   async _handleServicesNext (next, apiKey, services) {
     const response = await fetch(next, {
@@ -355,7 +355,7 @@ class Kong extends Gateway {
    * Get the subscription id in the gateway.
    * @param {String} consumerName The consumer name.
    * @param {String} subscriptionName The subscription/api name.
-   * @returns {String} The subscription id.
+   * @returns {Promise<String>} The subscription id.
    */
   async _getConsumerSubscriptionId (consumerName, subscriptionName) {
     const settings = this.config

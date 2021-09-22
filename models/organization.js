@@ -50,9 +50,9 @@ const organization = (sequelize, DataTypes) => {
     freezeTableName: true,
   })
 
-  Organization.afterCreate((organization, options) => {
+  Organization.afterCreate((org, options) => {
     publishEvent(routingKeys.ORG_CREATED, {
-      id: organization.id,
+      id: org.id,
     })
   })
 
