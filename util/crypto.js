@@ -7,19 +7,19 @@ const key = crypto.scryptSync(password, 'salt', 24)
 const iv = Buffer.alloc(16, 0)
 
 const cipher = (text) => {
-  const cipher = crypto.createCipheriv(algorithm, key, iv)
+  const c = crypto.createCipheriv(algorithm, key, iv)
 
-  let encrypted = cipher.update(text, 'utf8', 'hex')
-  encrypted += cipher.final('hex')
+  let encrypted = c.update(text, 'utf8', 'hex')
+  encrypted += c.final('hex')
 
   return encrypted
 }
 
 const decipher = (encrypted) => {
-  const decipher = crypto.createDecipheriv(algorithm, key, iv)
+  const d = crypto.createDecipheriv(algorithm, key, iv)
 
-  let decrypted = decipher.update(encrypted, 'hex', 'utf8')
-  decrypted += decipher.final('utf8')
+  let decrypted = d.update(encrypted, 'hex', 'utf8')
+  decrypted += d.final('utf8')
 
   return decrypted
 }

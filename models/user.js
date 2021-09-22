@@ -61,9 +61,9 @@ const user = (sequelize, DataTypes) => {
     User.hasMany(models.RefreshToken)
   }
 
-  const hashPassword = async function (user) {
-    if (user.changed('password')) {
-      user.password = await bcrypt.hash(user.password, 10)
+  const hashPassword = async function (userObj) {
+    if (userObj.changed('password')) {
+      userObj.password = await bcrypt.hash(userObj.password, 10)
     }
   }
 
