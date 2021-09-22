@@ -1,6 +1,6 @@
 
 const settingsStorefronts = (sequelize, DataTypes) => {
-  const SettingsStoreFronts = sequelize.define('settings_storefronts', {
+  return sequelize.define('settings_storefronts', {
     name: {
       type: DataTypes.STRING,
       primaryKey: true,
@@ -14,6 +14,5 @@ const settingsStorefronts = (sequelize, DataTypes) => {
     underscored: true,
     freezeTableName: true,
   })
-  return SettingsStoreFronts
 }
 module.exports = settingsStorefronts
