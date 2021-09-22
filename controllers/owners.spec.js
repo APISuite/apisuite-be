@@ -85,7 +85,7 @@ describe('setup', () => {
       findModel: sinon.stub(role, 'findOne').resolves('aaaa'),
       createInvite: sinon.stub(inviteOrganization, 'create').resolves(mockData),
       apiCreate: sinon.stub(api, 'create').resolves(apiReq),
-      apiVersionCreate: sinon.stub(apiVersion, 'create').resolves({ api: { id: '11111' } }),
+      apiVersionCreate: sinon.stub(apiVersion, 'create'),
       transaction: sinon.stub(sequelize, 'transaction').resolves(fakeTxn),
     }
   })
