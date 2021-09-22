@@ -44,6 +44,10 @@ const organization = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true,
     },
+    tax_exempt: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+    },
   }, {
     timestamps: true,
     underscored: true,
