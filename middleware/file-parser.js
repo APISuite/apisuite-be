@@ -6,6 +6,7 @@ module.exports = async (req, res, next) => {
   if (req.header('Content-Type').indexOf('multipart/form-data') === -1) return next()
 
   const form = formidable({
+    uploadDir: '/tmp',
     multiples: true,
     maxFileSize: config.get('maxFileSizeUpload'),
   })

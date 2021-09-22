@@ -4,10 +4,10 @@ const { resources, possessions, roles } = require('../util/enums')
 const { models } = require('../models')
 
 const fetchGrants = async () => {
-  const roles = await models.Role.findAll({ attributes: ['name', 'grants'], raw: true })
+  const allRoles = await models.Role.findAll({ attributes: ['name', 'grants'], raw: true })
 
   const grants = {}
-  for (const role of roles) {
+  for (const role of allRoles) {
     grants[role.name] = role.grants
   }
 

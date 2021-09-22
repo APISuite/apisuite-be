@@ -8,8 +8,8 @@ const msgBroker = require('../services/msg-broker')
 const { settingTypes, idpProviders } = require('../util/enums')
 const Gateway = require('../services/gateway')
 const Idp = require('../services/idp')
-const portalSettings = require('../util/portal-settings.json')
-const navigationSettings = require('../util/navigation-settings.json')
+const portalSettingsDefaults = require('../util/portal-settings.json')
+const navigationSettingsDefaults = require('../util/navigation-settings.json')
 
 const createDefaultAccountSettings = (txn) => {
   return models.Setting.create({
@@ -21,14 +21,14 @@ const createDefaultAccountSettings = (txn) => {
 const createDefaultPortalSettings = (txn) => {
   return models.Setting.create({
     type: settingTypes.PORTAL,
-    values: portalSettings,
+    values: portalSettingsDefaults,
   }, { transaction: txn })
 }
 
 const createDefaultNavigationSettings = (txn) => {
   return models.Setting.create({
     type: settingTypes.NAVIGATION,
-    values: navigationSettings,
+    values: navigationSettingsDefaults,
   }, { transaction: txn })
 }
 
@@ -391,7 +391,7 @@ const getPortalSettings = async (req, res) => {
   if (!settings) {
     settings = await models.Setting.create({
       type: settingTypes.PORTAL,
-      values: portalSettings,
+      values: portalSettingsDefaults,
     })
   }
 

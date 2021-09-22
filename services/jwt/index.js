@@ -27,7 +27,7 @@ const signAccessToken = (userID, data = {}) => {
 
 /**
  * Generates a refresh token composed of a randomly generated string
- * @returns {RefreshToken}
+ * @returns {Promise<RefreshToken>}
  * */
 const generateRefreshToken = async () => {
   return new Promise((resolve, reject) => {
@@ -84,7 +84,7 @@ const validateAccessToken = (token) => {
 /**
  * Generates set of access/refresh tokens for a user.
  * @param {string|number} userID - User ID to use as token subject
- * @returns {Tokens}
+ * @returns {Promise<Tokens>}
  * */
 const generateTokenSet = async (userID) => {
   return {

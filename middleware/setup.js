@@ -10,8 +10,7 @@ module.exports = async (req, res, next) => {
     return res.status(HTTPStatus.UNAUTHORIZED).send({ errors: ['Invalid token.'] })
   }
 
-  // eslint-disable-next-line no-unused-vars
-  const [_, rowsAffected] = await sequelize.query(`
+  const [, rowsAffected] = await sequelize.query(`
       UPDATE setup_token SET used = true
       WHERE token = ? AND used = false;
     `, { replacements: [token] })

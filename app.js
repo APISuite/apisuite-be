@@ -100,8 +100,7 @@ const bootstrapIdPSettings = async () => {
 
 const bootstrapSetupToken = async () => {
   if (config.get('setupToken')) {
-    // eslint-disable-next-line no-unused-vars
-    const [_, rowsAffected] = await sequelize.query(`
+    const [, rowsAffected] = await sequelize.query(`
       INSERT INTO setup_token (token)
       SELECT ?
       WHERE NOT EXISTS (SELECT * FROM setup_token);

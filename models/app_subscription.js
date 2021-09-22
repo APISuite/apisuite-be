@@ -1,4 +1,4 @@
-const AppSubscription = (sequelize, DataTypes) => {
+const model = (sequelize, DataTypes) => {
   const AppSubscription = sequelize.define('app_subscriptions', {
     app_id: {
       type: DataTypes.INTEGER,
@@ -31,4 +31,4 @@ const AppSubscription = (sequelize, DataTypes) => {
   return AppSubscription
 }
 
-module.exports = AppSubscription
+module.exports = model

@@ -4,7 +4,6 @@ const log = require('../util/logger')
 
 const get = async (req, res) => {
   const settings = await models.SettingsStoreFronts.findOne({ where: { name: req.params.name } })
-
   if (!settings) {
     return res.status(HTTPStatus.NOT_FOUND).send({ errors: ['Name does not exist.'] })
   }

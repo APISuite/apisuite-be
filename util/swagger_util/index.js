@@ -14,7 +14,7 @@ const checkIfOpenAPI = (swagger) => {
 /**
  * Validate the swagger object
  * @param {Object} swagger - The swagger object
- * @returns {Object} - The swagger with the errors found
+ * @returns {Promise<Object>} - The swagger with the errors found
  */
 const validateSwagger = async (swagger) => {
   const validation = {

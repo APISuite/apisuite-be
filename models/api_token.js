@@ -35,9 +35,9 @@ const apiToken = (sequelize, DataTypes) => {
     APIToken.belongsTo(models.User)
   }
 
-  const hashToken = async function (apiToken) {
-    if (apiToken.changed('token')) {
-      apiToken.token = await bcrypt.hash(apiToken.token, 10)
+  const hashToken = async function (apiTokenObj) {
+    if (apiTokenObj.changed('token')) {
+      apiTokenObj.token = await bcrypt.hash(apiTokenObj.token, 10)
     }
   }
 
