@@ -285,6 +285,7 @@ router.deleteAsync('/:orgId',
  * @openapi
  * /organizations/assign:
  *   post:
+ *     deprecated: true
  *     description: Add user to organization.
  *     tags: [Organization]
  *     requestBody:
@@ -434,6 +435,47 @@ router.postAsync('/:id/users',
 router.deleteAsync('/:id/users/:userId',
   loggedIn,
   controllers.organization.removeUserFromOrganization)
+
+/**
+ * @openapi
+ * /organizations/{id}/users/{userId}/roles/{roleId}:
+ *   put:
+ *     summary: Change user role
+ *     tags: [Organization]
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - name: id
+ *         description: The organization id.
+ *         required: true
+ *         in: path
+ *         schema:
+ *           type: string
+ *       - name: userId
+ *         description: User ID
+ *         required: true
+ *         in: path
+ *         schema:
+ *           type: string
+ *       - name: roleId
+ *         description: Role ID
+ *         required: true
+ *         in: path
+ *         schema:
+ *           type: string
+ *     responses:
+ *       204:
+ *         description: No content
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ */
+router.putAsync('/:id/users/:userId/roles/:roleId',
+  loggedIn,
+  controllers.organization.changeUserRole)
 
 /**
  * @openapi

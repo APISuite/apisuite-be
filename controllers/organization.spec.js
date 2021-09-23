@@ -5,8 +5,10 @@ const { models, sequelize } = require('../models')
 const { roles } = require('../util/enums')
 const helpers = require('../util/test-helpers')
 const UserOrganization = models.UserOrganization
+const Role = models.Role
 const {
   removeUserFromOrganization,
+  changeUserRole,
 } = require('./organization')
 
 describe('Organization', () => {
@@ -166,6 +168,129 @@ describe('Organization', () => {
       helpers.calledWithErrors(res.send)
       sinon.assert.calledOnce(fakeTxn.rollback)
       sinon.assert.notCalled(fakeTxn.commit)
+    })
+  })
+
+  describe('changeUserRole', () => {
+    let stubs = {}
+
+    beforeEach(() => {
+      stubs = {
+        role_findByPk: sinon.stub(Role, 'findByPk'),
+        userOrganization_update: sinon.stub(UserOrganization, 'update').resolves(),
+      }
+    })
+
+    afterEach(() => {
+      sinon.restore()
+    })
+
+    it('should return 204 when role update is successful', async () => {
+      stubs.role_findByPk.resolves({
+        id: 10,
+        level: 20,
+      })
+      const mockReq = {
+        params: {
+          id: 1,
+          userId: 666,
+          roleId: 10,
+        },
+        user: {
+          id: 1,
+          organizations: [{ id: 1, role: { name: roles.ORGANIZATION_OWNER } }],
+        },
+      }
+      const req = mockRequest(mockReq)
+      const res = mockResponse()
+
+      await changeUserRole(req, res)
+      sinon.assert.calledWith(res.sendStatus, HTTPStatus.NO_CONTENT)
+    })
+
+    it('should return 403 when the user tries to change own role', async () => {
+      const mockReq = {
+        params: {
+          id: 1,
+          userId: 1,
+          roleId: 10,
+        },
+        user: {
+          id: 1,
+          organizations: [{ id: 1, role: { name: roles.DEVELOPER } }],
+        },
+      }
+      const req = mockRequest(mockReq)
+      const res = mockResponse()
+
+      await changeUserRole(req, res)
+      sinon.assert.calledWith(res.status, HTTPStatus.FORBIDDEN)
+      helpers.calledWithErrors(res.send)
+    })
+
+    it('should return 403 when the user is changing a role in org without access', async () => {
+      const mockReq = {
+        params: {
+          id: 1000,
+          userId: 666,
+          roleId: 10,
+        },
+        user: {
+          id: 1,
+          organizations: [{ id: 1, role: { name: roles.DEVELOPER } }],
+        },
+      }
+      const req = mockRequest(mockReq)
+      const res = mockResponse()
+
+      await changeUserRole(req, res)
+      sinon.assert.calledWith(res.status, HTTPStatus.FORBIDDEN)
+      helpers.calledWithErrors(res.send)
+    })
+
+    it('should return 404 when the user tries to assign an unexisting role', async () => {
+      stubs.role_findByPk.resolves(null)
+      const mockReq = {
+        params: {
+          id: 1,
+          userId: 666,
+          roleId: 10,
+        },
+        user: {
+          id: 1,
+          organizations: [{ id: 1, role: { name: roles.ORGANIZATION_OWNER, level: 200 } }],
+        },
+      }
+      const req = mockRequest(mockReq)
+      const res = mockResponse()
+
+      await changeUserRole(req, res)
+      sinon.assert.calledWith(res.status, HTTPStatus.NOT_FOUND)
+      helpers.calledWithErrors(res.send)
+    })
+
+    it('should return 403 when the user tries to assign a role with higher hierarchy level', async () => {
+      stubs.role_findByPk.resolves({
+        id: 10,
+        level: 1,
+      })
+      const mockReq = {
+        params: {
+          id: 1,
+          userId: 666,
+          roleId: 10,
+        },
+        user: {
+          id: 1,
+          organizations: [{ id: 10, role: { name: roles.ORGANIZATION_OWNER, level: 200 } }],
+        },
+      }
+      const req = mockRequest(mockReq)
+      const res = mockResponse()
+
+      await changeUserRole(req, res)
+      sinon.assert.calledWith(res.status, HTTPStatus.FORBIDDEN)
+      helpers.calledWithErrors(res.send)
     })
   })
 })
