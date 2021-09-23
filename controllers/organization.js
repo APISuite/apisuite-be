@@ -9,11 +9,19 @@ const { publishEvent, routingKeys } = require('../services/msg-broker')
 const getAll = async (req, res) => {
   const include = req.query.include || []
 
+  let exclude = []
+  if (!res.locals.isAdmin) {
+    exclude = ['taxExempt']
+  }
+
   let orgs
   if (include.includes('appCount') && res.locals.isAdmin) {
     orgs = await models.Organization.getWithAppCount()
   } else {
     orgs = await models.Organization.findAllPaginated({
+      options: {
+        attributes: { exclude },
+      },
       page: req.query.page,
       pageSize: req.query.pageSize,
     })
@@ -23,9 +31,14 @@ const getAll = async (req, res) => {
 }
 
 const getById = async (req, res) => {
-  const org = await models.Organization.findByPk(
-    req.params.orgId,
-  )
+  let exclude = []
+  if (!res.locals.isAdmin) {
+    exclude = ['taxExempt']
+  }
+
+  const org = await models.Organization.findByPk(req.params.orgId, {
+    attributes: { exclude },
+  })
   if (!org) {
     return res.status(HTTPStatus.NOT_FOUND).send({ errors: ['Organization with inputed id does not exist.'] })
   }
