@@ -162,7 +162,6 @@ const updateOrg = async (req, res) => {
   return res.status(HTTPStatus.OK).send(updated)
 }
 
-// TODO: transform in changeRole
 const assignUserToOrg = async (req, res) => {
   try {
     const userId = req.body.user_id
@@ -355,6 +354,42 @@ const removeUserFromOrganization = async (req, res) => {
   }
 }
 
+const changeUserRole = async (req, res) => {
+  const orgId = Number(req.params.id)
+  const userId = Number(req.params.userId)
+  const roleId = Number(req.params.roleId)
+
+  if (userId === req.user.id) {
+    return res.status(HTTPStatus.FORBIDDEN).send({ errors: ['Not allowed'] })
+  }
+
+  const userOrg = req.user.organizations.find((o) => o.id === orgId)
+  if (!userOrg) {
+    return res.status(HTTPStatus.FORBIDDEN).send({ errors: ['Not allowed'] })
+  }
+
+  const targetRole = await models.Role.findByPk(roleId)
+  if (!targetRole) {
+    return res.status(HTTPStatus.NOT_FOUND).send({ errors: ['Role not found'] })
+  }
+
+  if (targetRole.level < userOrg.role.level) {
+    return res.status(HTTPStatus.FORBIDDEN).send({ errors: ['Not allowed'] })
+  }
+
+  await models.UserOrganization.update(
+    { role_id: targetRole.id },
+    {
+      where: {
+        user_id: userId,
+        org_id: orgId,
+      },
+    },
+  )
+
+  return res.sendStatus(HTTPStatus.NO_CONTENT)
+}
+
 module.exports = {
   getAll,
   getById,
@@ -367,4 +402,5 @@ module.exports = {
   listPublishers,
   getPublisher,
   removeUserFromOrganization,
+  changeUserRole,
 }
