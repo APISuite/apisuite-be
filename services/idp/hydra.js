@@ -1,4 +1,5 @@
 const HTTPStatus = require('http-status-codes')
+const crypto = require('crypto')
 const { v4: uuidv4 } = require('uuid')
 const fetch = require('node-fetch')
 const log = require('../../util/logger')
@@ -37,9 +38,10 @@ class Hydra extends IdP {
   }
 
   static generateOAuth2Client (clientConfig) {
+    const secret = crypto.randomBytes(120).toString('hex')
     return {
       client_id: uuidv4(),
-      client_secret: Hydra.generateClientSecret(120, '0123456789abcdefghijklmnopqrstuvxzABCDEFGHIJKLMNOPQRSTUVXZ'),
+      client_secret: secret,
       client_name: clientConfig.clientName,
       redirect_uris: clientConfig.redirectURIs,
       grant_types: [
@@ -54,14 +56,6 @@ class Hydra extends IdP {
       scope: clientConfig.scope || 'sandbox openid offline offline_access profile',
       userinfo_signed_response_alg: 'none',
     }
-  }
-
-  static generateClientSecret (len, arr) {
-    let ans = ''
-    for (let i = len; i > 0; i--) {
-      ans += arr[Math.floor(Math.random() * arr.length)]
-    }
-    return ans
   }
 
   async deleteClient (clientID, clientData) {
