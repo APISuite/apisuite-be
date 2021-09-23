@@ -39,6 +39,7 @@
  *           format: uri
  *         taxExempt:
  *           type: boolean
+ *           description: Only available to admins
  */
 
 /**
