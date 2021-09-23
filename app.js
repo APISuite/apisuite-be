@@ -27,19 +27,13 @@ morgan.token('body', (req, res) => {
 })
 
 const app = express()
+app.disable('X-Powered-By')
 
-// Application-Level API
-app.use((req, res, next) => {
-  res.removeHeader('X-Powered-By')
-  next()
-})
 app.use(cors(config.get('cors')))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser())
-
 app.use(morgan(':method :url :status - :body'))
-
 app.use(promBundle({ includeMethod: true }))
 app.use(middleware.internalError)
 
@@ -59,7 +53,6 @@ app.use('/owner', routes.owner)
 app.use('/registration', routes.registration)
 app.use('/role', routes.role)
 app.use('/roles', routes.role)
-
 app.use('/settings', routes.settings)
 app.use('/translations', routes.translations)
 app.use('/users', routes.user)
