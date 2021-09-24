@@ -13,23 +13,26 @@ const getAll = async (req, res) => {
   if (include.includes('appCount') && res.locals.isAdmin) {
     orgs = await models.Organization.getWithAppCount()
   } else {
-    orgs = await models.Organization.findAllPaginated({
+    orgs = await models.Organization.getAll({
       page: req.query.page,
       pageSize: req.query.pageSize,
     })
   }
 
+  console.log(orgs)
+
   return res.status(HTTPStatus.OK).send(orgs)
 }
 
 const getById = async (req, res) => {
-  const org = await models.Organization.findByPk(
+  const org = await models.Organization.getById(
     req.params.orgId,
   )
   if (!org) {
     return res.status(HTTPStatus.NOT_FOUND).send({ errors: ['Organization with inputed id does not exist.'] })
   }
-  return res.status(HTTPStatus.OK).send(org)
+
+  return res.status(HTTPStatus.OK).send(org[0])
 }
 
 const addOrg = async (req, res) => {
@@ -54,6 +57,15 @@ const addOrg = async (req, res) => {
       throw new Error('missing organizationOwner role')
     }
 
+    const address = await models.Address.create({
+      address: req.body.address,
+      postalCode: req.body.postalCode,
+      city: req.body.city,
+      country: req.body.country,
+    }, { transaction })
+
+    console.log(address)
+
     const newOrganization = await models.Organization.create({
       name: req.body.name,
       description: req.body.description,
@@ -66,6 +78,7 @@ const addOrg = async (req, res) => {
       youtubeUrl: req.body.youtubeUrl,
       websiteUrl: req.body.websiteUrl,
       supportUrl: req.body.supportUrl,
+      addressId: address.id,
     }, { transaction })
 
     const userOrgs = await models.UserOrganization.count({
@@ -86,7 +99,9 @@ const addOrg = async (req, res) => {
       organization_id: newOrganization.id,
     })
 
-    return res.status(HTTPStatus.CREATED).send(newOrganization)
+    const retObj = { ...newOrganization.dataValues, ...address.dataValues }
+
+    return res.status(HTTPStatus.CREATED).send(retObj)
   } catch (error) {
     if (transaction) await transaction.rollback()
     log.error(error, '[CREATE ORGANIZATION]')
@@ -133,6 +148,15 @@ const updateOrg = async (req, res) => {
     },
   )
 
+  const [rows, [addressUpdated]] = await models.Address.update(req.body,
+    {
+      returning: true,
+      where: {
+        id: updated.addressId,
+      },
+    },
+  )
+
   if (!rowsUpdated) {
     return res.status(HTTPStatus.NOT_FOUND).send({ errors: ['Organization not found'] })
   }
@@ -146,7 +170,9 @@ const updateOrg = async (req, res) => {
     },
   })
 
-  return res.status(HTTPStatus.OK).send(updated)
+  const retObj = { ...updated.dataValues, ...addressUpdated.dataValues }
+
+  return res.status(HTTPStatus.OK).send(retObj)
 }
 
 // TODO: transform in changeRole

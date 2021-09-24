@@ -37,6 +37,14 @@
  *         supportUrl:
  *           type: string
  *           format: uri
+ *         address:
+ *           type: string
+ *         postalCode:
+ *           type: string
+ *         city:
+ *           type: string
+ *         country:
+ *           type: string
  */
 
 /**

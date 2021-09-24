@@ -18,6 +18,10 @@ const organizationSchema = (create) => {
     youtubeUrl: Joi.string().optional().allow(null, ''),
     websiteUrl: Joi.string().optional().allow(null, ''),
     supportUrl: Joi.string().optional().allow(null, ''),
+    address: Joi.string().optional().allow(null, ''),
+    postalCode: Joi.string().optional().allow(null, ''),
+    city: Joi.string().optional().allow(null, ''),
+    country: Joi.string().optional().allow(null, ''),
   }
 
   baseSchema.name = create
