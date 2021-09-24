@@ -19,8 +19,6 @@ const getAll = async (req, res) => {
     })
   }
 
-  console.log(orgs)
-
   return res.status(HTTPStatus.OK).send(orgs)
 }
 
@@ -99,9 +97,7 @@ const addOrg = async (req, res) => {
       organization_id: newOrganization.id,
     })
 
-    const retObj = { ...newOrganization.dataValues, ...address.dataValues }
-
-    return res.status(HTTPStatus.CREATED).send(retObj)
+    return res.status(HTTPStatus.CREATED).send({ ...newOrganization.dataValues, ...address.dataValues })
   } catch (error) {
     if (transaction) await transaction.rollback()
     log.error(error, '[CREATE ORGANIZATION]')
@@ -148,7 +144,7 @@ const updateOrg = async (req, res) => {
     },
   )
 
-  const [rows, [addressUpdated]] = await models.Address.update(req.body,
+  const [, [addressUpdated]] = await models.Address.update(req.body,
     {
       returning: true,
       where: {
@@ -170,9 +166,7 @@ const updateOrg = async (req, res) => {
     },
   })
 
-  const retObj = { ...updated.dataValues, ...addressUpdated.dataValues }
-
-  return res.status(HTTPStatus.OK).send(retObj)
+  return res.status(HTTPStatus.OK).send({ ...updated.dataValues, ...addressUpdated.dataValues })
 }
 
 // TODO: transform in changeRole
