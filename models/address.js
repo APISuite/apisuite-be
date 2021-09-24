@@ -23,11 +23,14 @@ const address = (sequelize, DataTypes) => {
       allowNull: true,
     },
   }, {
-    tableName: 'address',
     timestamps: true,
     underscored: true,
     freezeTableName: true,
   })
+
+  //Address.associate = (models) => {
+  //  Address.belongsTo(models.Organization, { foreignKey: 'address_id' })
+  //}
 
   return Address
 }

@@ -21,6 +21,12 @@ const getAll = async (req, res) => {
     orgs = await models.Organization.findAllPaginated({
       options: {
         attributes: { exclude },
+        include: [{
+          model: models.Address,
+          attributes: {
+            exclude: ['id', 'createdAt', 'updatedAt'],
+          },
+        }],
       },
       page: req.query.page,
       pageSize: req.query.pageSize,
@@ -38,12 +44,18 @@ const getById = async (req, res) => {
 
   const org = await models.Organization.findByPk(req.params.orgId, {
     attributes: { exclude },
+    include: [{
+      model: models.Address,
+      attributes: {
+        exclude: ['id', 'createdAt', 'updatedAt'],
+      },
+    }],
   })
   if (!org) {
     return res.status(HTTPStatus.NOT_FOUND).send({ errors: ['Organization with inputed id does not exist.'] })
   }
 
-  return res.status(HTTPStatus.OK).send(org[0])
+  return res.status(HTTPStatus.OK).send(org)
 }
 
 const addOrg = async (req, res) => {
@@ -68,15 +80,6 @@ const addOrg = async (req, res) => {
       throw new Error('missing organizationOwner role')
     }
 
-    const address = await models.Address.create({
-      address: req.body.address,
-      postalCode: req.body.postalCode,
-      city: req.body.city,
-      country: req.body.country,
-    }, { transaction })
-
-    console.log(address)
-
     const newOrganization = await models.Organization.create({
       name: req.body.name,
       description: req.body.description,
@@ -89,8 +92,20 @@ const addOrg = async (req, res) => {
       youtubeUrl: req.body.youtubeUrl,
       websiteUrl: req.body.websiteUrl,
       supportUrl: req.body.supportUrl,
-      addressId: address.id,
-    }, { transaction })
+      address: {
+        address: req.body.address.address,
+        postalCode: req.body.address.postalCode,
+        city: req.body.address.city,
+        country: req.body.address.country,
+      },
+    }, {
+      include: [
+        {
+          model: models.Address,
+        },
+      ],
+      transaction,
+    })
 
     const userOrgs = await models.UserOrganization.count({
       where: { user_id: req.user.id },
@@ -110,7 +125,7 @@ const addOrg = async (req, res) => {
       organization_id: newOrganization.id,
     })
 
-    return res.status(HTTPStatus.CREATED).send({ ...newOrganization.dataValues, ...address.dataValues })
+    return res.status(HTTPStatus.CREATED).send({ newOrganization })
   } catch (error) {
     if (transaction) await transaction.rollback()
     log.error(error, '[CREATE ORGANIZATION]')
@@ -148,6 +163,7 @@ const deleteOrg = async (req, res) => {
 }
 
 const updateOrg = async (req, res) => {
+  const transaction = await sequelize.transaction()
   const [rowsUpdated, [updated]] = await models.Organization.update(req.body,
     {
       returning: true,
@@ -155,18 +171,21 @@ const updateOrg = async (req, res) => {
         id: req.params.id,
       },
     },
+    transaction,
   )
 
-  const [, [addressUpdated]] = await models.Address.update(req.body,
+  const addressUpdated = await models.Address.update(req.body.address,
     {
       returning: true,
       where: {
         id: updated.addressId,
       },
     },
+    transaction,
   )
 
   if (!rowsUpdated) {
+    await transaction.rollback()
     return res.status(HTTPStatus.NOT_FOUND).send({ errors: ['Organization not found'] })
   }
 
@@ -179,7 +198,7 @@ const updateOrg = async (req, res) => {
     },
   })
 
-  return res.status(HTTPStatus.OK).send({ ...updated.dataValues, ...addressUpdated.dataValues })
+  return res.status(HTTPStatus.OK).send({ ...updated.dataValues, address: { ...addressUpdated[1][0].dataValues } })
 }
 
 const assignUserToOrg = async (req, res) => {
