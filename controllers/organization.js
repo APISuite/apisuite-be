@@ -125,7 +125,7 @@ const addOrg = async (req, res) => {
       organization_id: newOrganization.id,
     })
 
-    return res.status(HTTPStatus.CREATED).send({ newOrganization })
+    return res.status(HTTPStatus.CREATED).send(newOrganization)
   } catch (error) {
     if (transaction) await transaction.rollback()
     log.error(error, '[CREATE ORGANIZATION]')
@@ -174,7 +174,7 @@ const updateOrg = async (req, res) => {
     transaction,
   )
 
-  const addressUpdated = await models.Address.update(req.body.address,
+  const [, [addressUpdated]] = await models.Address.update(req.body.address,
     {
       returning: true,
       where: {
@@ -198,7 +198,7 @@ const updateOrg = async (req, res) => {
     },
   })
 
-  return res.status(HTTPStatus.OK).send({ ...updated.dataValues, address: { ...addressUpdated[1][0].dataValues } })
+  return res.status(HTTPStatus.OK).send({ ...updated.dataValues, address: { ...addressUpdated.dataValues } })
 }
 
 const assignUserToOrg = async (req, res) => {
