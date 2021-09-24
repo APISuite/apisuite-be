@@ -45,6 +45,9 @@
  *           type: string
  *         country:
  *           type: string
+ *         taxExempt:
+ *           type: boolean
+ *           description: Only available to admins
  */
 
 /**

@@ -9,11 +9,19 @@ const { publishEvent, routingKeys } = require('../services/msg-broker')
 const getAll = async (req, res) => {
   const include = req.query.include || []
 
+  let exclude = []
+  if (!res.locals.isAdmin) {
+    exclude = ['taxExempt']
+  }
+
   let orgs
   if (include.includes('appCount') && res.locals.isAdmin) {
     orgs = await models.Organization.getWithAppCount()
   } else {
-    orgs = await models.Organization.getAll({
+    orgs = await models.Organization.findAllPaginated({
+      options: {
+        attributes: { exclude },
+      },
       page: req.query.page,
       pageSize: req.query.pageSize,
     })
@@ -23,9 +31,14 @@ const getAll = async (req, res) => {
 }
 
 const getById = async (req, res) => {
-  const org = await models.Organization.getById(
-    req.params.orgId,
-  )
+  let exclude = []
+  if (!res.locals.isAdmin) {
+    exclude = ['taxExempt']
+  }
+
+  const org = await models.Organization.findByPk(req.params.orgId, {
+    attributes: { exclude },
+  })
   if (!org) {
     return res.status(HTTPStatus.NOT_FOUND).send({ errors: ['Organization with inputed id does not exist.'] })
   }
@@ -169,7 +182,6 @@ const updateOrg = async (req, res) => {
   return res.status(HTTPStatus.OK).send({ ...updated.dataValues, ...addressUpdated.dataValues })
 }
 
-// TODO: transform in changeRole
 const assignUserToOrg = async (req, res) => {
   try {
     const userId = req.body.user_id
@@ -362,6 +374,42 @@ const removeUserFromOrganization = async (req, res) => {
   }
 }
 
+const changeUserRole = async (req, res) => {
+  const orgId = Number(req.params.id)
+  const userId = Number(req.params.userId)
+  const roleId = Number(req.params.roleId)
+
+  if (userId === req.user.id) {
+    return res.status(HTTPStatus.FORBIDDEN).send({ errors: ['Not allowed'] })
+  }
+
+  const userOrg = req.user.organizations.find((o) => o.id === orgId)
+  if (!userOrg) {
+    return res.status(HTTPStatus.FORBIDDEN).send({ errors: ['Not allowed'] })
+  }
+
+  const targetRole = await models.Role.findByPk(roleId)
+  if (!targetRole) {
+    return res.status(HTTPStatus.NOT_FOUND).send({ errors: ['Role not found'] })
+  }
+
+  if (targetRole.level < userOrg.role.level) {
+    return res.status(HTTPStatus.FORBIDDEN).send({ errors: ['Not allowed'] })
+  }
+
+  await models.UserOrganization.update(
+    { role_id: targetRole.id },
+    {
+      where: {
+        user_id: userId,
+        org_id: orgId,
+      },
+    },
+  )
+
+  return res.sendStatus(HTTPStatus.NO_CONTENT)
+}
+
 module.exports = {
   getAll,
   getById,
@@ -374,4 +422,5 @@ module.exports = {
   listPublishers,
   getPublisher,
   removeUserFromOrganization,
+  changeUserRole,
 }
