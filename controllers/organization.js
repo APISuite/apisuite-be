@@ -5,6 +5,7 @@ const log = require('../util/logger')
 const { models, sequelize } = require('../models')
 const { roles } = require('../util/enums')
 const { publishEvent, routingKeys } = require('../services/msg-broker')
+const excludeFields = ['id', 'createdAt', 'updatedAt']
 
 const getAll = async (req, res) => {
   const include = req.query.include || []
@@ -24,7 +25,7 @@ const getAll = async (req, res) => {
         include: [{
           model: models.Address,
           attributes: {
-            exclude: ['id', 'createdAt', 'updatedAt'],
+            exclude: excludeFields,
           },
         }],
       },
@@ -47,7 +48,7 @@ const getById = async (req, res) => {
     include: [{
       model: models.Address,
       attributes: {
-        exclude: ['id', 'createdAt', 'updatedAt'],
+        exclude: excludeFields,
       },
     }],
   })
@@ -102,6 +103,9 @@ const addOrg = async (req, res) => {
       include: [
         {
           model: models.Address,
+          attributes: {
+            exclude: excludeFields,
+          },
         },
       ],
       transaction,
