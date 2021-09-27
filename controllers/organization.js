@@ -6,13 +6,13 @@ const { models, sequelize } = require('../models')
 const { roles } = require('../util/enums')
 const { publishEvent, routingKeys } = require('../services/msg-broker')
 const excludeFields = ['id', 'createdAt', 'updatedAt']
+const exclude = ['addressId']
 
 const getAll = async (req, res) => {
   const include = req.query.include || []
 
-  let exclude = []
   if (!res.locals.isAdmin) {
-    exclude = ['taxExempt']
+    exclude.push = ('taxExempt')
   }
 
   let orgs
@@ -38,9 +38,8 @@ const getAll = async (req, res) => {
 }
 
 const getById = async (req, res) => {
-  let exclude = []
   if (!res.locals.isAdmin) {
-    exclude = ['taxExempt']
+    exclude.push = ('taxExempt')
   }
 
   const org = await models.Organization.findByPk(req.params.orgId, {
@@ -62,7 +61,7 @@ const getById = async (req, res) => {
 const addOrg = async (req, res) => {
   const transaction = await sequelize.transaction()
   try {
-    const exclude = ['taxExempt']
+    exclude.push = ('taxExempt')
     const org = await models.Organization.findOne({
       where: { name: req.body.name },
       transaction,
@@ -175,42 +174,68 @@ const deleteOrg = async (req, res) => {
 }
 
 const updateOrg = async (req, res) => {
+  exclude.push = ('taxExempt')
   const transaction = await sequelize.transaction()
-  const [rowsUpdated, [updated]] = await models.Organization.update(req.body,
-    {
-      returning: true,
-      where: {
-        id: req.params.id,
-      },
-    },
-    transaction,
-  )
 
-  const [, [addressUpdated]] = await models.Address.update(req.body.address,
-    {
-      returning: true,
-      where: {
-        id: updated.addressId,
-      },
-    },
-    transaction,
-  )
+  if (req.body.address) {
+    const data = await models.Organization.findByPk(req.params.id, {
+      include: [{
+        model: models.Address,
+      }],
+      transaction,
+    })
 
-  if (!rowsUpdated) {
-    await transaction.rollback()
-    return res.status(HTTPStatus.NOT_FOUND).send({ errors: ['Organization not found'] })
+    await models.Address.update(req.body.address,
+      {
+        returning: true,
+        where: {
+          id: data.addressId,
+        },
+      },
+      transaction,
+    )
+    delete req.body.address
   }
 
-  publishEvent(routingKeys.ORG_UPDATED, {
-    user_id: req.user.id,
-    organization_id: req.params.id,
-    meta: {
-      id: updated.id,
-      name: updated.name,
-    },
+  if (Object.keys(req.body).length) {
+    const [rowsUpdated, [updated]] = await models.Organization.update(req.body,
+      {
+        returning: true,
+        where: {
+          id: req.params.id,
+        },
+      },
+      transaction,
+    )
+
+    if (!rowsUpdated) {
+      await transaction.rollback()
+      return res.status(HTTPStatus.NOT_FOUND).send({ errors: ['Organization not found'] })
+    }
+
+    publishEvent(routingKeys.ORG_UPDATED, {
+      user_id: req.user.id,
+      organization_id: req.params.id,
+      meta: {
+        id: updated.id,
+        name: updated.name,
+      },
+    })
+  }
+
+  await transaction.commit()
+
+  const organization = await models.Organization.findByPk(req.params.id, {
+    attributes: { exclude },
+    include: [{
+      model: models.Address,
+      attributes: {
+        exclude: excludeFields,
+      },
+    }],
   })
 
-  return res.status(HTTPStatus.OK).send({ ...updated.dataValues, address: { ...addressUpdated.dataValues } })
+  return res.status(HTTPStatus.OK).send(organization)
 }
 
 const assignUserToOrg = async (req, res) => {
