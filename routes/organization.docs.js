@@ -40,6 +40,25 @@
  *         taxExempt:
  *           type: boolean
  *           description: Only available to admins
+ *         address:
+ *           $ref: "#/components/schemas/address"
+ */
+
+/**
+ * @openapi
+ * components:
+ *   schemas:
+ *     address:
+ *       type: object
+ *       properties:
+ *         address:
+ *           type: string
+ *         postalCode:
+ *           type: string
+ *         city:
+ *           type: string
+ *         country:
+ *           type: string
  */
 
 /**

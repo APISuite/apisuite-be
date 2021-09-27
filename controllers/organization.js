@@ -5,13 +5,15 @@ const log = require('../util/logger')
 const { models, sequelize } = require('../models')
 const { roles } = require('../util/enums')
 const { publishEvent, routingKeys } = require('../services/msg-broker')
+const excludeFields = ['id', 'createdAt', 'updatedAt']
+const exclude = ['addressId']
 
 const getAll = async (req, res) => {
   const include = req.query.include || []
+  const _exclude = [...exclude]
 
-  let exclude = []
   if (!res.locals.isAdmin) {
-    exclude = ['taxExempt']
+    _exclude.push('taxExempt')
   }
 
   let orgs
@@ -20,7 +22,13 @@ const getAll = async (req, res) => {
   } else {
     orgs = await models.Organization.findAllPaginated({
       options: {
-        attributes: { exclude },
+        attributes: { exclude: _exclude },
+        include: [{
+          model: models.Address,
+          attributes: {
+            exclude: excludeFields,
+          },
+        }],
       },
       page: req.query.page,
       pageSize: req.query.pageSize,
@@ -31,23 +39,34 @@ const getAll = async (req, res) => {
 }
 
 const getById = async (req, res) => {
-  let exclude = []
+  const _exclude = [...exclude]
+
   if (!res.locals.isAdmin) {
-    exclude = ['taxExempt']
+    _exclude.push('taxExempt')
   }
 
   const org = await models.Organization.findByPk(req.params.orgId, {
-    attributes: { exclude },
+    attributes: { exclude: _exclude },
+    include: [{
+      model: models.Address,
+      attributes: {
+        exclude: excludeFields,
+      },
+    }],
   })
   if (!org) {
     return res.status(HTTPStatus.NOT_FOUND).send({ errors: ['Organization with inputed id does not exist.'] })
   }
+
   return res.status(HTTPStatus.OK).send(org)
 }
 
 const addOrg = async (req, res) => {
   const transaction = await sequelize.transaction()
   try {
+    const _exclude = [...exclude]
+    _exclude.push('taxExempt')
+
     const org = await models.Organization.findOne({
       where: { name: req.body.name },
       transaction,
@@ -79,7 +98,20 @@ const addOrg = async (req, res) => {
       youtubeUrl: req.body.youtubeUrl,
       websiteUrl: req.body.websiteUrl,
       supportUrl: req.body.supportUrl,
-    }, { transaction })
+      address: {
+        address: req.body.address.address,
+        postalCode: req.body.address.postalCode,
+        city: req.body.address.city,
+        country: req.body.address.country,
+      },
+    }, {
+      include: [
+        {
+          model: models.Address,
+        },
+      ],
+      transaction,
+    })
 
     const userOrgs = await models.UserOrganization.count({
       where: { user_id: req.user.id },
@@ -99,7 +131,17 @@ const addOrg = async (req, res) => {
       organization_id: newOrganization.id,
     })
 
-    return res.status(HTTPStatus.CREATED).send(newOrganization)
+    const organization = await models.Organization.findByPk(newOrganization.id, {
+      attributes: { exclude: _exclude },
+      include: [{
+        model: models.Address,
+        attributes: {
+          exclude: excludeFields,
+        },
+      }],
+    })
+
+    return res.status(HTTPStatus.CREATED).send(organization)
   } catch (error) {
     if (transaction) await transaction.rollback()
     log.error(error, '[CREATE ORGANIZATION]')
@@ -137,29 +179,70 @@ const deleteOrg = async (req, res) => {
 }
 
 const updateOrg = async (req, res) => {
-  const [rowsUpdated, [updated]] = await models.Organization.update(req.body,
-    {
-      returning: true,
-      where: {
-        id: req.params.id,
-      },
-    },
-  )
+  const _exclude = [...exclude]
+  _exclude.push('taxExempt')
 
-  if (!rowsUpdated) {
-    return res.status(HTTPStatus.NOT_FOUND).send({ errors: ['Organization not found'] })
+  const transaction = await sequelize.transaction()
+
+  if (req.body.address) {
+    const data = await models.Organization.findByPk(req.params.id, {
+      include: [{
+        model: models.Address,
+      }],
+      transaction,
+    })
+
+    await models.Address.update(req.body.address,
+      {
+        returning: true,
+        where: {
+          id: data.addressId,
+        },
+      },
+      transaction,
+    )
+    delete req.body.address
   }
 
-  publishEvent(routingKeys.ORG_UPDATED, {
-    user_id: req.user.id,
-    organization_id: req.params.id,
-    meta: {
-      id: updated.id,
-      name: updated.name,
-    },
+  if (Object.keys(req.body).length) {
+    const [rowsUpdated, [updated]] = await models.Organization.update(req.body,
+      {
+        returning: true,
+        where: {
+          id: req.params.id,
+        },
+      },
+      transaction,
+    )
+
+    if (!rowsUpdated) {
+      await transaction.rollback()
+      return res.status(HTTPStatus.NOT_FOUND).send({ errors: ['Organization not found'] })
+    }
+
+    publishEvent(routingKeys.ORG_UPDATED, {
+      user_id: req.user.id,
+      organization_id: req.params.id,
+      meta: {
+        id: updated.id,
+        name: updated.name,
+      },
+    })
+  }
+
+  await transaction.commit()
+
+  const organization = await models.Organization.findByPk(req.params.id, {
+    attributes: { exclude: _exclude },
+    include: [{
+      model: models.Address,
+      attributes: {
+        exclude: excludeFields,
+      },
+    }],
   })
 
-  return res.status(HTTPStatus.OK).send(updated)
+  return res.status(HTTPStatus.OK).send(organization)
 }
 
 const assignUserToOrg = async (req, res) => {
