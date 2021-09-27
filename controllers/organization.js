@@ -40,7 +40,6 @@ const getAll = async (req, res) => {
 
 const getById = async (req, res) => {
   const _exclude = [...exclude]
-  _exclude.push('taxExempt')
 
   if (!res.locals.isAdmin) {
     _exclude.push('taxExempt')
