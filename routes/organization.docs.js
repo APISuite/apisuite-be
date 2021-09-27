@@ -37,18 +37,10 @@
  *         supportUrl:
  *           type: string
  *           format: uri
- *         address:
- *           type: string
- *         postalCode:
- *           type: string
- *         city:
- *           type: string
- *         country:
- *           type: string
  *         taxExempt:
  *           type: boolean
  *           description: Only available to admins
- *         Address:
+ *         address:
  *           $ref: "#/components/schemas/Address"
  */
 
