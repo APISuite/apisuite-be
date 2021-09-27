@@ -41,14 +41,14 @@
  *           type: boolean
  *           description: Only available to admins
  *         address:
- *           $ref: "#/components/schemas/Address"
+ *           $ref: "#/components/schemas/address"
  */
 
 /**
  * @openapi
  * components:
  *   schemas:
- *     Address:
+ *     address:
  *       type: object
  *       properties:
  *         address:
