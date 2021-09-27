@@ -12,8 +12,10 @@ const getAll = async (req, res) => {
   const include = req.query.include || []
 
   if (!res.locals.isAdmin) {
-    exclude.push = ('taxExempt')
+    exclude.push('taxExempt')
   }
+
+  console.log(exclude)
 
   let orgs
   if (include.includes('appCount') && res.locals.isAdmin) {
@@ -34,12 +36,13 @@ const getAll = async (req, res) => {
     })
   }
 
+  exclude.pop()
   return res.status(HTTPStatus.OK).send(orgs)
 }
 
 const getById = async (req, res) => {
   if (!res.locals.isAdmin) {
-    exclude.push = ('taxExempt')
+    exclude.push('taxExempt')
   }
 
   const org = await models.Organization.findByPk(req.params.orgId, {
@@ -55,13 +58,14 @@ const getById = async (req, res) => {
     return res.status(HTTPStatus.NOT_FOUND).send({ errors: ['Organization with inputed id does not exist.'] })
   }
 
+  exclude.pop()
   return res.status(HTTPStatus.OK).send(org)
 }
 
 const addOrg = async (req, res) => {
   const transaction = await sequelize.transaction()
   try {
-    exclude.push = ('taxExempt')
+    exclude.push('taxExempt')
     const org = await models.Organization.findOne({
       where: { name: req.body.name },
       transaction,
@@ -136,6 +140,7 @@ const addOrg = async (req, res) => {
       }],
     })
 
+    exclude.pop()
     return res.status(HTTPStatus.CREATED).send(organization)
   } catch (error) {
     if (transaction) await transaction.rollback()
@@ -174,7 +179,7 @@ const deleteOrg = async (req, res) => {
 }
 
 const updateOrg = async (req, res) => {
-  exclude.push = ('taxExempt')
+  exclude.push('taxExempt')
   const transaction = await sequelize.transaction()
 
   if (req.body.address) {
@@ -225,6 +230,7 @@ const updateOrg = async (req, res) => {
 
   await transaction.commit()
 
+  console.log(exclude)
   const organization = await models.Organization.findByPk(req.params.id, {
     attributes: { exclude },
     include: [{
@@ -235,6 +241,7 @@ const updateOrg = async (req, res) => {
     }],
   })
 
+  exclude.pop()
   return res.status(HTTPStatus.OK).send(organization)
 }
 
