@@ -62,6 +62,7 @@ const getById = async (req, res) => {
 const addOrg = async (req, res) => {
   const transaction = await sequelize.transaction()
   try {
+    const exclude = ['taxExempt']
     const org = await models.Organization.findOne({
       where: { name: req.body.name },
       transaction,
@@ -103,9 +104,6 @@ const addOrg = async (req, res) => {
       include: [
         {
           model: models.Address,
-          attributes: {
-            exclude: excludeFields,
-          },
         },
       ],
       transaction,
@@ -129,7 +127,17 @@ const addOrg = async (req, res) => {
       organization_id: newOrganization.id,
     })
 
-    return res.status(HTTPStatus.CREATED).send(newOrganization)
+    const organization = await models.Organization.findByPk(newOrganization.id, {
+      attributes: { exclude },
+      include: [{
+        model: models.Address,
+        attributes: {
+          exclude: excludeFields,
+        },
+      }],
+    })
+
+    return res.status(HTTPStatus.CREATED).send(organization)
   } catch (error) {
     if (transaction) await transaction.rollback()
     log.error(error, '[CREATE ORGANIZATION]')
