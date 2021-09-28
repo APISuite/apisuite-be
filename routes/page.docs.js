@@ -20,6 +20,16 @@
  *         createdAt:
  *           type: string
  *
+ *     NewPage:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: string
+ *         locale:
+ *           type: string
+ *         content:
+ *           type: string
+ *
  *     SimplePage:
  *       type: object
  *       properties:

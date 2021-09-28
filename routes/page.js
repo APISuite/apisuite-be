@@ -69,7 +69,7 @@ router.getAsync('/:id/:locale',
  *       content:
  *         application/json:
  *           schema:
- *             $ref: "#/components/schemas/Page"
+ *             $ref: "#/components/schemas/NewPage"
  *     responses:
  *       201:
  *         description: Created page
@@ -110,7 +110,7 @@ router.postAsync('/',
  *       content:
  *         application/json:
  *           schema:
- *             $ref: "#/components/schemas/Page"
+ *             $ref: "#/components/schemas/NewPage"
  *     responses:
  *       200:
  *         description: Updated page
