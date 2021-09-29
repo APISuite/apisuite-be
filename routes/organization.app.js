@@ -44,7 +44,7 @@ router.use('/:appId/media', appMediaRoutes)
  */
 router.getAsync('/',
   loggedIn,
-  accessControl(actions.READ, possessions.OWN, resources.ORGANIZATION, { idCarrier: 'params', idField: 'id' }),
+  accessControl(actions.READ, possessions.OWN, resources.ORGANIZATION, { idCarrier: 'params', idField: 'id', adminOverride: true }),
   controllers.app.listApps)
 
 /**
@@ -86,8 +86,8 @@ router.getAsync('/',
  */
 router.getAsync('/:appId',
   loggedIn,
-  accessControl(actions.READ, possessions.OWN, resources.ORGANIZATION, { idCarrier: 'params', idField: 'id' }),
-  accessControl(actions.READ, possessions.OWN, resources.APP, { idCarrier: 'params', idField: 'appId' }),
+  accessControl(actions.READ, possessions.OWN, resources.ORGANIZATION, { idCarrier: 'params', idField: 'id', adminOverride: true }),
+  accessControl(actions.READ, possessions.OWN, resources.APP, { idCarrier: 'params', idField: 'appId', adminOverride: true }),
   controllers.app.getApp)
 
 /**
