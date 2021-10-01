@@ -29,13 +29,13 @@ morgan.token('body', (req, res) => {
 const app = express()
 app.disable('X-Powered-By')
 
+app.use(middleware.internalError)
 app.use(cors(config.get('cors')))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser())
 app.use(morgan(':method :url :status - :body'))
 app.use(promBundle({ includeMethod: true }))
-app.use(middleware.internalError)
 
 // Auth middleware
 app.use(middleware.auth.cookieAuth)
