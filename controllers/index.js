@@ -12,6 +12,7 @@ const owner = require('./owner')
 const page = require('./page')
 const translations = require('./translations')
 const settingsStorefronts = require('./settings.strorefronts')
+const media = require('./media')
 
 module.exports = {
   api,
@@ -28,4 +29,5 @@ module.exports = {
   translations,
   user,
   settingsStorefronts,
+  media,
 }
