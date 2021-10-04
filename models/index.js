@@ -40,6 +40,7 @@ const models = {
   UserRegistration: importModel('./user_registration'),
   SettingsStoreFronts: importModel('./settings_storefronts'),
   Address: importModel('./address'),
+  Media: importModel('./media'),
 }
 
 Object.keys(models).forEach(key => {

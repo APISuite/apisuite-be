@@ -57,7 +57,7 @@ app.use('/settings', routes.settings)
 app.use('/translations', routes.translations)
 app.use('/users', routes.user)
 app.use('/pages', routes.page)
-
+app.use('/media', routes.media)
 app.use(middleware.error)
 
 // serve api documentation
@@ -70,8 +70,6 @@ app.use('/api-docs', redoc({
   specUrl: '/docs/spec.json',
   favicon: 'https://cloudcdn.apisuite.io/favicon.ico',
 }))
-
-app.use('/media', express.static('media'))
 
 const bootstrapIdPSettings = async () => {
   const settings = await models.Setting.findOne({
