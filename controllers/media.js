@@ -73,13 +73,13 @@ const uploadMedia = async (req, res) => {
       continue
     }
 
-    await transaction.commit()
-
     response.errors.push({
       file: files[j].name,
       error: 'failed to save image',
     })
   }
+
+  await transaction.commit()
 
   if (!response.errors.length) delete response.errors
   return res.status(HTTPStatus.OK).send(response)
@@ -105,10 +105,11 @@ const deleteMedia = async (req, res) => {
     },
     transaction,
   })
-  await transaction.commit()
 
   const storageClient = Storage.getStorageClient()
   await storageClient.deleteFile(path)
+
+  await transaction.commit()
 
   return res.sendStatus(HTTPStatus.NO_CONTENT)
 }

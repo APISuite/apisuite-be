@@ -10,7 +10,7 @@ const media = (sequelize, DataTypes) => {
       allowNull: false,
     },
     orgId: {
-      type: DataTypes.STRING,
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
   }, {

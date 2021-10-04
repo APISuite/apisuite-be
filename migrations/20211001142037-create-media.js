@@ -11,8 +11,14 @@ module.exports = {
         allowNull: false,
       },
       org_id: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
         allowNull: false,
+        references: {
+          model: 'organization',
+          key: 'id',
+        },
+        onDelete: 'cascade',
+        onUpdate: 'cascade',
       },
       created_at: {
         type: Sequelize.DATE,
