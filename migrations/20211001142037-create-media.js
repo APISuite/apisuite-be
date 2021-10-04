@@ -1,23 +1,18 @@
 module.exports = {
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('media', {
-      id: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        primaryKey: true,
-        autoIncrement: true,
-      },
       file: {
         type: Sequelize.STRING,
-        allowNull: true,
+        allowNull: false,
+        primaryKey: true,
       },
       url: {
         type: Sequelize.STRING,
-        allowNull: true,
+        allowNull: false,
       },
       org_id: {
         type: Sequelize.STRING,
-        allowNull: true,
+        allowNull: false,
       },
       created_at: {
         type: Sequelize.DATE,

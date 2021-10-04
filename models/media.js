@@ -1,22 +1,17 @@
 const media = (sequelize, DataTypes) => {
   const Media = sequelize.define('media', {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      allowNull: false,
-      autoIncrement: true,
-    },
     file: {
       type: DataTypes.STRING,
-      allowNull: true,
+      primaryKey: true,
+      allowNull: false,
     },
     url: {
       type: DataTypes.STRING,
-      allowNull: true,
+      allowNull: false,
     },
     orgId: {
       type: DataTypes.STRING,
-      allowNull: true,
+      allowNull: false,
     },
   }, {
     timestamps: true,

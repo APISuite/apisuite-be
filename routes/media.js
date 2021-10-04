@@ -6,10 +6,9 @@ const { accessControl, loggedIn, fileParser } = require('../middleware')
 
 /**
  * @openapi
- * /media/{appId}:
+ * /media/{orgId}:
  *   post:
- *     summary: Upload app images/media
- *     tags: [App]
+ *     summary: Upload images/media
  *     security:
  *       - cookieAuth: []
  *     parameters:
@@ -20,7 +19,7 @@ const { accessControl, loggedIn, fileParser } = require('../middleware')
  *         schema:
  *           type: number
  *     requestBody:
- *       description: Media files to be updated
+ *       description: Media files to be uploaded
  *       required: true
  *       content:
  *         multipart/form-data:
@@ -78,11 +77,10 @@ router.postAsync('/:orgId',
  * /media/{orgId}:
  *   delete:
  *     summary: Delete selected media objects
- *     tags: [App]
  *     security:
  *       - cookieAuth: []
  *     parameters:
- *       - name: OrgId
+ *       - name: orgId
  *         description: Org id
  *         required: true
  *         in: path

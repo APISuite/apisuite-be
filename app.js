@@ -57,7 +57,7 @@ app.use('/settings', routes.settings)
 app.use('/translations', routes.translations)
 app.use('/users', routes.user)
 app.use('/pages', routes.page)
-app.use('/mediaUpload', routes.media)
+app.use('/media', routes.media)
 app.use(middleware.error)
 
 // serve api documentation
