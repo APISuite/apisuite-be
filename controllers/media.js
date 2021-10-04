@@ -8,6 +8,12 @@ const {
 } = require('../models')
 const Storage = require('../services/storage')
 
+function pathParser (mediaUrl, offset) {
+  const path = mediaUrl.substr(mediaUrl.indexOf('/media') + offset, mediaUrl.length)
+
+  return path
+}
+
 const uploadMedia = async (req, res) => {
   if (!req.formdata || !req.formdata.files) {
     return res.status(HTTPStatus.BAD_REQUEST).send({ errors: ['no files uploaded'] })
@@ -15,8 +21,9 @@ const uploadMedia = async (req, res) => {
 
   const files = []
   const badTypes = []
-  for (const key in req.formdata.files['']) {
-    const file = req.formdata.files[''][key]
+  for (const key in req.formdata.files) {
+    if (key === '') return res.status(HTTPStatus.BAD_REQUEST).send({ errors: ['Add key for each file of the request'] })
+    const file = req.formdata.files[key]
     if (file.type.split('/')[0] !== 'image') {
       badTypes.push(file.name)
     }
@@ -50,13 +57,12 @@ const uploadMedia = async (req, res) => {
     savedImages: [],
     errors: [],
   }
-  const imageURls = []
+
   const transaction = await sequelize.transaction()
   for (let j = 0; j < saveResults.length; j++) {
     const sr = saveResults[j]
-    const file = sr.objectURL.substr(sr.objectURL.indexOf('/media/') + 7, sr.objectURL.length)
     if (sr.objectURL && sr.objectURL.length) {
-      imageURls.push(sr.objectURL)
+      const file = pathParser(sr.objectURL, 7)
       response.savedImages.push({
         file: files[j].name,
         url: sr.objectURL,
@@ -84,12 +90,15 @@ const uploadMedia = async (req, res) => {
 const deleteMedia = async (req, res) => {
   const transaction = await sequelize.transaction()
 
-  const file = req.query.mediaUrl.substr(req.query.mediaUrl.indexOf('/media/') + 7, req.query.mediaUrl.length)
+  const file = pathParser(req.query.mediaUrl, 7)
   const mediaSearch = await models.Media.findByPk(file, { transaction })
 
-  if (!mediaSearch) return res.status(HTTPStatus.NOT_FOUND).send({ errors: ['Image not found'] })
+  if (!mediaSearch) {
+    if (transaction) await transaction.rollback()
+    return res.status(HTTPStatus.NOT_FOUND).send({ errors: ['Image not found'] })
+  }
 
-  const path = req.query.mediaUrl.substr(req.query.mediaUrl.indexOf('/media'), req.query.mediaUrl.length)
+  const path = pathParser(req.query.mediaUrl, 0)
 
   await models.Media.destroy({
     where: {

@@ -19,6 +19,10 @@ const media = (sequelize, DataTypes) => {
     freezeTableName: true,
   })
 
+  Media.associate = (models) => {
+    Media.belongsTo(models.Organization, { foreignKey: 'org_id' })
+  }
+
   return Media
 }
 
