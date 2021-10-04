@@ -9,9 +9,7 @@ const {
 const Storage = require('../services/storage')
 
 function pathParser (mediaUrl, offset) {
-  const path = mediaUrl.substr(mediaUrl.indexOf('/media') + offset, mediaUrl.length)
-
-  return path
+  return mediaUrl.substr(mediaUrl.indexOf('/media') + offset, mediaUrl.length)
 }
 
 const uploadMedia = async (req, res) => {
