@@ -3,6 +3,7 @@ const router = decorateRouter(require('express').Router({ mergeParams: true }))
 const controllers = require('../controllers')
 const { actions, possessions, resources } = require('../util/enums')
 const { accessControl, loggedIn, fileParser } = require('../middleware')
+const express = require('express')
 
 /**
  * @openapi
@@ -111,3 +112,5 @@ router.deleteAsync('/:orgId',
   fileParser,
   controllers.media.deleteMedia)
 module.exports = router
+
+router.use('/media', express.static('media'))
