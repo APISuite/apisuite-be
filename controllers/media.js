@@ -52,7 +52,7 @@ const uploadMedia = async (req, res) => {
   }
 
   const response = {
-    savedImages: [],
+    savedObjects: [],
     errors: [],
   }
 
@@ -61,7 +61,7 @@ const uploadMedia = async (req, res) => {
     const sr = saveResults[j]
     if (sr.objectURL && sr.objectURL.length) {
       const file = pathParser(sr.objectURL, 7)
-      response.savedImages.push({
+      response.savedObjects.push({
         file: files[j].name,
         url: sr.objectURL,
       })

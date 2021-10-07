@@ -10,11 +10,12 @@ const express = require('express')
  * /media/{orgId}:
  *   post:
  *     summary: Upload images/media
+ *     tags: [Media]
  *     security:
  *       - cookieAuth: []
  *     parameters:
  *       - name: orgId
- *         description: Org id
+ *         description: Organization id
  *         required: true
  *         in: path
  *         schema:
@@ -40,7 +41,7 @@ const express = require('express')
  *             schema:
  *               type: object
  *               properties:
- *                 savedImages:
+ *                 savedObjects:
  *                   type: array
  *                   items:
  *                     type: object
@@ -78,6 +79,7 @@ router.postAsync('/:orgId',
  * /media/{orgId}:
  *   delete:
  *     summary: Delete selected media objects
+ *     tags: [Media]
  *     security:
  *       - cookieAuth: []
  *     parameters:
