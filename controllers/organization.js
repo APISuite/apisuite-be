@@ -198,8 +198,8 @@ const updateOrg = async (req, res) => {
         where: {
           id: data.addressId,
         },
+        transaction,
       },
-      transaction,
     )
     delete req.body.address
   }
@@ -211,8 +211,8 @@ const updateOrg = async (req, res) => {
         where: {
           id: req.params.id,
         },
+        transaction,
       },
-      transaction,
     )
 
     if (!rowsUpdated) {
