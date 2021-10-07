@@ -203,15 +203,16 @@ const updateOrg = async (req, res) => {
       },
       transaction,
       )
+
       await models.Organization.update(
         {
           addressId: newAddress.id,
-          transaction,
         },
         {
           where: {
             id: req.params.id,
           },
+          transaction,
         })
     }
 
