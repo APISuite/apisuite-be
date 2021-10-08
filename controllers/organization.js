@@ -86,7 +86,7 @@ const addOrg = async (req, res) => {
       throw new Error('missing organizationOwner role')
     }
 
-    const newOrganization = await models.Organization.create({
+    let newOrg = {
       name: req.body.name,
       description: req.body.description,
       vat: req.body.vat,
@@ -98,20 +98,22 @@ const addOrg = async (req, res) => {
       youtubeUrl: req.body.youtubeUrl,
       websiteUrl: req.body.websiteUrl,
       supportUrl: req.body.supportUrl,
-      address: {
-        address: req.body.address.address,
-        postalCode: req.body.address.postalCode,
-        city: req.body.address.city,
-        country: req.body.address.country,
-      },
-    }, {
-      include: [
-        {
-          model: models.Address,
-        },
-      ],
-      transaction,
-    })
+    }
+
+    if (req.body.address) {
+      newOrg = { ...newOrg, address: req.body.address }
+    }
+
+    const newOrganization = await models.Organization.create(
+      newOrg,
+      {
+        include: [
+          {
+            model: models.Address,
+          },
+        ],
+        transaction,
+      })
 
     const userOrgs = await models.UserOrganization.count({
       where: { user_id: req.user.id },
@@ -192,15 +194,32 @@ const updateOrg = async (req, res) => {
       transaction,
     })
 
-    await models.Address.update(req.body.address,
-      {
+    if (data.addressId) {
+      await models.Address.update(req.body.address, {
         returning: true,
         where: {
           id: data.addressId,
         },
         transaction,
-      },
-    )
+      })
+    } else {
+      const newAddress = await models.Address.create({
+        address: req.body.address.address,
+        postalCode: req.body.address.postalCode,
+        city: req.body.address.city,
+        country: req.body.address.country,
+      }, { transaction })
+
+      await models.Organization.update({
+        addressId: newAddress.id,
+      }, {
+        where: {
+          id: req.params.id,
+        },
+        transaction,
+      })
+    }
+
     delete req.body.address
   }
 
