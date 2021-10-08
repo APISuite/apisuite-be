@@ -216,7 +216,7 @@ const updateOrg = async (req, res) => {
 
       await transaction.commit()
 
-      const organization = await models.Organization.findByPk(req.params.id, {
+      const organizationData = await models.Organization.findByPk(req.params.id, {
         attributes: { exclude: _exclude },
         include: [{
           model: models.Address,
@@ -226,7 +226,7 @@ const updateOrg = async (req, res) => {
         }],
       })
 
-      return res.status(HTTPStatus.OK).send(organization)
+      return res.status(HTTPStatus.OK).send(organizationData)
     }
 
     await models.Address.update(req.body.address,
