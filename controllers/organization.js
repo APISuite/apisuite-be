@@ -200,8 +200,7 @@ const updateOrg = async (req, res) => {
         postalCode: req.body.address.postalCode,
         city: req.body.address.city,
         country: req.body.address.country,
-      },
-      transaction,
+      }, { transaction },
       )
 
       await models.Organization.update(
@@ -214,6 +213,20 @@ const updateOrg = async (req, res) => {
           },
           transaction,
         })
+
+      await transaction.commit()
+
+      const organization = await models.Organization.findByPk(req.params.id, {
+        attributes: { exclude: _exclude },
+        include: [{
+          model: models.Address,
+          attributes: {
+            exclude: excludeFields,
+          },
+        }],
+      })
+
+      return res.status(HTTPStatus.OK).send(organization)
     }
 
     await models.Address.update(req.body.address,
