@@ -194,50 +194,32 @@ const updateOrg = async (req, res) => {
       transaction,
     })
 
-    if (!data.addressId) {
-      const newAddress = await models.Address.create({
-        address: req.body.address.address,
-        postalCode: req.body.address.postalCode,
-        city: req.body.address.city,
-        country: req.body.address.country,
-      }, { transaction },
-      )
-
-      await models.Organization.update(
-        {
-          addressId: newAddress.id,
-        },
-        {
-          where: {
-            id: req.params.id,
-          },
-          transaction,
-        })
-
-      await transaction.commit()
-
-      const organizationData = await models.Organization.findByPk(req.params.id, {
-        attributes: { exclude: _exclude },
-        include: [{
-          model: models.Address,
-          attributes: {
-            exclude: excludeFields,
-          },
-        }],
-      })
-
-      return res.status(HTTPStatus.OK).send(organizationData)
-    }
-
-    await models.Address.update(req.body.address,
-      {
+    if (data.addressId) {
+      await models.Address.update(req.body.address, {
         returning: true,
         where: {
           id: data.addressId,
         },
         transaction,
-      },
-    )
+      })
+    } else {
+      const newAddress = await models.Address.create({
+        address: req.body.address.address,
+        postalCode: req.body.address.postalCode,
+        city: req.body.address.city,
+        country: req.body.address.country,
+      }, { transaction })
+
+      await models.Organization.update({
+        addressId: newAddress.id,
+      }, {
+        where: {
+          id: req.params.id,
+        },
+        transaction,
+      })
+    }
+
     delete req.body.address
   }
 
