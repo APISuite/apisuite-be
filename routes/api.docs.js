@@ -25,6 +25,9 @@
  *            type: array
  *            items:
  *              $ref: '#/components/schemas/APIversion'
+ *         type:
+ *           type: string
+ *           enum: [local, cloud]
  *         publishedAt:
  *           type: string
  */
