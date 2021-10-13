@@ -115,4 +115,4 @@ router.deleteAsync('/:orgId',
   controllers.media.deleteMedia)
 module.exports = router
 
-router.use('/media', express.static('media'))
+router.use('/', express.static('media'))
