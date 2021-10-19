@@ -24,6 +24,7 @@ const models = {
   ApiVersionRoute: importModel('./api_version_route'),
   APIToken: importModel('./api_token'),
   App: importModel('./app'),
+  AppType: importModel('./app_type'),
   AppMetadata: importModel('./app_metadata'),
   AppSubscription: importModel('./app_subscription'),
   InviteOrganization: importModel('./invite_organization'),

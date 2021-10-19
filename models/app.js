@@ -101,6 +101,14 @@ const app = (sequelize, DataTypes) => {
       allowNull: true,
       defaultValue: [],
     },
+    appTypeId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'app_types',
+        key: 'id',
+      },
+      allowNull: false,
+    },
   }, {
     timestamps: true,
     underscored: true,
@@ -110,6 +118,7 @@ const app = (sequelize, DataTypes) => {
   App.associate = (models) => {
     App.hasMany(models.AppMetadata, { as: 'metadata' })
     App.belongsTo(models.Organization, { foreignKey: 'org_id' })
+    App.belongsTo(models.AppType, { foreignKey: 'app_type_id' })
     App.belongsToMany(models.Api, { as: 'subscriptions', through: models.AppSubscription, foreignKey: 'app_id' })
   }
 
