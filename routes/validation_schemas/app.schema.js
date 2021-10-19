@@ -33,6 +33,7 @@ const appSchema = Joi.object({
   supportUrl: Joi.string().optional().allow(null, ''),
   directUrl: Joi.string().optional().allow(null, ''),
   metadata: Joi.array().items(appMetadata).optional().allow(null),
+  appType: Joi.number().required(),
 })
 
 const subscriptionSchema = Joi.object({

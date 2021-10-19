@@ -315,6 +315,12 @@ const createDraftApp = async (req, res) => {
 
     if (req.user.role.name !== roles.ADMIN) req.body.labels = []
 
+    const appTypeId = await models.AppType.findByPk(req.body.appTypeId)
+
+    if (!appTypeId) {
+      return res.status(HTTPStatus.BAD_REQUEST).send({ errors: ['Failed to create app. App type does not exists'] })
+    }
+
     let app = await models.App.create({
       name: req.body.name,
       description: req.body.description,
@@ -334,6 +340,7 @@ const createDraftApp = async (req, res) => {
       websiteUrl: req.body.websiteUrl,
       supportUrl: req.body.supportUrl,
       directUrl: req.body.directUrl,
+      appTypeId: req.body.appTypeId,
     }, { transaction })
 
     if (req.body.metadata && req.body.metadata.length) {
@@ -356,6 +363,7 @@ const createDraftApp = async (req, res) => {
       user_id: req.user.id,
       app_id: app.id,
       organization_id: orgId,
+      app_type_id: app.appTypeId,
       meta: {
         id: app.id,
         name: app.name,

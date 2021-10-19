@@ -192,6 +192,8 @@
  *           type: array
  *           items:
  *             $ref: '#/components/schemas/AppMetadata'
+ *         appTypeId:
+ *           type: number
  *
  *     AppMetadata:
  *       type: object
