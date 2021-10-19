@@ -43,6 +43,8 @@ module.exports = {
 
       await queryInterface.sequelize.query(`UPDATE app SET app_type_id = ${createdAppType.id};`, { transaction })
 
+      await queryInterface.sequelize.query('ALTER TABLE app DROP CONSTRAINT app_app_type_id_fkey;', { transaction })
+
       await queryInterface.changeColumn('app', 'app_type_id', {
         type: Sequelize.INTEGER,
         allowNull: false,
