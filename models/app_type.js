@@ -1,14 +1,8 @@
 const appType = (sequelize, DataTypes) => {
   const AppType = sequelize.define('app_type', {
-    appId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      primaryKey: true,
-    },
     type: {
       type: DataTypes.TEXT,
       allowNull: false,
-      primaryKey: true,
     },
   }, {
     tableName: 'app_types',
