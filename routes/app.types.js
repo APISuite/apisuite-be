@@ -16,26 +16,24 @@ const {
 
 /**
  * @openapi
- * /app/types/:
+ * /apps/types/:
  *   get:
- *     description: Get App Type
- *     tags: [Settings]
+ *     summary: Create an app type
+ *     description: Create an app type
+ *     tags: [App]
+ *     security:
+ *       - cookieAuth: []
  *     responses:
  *       200:
  *         description: App Types
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                id:
- *                  type: number
- *                type:
- *                  type: string
- *                createdAt:
- *                  type: string
- *                updatedAt:
- *                  type: string
+ *               $ref: '#/components/schemas/types'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
  *       404:
  *         $ref: '#/components/responses/NotFound'
  */

@@ -144,6 +144,8 @@
  *           type: string
  *         updatedAt:
  *           type: string
+ *         appType:
+ *            $ref: '#/components/schemas/types'
  *
  *     AppDraft:
  *       type: object
@@ -283,3 +285,20 @@
  *         message:
  *           type: string
 */
+
+/**
+ * @openapi
+ * components:
+ *   schemas:
+ *     types:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: number
+ *         type:
+ *           type: string
+ *         createdAt:
+ *           type: string
+ *         updatedAt:
+ *           type: string
+ */

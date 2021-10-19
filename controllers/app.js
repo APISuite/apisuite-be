@@ -38,6 +38,11 @@ const includes = () => [
     as: 'metadata',
     attributes: ['key', 'value', 'title', 'description'],
   },
+  {
+    model: models.AppType,
+    as: 'app_type',
+    attributes: ['id', 'type', 'createdAt', 'updatedAt'],
+  },
 ]
 
 const getSubscriptionModel = async () => {
@@ -208,6 +213,12 @@ const updateApp = async (req, res) => {
   try {
     if (req.user.role.name !== roles.ADMIN) req.body.labels = undefined
 
+    const appTypeId = await models.AppType.findByPk(req.body.appTypeId)
+
+    if (!appTypeId) {
+      return res.status(HTTPStatus.BAD_REQUEST).send({ errors: ['Failed to create app. App type does not exists'] })
+    }
+
     const [rowsUpdated, [updated]] = await models.App.update(
       {
         name: req.body.name,
@@ -223,6 +234,7 @@ const updateApp = async (req, res) => {
         websiteUrl: req.body.websiteUrl,
         supportUrl: req.body.supportUrl,
         directUrl: req.body.directUrl,
+        appTypeId: req.body.appTypeId,
       },
       {
         transaction,
@@ -256,7 +268,7 @@ const updateApp = async (req, res) => {
 
       await models.AppMetadata.bulkCreate(metadata, { transaction })
     }
-
+    console.log(typeof req.body.subscriptions)
     const subscriptionModel = await getSubscriptionModel()
 
     if (subscriptionModel === subscriptionModels.DETAILED && typeof req.body.subscriptions !== 'undefined') {
@@ -281,6 +293,7 @@ const updateApp = async (req, res) => {
       user_id: req.user.id,
       app_id: req.params.appId,
       organization_id: orgId,
+      app_type_id: updated.appTypeId,
       meta: {
         id: updated.id,
         name: updated.name,
