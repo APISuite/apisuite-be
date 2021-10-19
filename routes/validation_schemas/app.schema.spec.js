@@ -22,6 +22,7 @@ describe('Apps Validations', () => {
       websiteUrl: chance.url(),
       supportUrl: chance.url(),
       directUrl: chance.url(),
+      appTypeId: chance.integer(),
     }
 
     describe('test invalid payloads', () => {
