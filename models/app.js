@@ -14,7 +14,7 @@ const app = (sequelize, DataTypes) => {
     },
     redirect_url: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     shortDescription: {
       type: DataTypes.STRING,
@@ -94,12 +94,12 @@ const app = (sequelize, DataTypes) => {
     labels: {
       type: DataTypes.ARRAY(DataTypes.TEXT),
       allowNull: false,
-      default: [],
+      defaultValue: [],
     },
     images: {
       type: DataTypes.ARRAY(DataTypes.TEXT),
       allowNull: true,
-      default: [],
+      defaultValue: [],
     },
   }, {
     timestamps: true,
