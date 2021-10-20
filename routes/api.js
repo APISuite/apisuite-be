@@ -12,6 +12,39 @@ const validations = require('./validation_schemas/api.schema')
  *     description: Get list of available APIs, sorted by update time (desc).
  *     tags: [API]
  *     parameters:
+ *       - name: search
+ *         description: Search terms
+ *         in: query
+ *         schema:
+ *           type: string
+ *       - name: name
+ *         description: The name(s) of the API Product for filtering
+ *         in: query
+ *         schema:
+ *           type: string
+ *       - name: type
+ *         description: The type(s) of API Product for filtering
+ *         in: query
+ *         schema:
+ *           type: string
+ *       - name: sort_by
+ *         description: Sorting field
+ *         in: query
+ *         schema:
+ *           type: string
+ *           default: published
+ *           enum:
+ *             - created
+ *             - updated
+ *       - name: order
+ *         description: Publication sorting order
+ *         in: query
+ *         schema:
+ *           type: string
+ *           default: asc
+ *           enum:
+ *             - asc
+ *             - desc
  *       - name: page
  *         description: The page we are at.
  *         in: query

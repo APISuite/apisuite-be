@@ -28,8 +28,19 @@ const APIversionSchema = Joi.object({
 })
 
 const apiPaginationSchema = Joi.object({
+  search: Joi.string().optional(),
+  name: Joi.alternatives().try(
+    Joi.string(),
+    Joi.array().min(1).items(Joi.string()),
+  ).optional(),
+  type: Joi.alternatives().try(
+    Joi.string(),
+    Joi.array().min(1).items(Joi.string()),
+  ).optional(),
   page: Joi.number().min(1).optional(),
   pageSize: Joi.number().min(1).optional(),
+  sort_by: Joi.string().valid('created', 'updated', 'published').optional(),
+  order: Joi.string().valid('asc', 'desc').optional(),
 })
 
 module.exports = {
