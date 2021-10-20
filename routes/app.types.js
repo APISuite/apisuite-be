@@ -18,28 +18,19 @@ const {
  * @openapi
  * /apps/types/:
  *   get:
- *     summary: Create an app type
- *     description: Create an app type
+ *     summary: List app types
  *     tags: [App]
- *     security:
- *       - cookieAuth: []
  *     responses:
  *       200:
- *         description: App Types
+ *         description: App Type
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/types'
- *       401:
- *         $ref: '#/components/responses/Unauthorized'
- *       403:
- *         $ref: '#/components/responses/Forbidden'
- *       404:
- *         $ref: '#/components/responses/NotFound'
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Type'
  */
 router.getAsync('/',
-  loggedIn,
-  accessControl(actions.UPDATE, possessions.ANY, resources.SETTINGS),
   controllers.appTypes.get)
 
 /**
@@ -47,7 +38,6 @@ router.getAsync('/',
  * /apps/types/:
  *   post:
  *     summary: Create an app type
- *     description: Create an app type
  *     tags: [App]
  *     security:
  *       - cookieAuth: []
@@ -60,15 +50,15 @@ router.getAsync('/',
  *             type: string
  *     responses:
  *       201:
- *         description: No Content
- *         schema:
- *             type: string
+ *         description: App Type
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Type'
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
  *       403:
  *         $ref: '#/components/responses/Forbidden'
- *       404:
- *         $ref: '#/components/responses/NotFound'
  */
 router.postAsync('/',
   loggedIn,

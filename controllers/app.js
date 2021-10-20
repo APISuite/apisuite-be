@@ -213,9 +213,9 @@ const updateApp = async (req, res) => {
   try {
     if (req.user.role.name !== roles.ADMIN) req.body.labels = undefined
 
-    const appTypeId = await models.AppType.findByPk(req.body.appTypeId)
+    const appType = await models.AppType.findByPk(req.body.appTypeId)
 
-    if (!appTypeId) {
+    if (!appType) {
       return res.status(HTTPStatus.BAD_REQUEST).send({ errors: ['Failed to create app. App type does not exists'] })
     }
 
@@ -234,7 +234,7 @@ const updateApp = async (req, res) => {
         websiteUrl: req.body.websiteUrl,
         supportUrl: req.body.supportUrl,
         directUrl: req.body.directUrl,
-        appTypeId: req.body.appTypeId,
+        appTypeId: appType.id,
       },
       {
         transaction,
@@ -268,7 +268,7 @@ const updateApp = async (req, res) => {
 
       await models.AppMetadata.bulkCreate(metadata, { transaction })
     }
-    console.log(typeof req.body.subscriptions)
+
     const subscriptionModel = await getSubscriptionModel()
 
     if (subscriptionModel === subscriptionModels.DETAILED && typeof req.body.subscriptions !== 'undefined') {
@@ -328,9 +328,9 @@ const createDraftApp = async (req, res) => {
 
     if (req.user.role.name !== roles.ADMIN) req.body.labels = []
 
-    const appTypeId = await models.AppType.findByPk(req.body.appTypeId)
+    const appType = await models.AppType.findByPk(req.body.appTypeId)
 
-    if (!appTypeId) {
+    if (!appType) {
       return res.status(HTTPStatus.BAD_REQUEST).send({ errors: ['Failed to create app. App type does not exists'] })
     }
 
@@ -353,7 +353,7 @@ const createDraftApp = async (req, res) => {
       websiteUrl: req.body.websiteUrl,
       supportUrl: req.body.supportUrl,
       directUrl: req.body.directUrl,
-      appTypeId: req.body.appTypeId,
+      appTypeId: appType.id,
     }, { transaction })
 
     if (req.body.metadata && req.body.metadata.length) {

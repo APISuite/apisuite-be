@@ -290,7 +290,7 @@
  * @openapi
  * components:
  *   schemas:
- *     types:
+ *     Type:
  *       type: object
  *       properties:
  *         id:
