@@ -145,7 +145,7 @@
  *         updatedAt:
  *           type: string
  *         appType:
- *            $ref: '#/components/schemas/types'
+ *            $ref: '#/components/schemas/Type'
  *
  *     AppDraft:
  *       type: object
