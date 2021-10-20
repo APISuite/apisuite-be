@@ -38,6 +38,11 @@ const includes = () => [
     as: 'metadata',
     attributes: ['key', 'value', 'title', 'description'],
   },
+  {
+    model: models.AppType,
+    as: 'app_type',
+    attributes: ['id', 'type', 'createdAt', 'updatedAt'],
+  },
 ]
 
 const getSubscriptionModel = async () => {
@@ -208,6 +213,12 @@ const updateApp = async (req, res) => {
   try {
     if (req.user.role.name !== roles.ADMIN) req.body.labels = undefined
 
+    const appType = await models.AppType.findByPk(req.body.appTypeId)
+
+    if (!appType) {
+      return res.status(HTTPStatus.BAD_REQUEST).send({ errors: ['Failed to create app. App type does not exists'] })
+    }
+
     const [rowsUpdated, [updated]] = await models.App.update(
       {
         name: req.body.name,
@@ -223,6 +234,7 @@ const updateApp = async (req, res) => {
         websiteUrl: req.body.websiteUrl,
         supportUrl: req.body.supportUrl,
         directUrl: req.body.directUrl,
+        appTypeId: appType.id,
       },
       {
         transaction,
@@ -281,6 +293,7 @@ const updateApp = async (req, res) => {
       user_id: req.user.id,
       app_id: req.params.appId,
       organization_id: orgId,
+      app_type_id: updated.appTypeId,
       meta: {
         id: updated.id,
         name: updated.name,
@@ -315,6 +328,12 @@ const createDraftApp = async (req, res) => {
 
     if (req.user.role.name !== roles.ADMIN) req.body.labels = []
 
+    const appType = await models.AppType.findByPk(req.body.appTypeId)
+
+    if (!appType) {
+      return res.status(HTTPStatus.BAD_REQUEST).send({ errors: ['Failed to create app. App type does not exists'] })
+    }
+
     let app = await models.App.create({
       name: req.body.name,
       description: req.body.description,
@@ -334,6 +353,7 @@ const createDraftApp = async (req, res) => {
       websiteUrl: req.body.websiteUrl,
       supportUrl: req.body.supportUrl,
       directUrl: req.body.directUrl,
+      appTypeId: appType.id,
     }, { transaction })
 
     if (req.body.metadata && req.body.metadata.length) {
@@ -356,6 +376,7 @@ const createDraftApp = async (req, res) => {
       user_id: req.user.id,
       app_id: app.id,
       organization_id: orgId,
+      app_type_id: app.appTypeId,
       meta: {
         id: app.id,
         name: app.name,

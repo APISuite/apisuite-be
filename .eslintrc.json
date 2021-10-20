@@ -16,7 +16,9 @@
         "ecmaVersion": 2020
     },
     "rules": {
-        "comma-dangle": ["error", "always-multiline"]
+        "comma-dangle": ["error", "always-multiline"],
+        "object-curly-spacing": ["error", "always"],
+        "no-console": "error"
     },
     "overrides": [
         {

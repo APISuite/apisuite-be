@@ -9,9 +9,11 @@ const {
 } = require('./validation_schemas/app.schema')
 const publicAppsRoutes = require('./app.public')
 const appMediaRoutes = require('./app.media')
+const appTypes = require('./app.types')
 
 router.use('/public', publicAppsRoutes)
 router.use('/:appId/media', appMediaRoutes)
+router.use('/types', appTypes)
 
 /**
  * @openapi
