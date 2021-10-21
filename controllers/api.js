@@ -18,13 +18,14 @@ const getAll = async (req, res) => {
   }
 
   let search = {}
+  let matchSearch = ''
   if (req.query.search && typeof req.query.search === 'string') {
-    const matchSearch = `%${req.query.search}%`
+    matchSearch = `%${req.query.search}%`
     search = {
       [Op.or]:
         [
           { name: { [Op.iLike]: matchSearch } },
-          sequelize.literal(`"apis"."type"::TEXT ILIKE '%${matchSearch}%'`),
+          sequelize.literal('?.?::TEXT ILIKE ?'),
         ],
     }
   }
@@ -72,6 +73,7 @@ const getAll = async (req, res) => {
           exclude: ['spec'],
         },
       }],
+      replacements: ['apis', 'type', matchSearch],
       order,
     }
 
