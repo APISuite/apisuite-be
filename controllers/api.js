@@ -9,10 +9,62 @@ const { apiTypes } = require('../util/enums')
 const { createAPIHandler } = require('./api-helper')
 
 const getAll = async (req, res) => {
+  const filters = {}
+
+  if (req.query.type) {
+    filters.type = {
+      [Op.overlap]: Array.isArray(req.query.type) ? req.query.type : [req.query.type],
+    }
+  }
+
+  let search = {}
+  let matchSearch = ''
+  if (req.query.search && typeof req.query.search === 'string') {
+    matchSearch = `%${req.query.search}%`
+    search = {
+      [Op.or]:
+        [
+          { name: { [Op.iLike]: matchSearch } },
+          sequelize.literal('?.?::TEXT ILIKE ?'),
+        ],
+    }
+  }
+
+  let order = []
+  const sortOrder = req.query.order || 'asc'
+  switch (req.query.sort_by) {
+    case 'published': {
+      order = [
+        ['published_at', sortOrder],
+        ['name', sortOrder],
+      ]
+      break
+    }
+    case 'created': {
+      order = [
+        ['created_at', sortOrder],
+        ['name', sortOrder],
+      ]
+      break
+    }
+    case 'updated': {
+      order = [
+        ['updated_at', sortOrder],
+        ['name', sortOrder],
+      ]
+      break
+    }
+    default: {
+      order = [['name', sortOrder]]
+      break
+    }
+  }
+
   try {
     const options = {
       where: {
-        publishedAt: { [Op.not]: null },
+        ...search,
+        ...filters,
       },
       distinct: true,
       include: [{
@@ -21,10 +73,8 @@ const getAll = async (req, res) => {
           exclude: ['spec'],
         },
       }],
-      order: [
-        ['updated_at', 'DESC'],
-        [models.ApiVersion, 'created_at', 'DESC'],
-      ],
+      replacements: ['apis', 'type', matchSearch],
+      order,
     }
 
     if (res.locals.isAdmin) {
