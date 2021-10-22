@@ -13,8 +13,6 @@ const { getUserProfile } = require('./user-helper')
 const fs = require('fs').promises
 const apiTokensControllers = require('./user.api-tokens')
 
-const excludedUserFields = ['password', 'activation_token']
-
 const getById = async (req, res) => {
   let where = { id: req.params.id }
 
@@ -25,10 +23,20 @@ const getById = async (req, res) => {
 
     where = { oidcId: req.params.id }
   }
-  const user = await models.User.findOne({ where }, { attributes: { exclude: excludedUserFields } })
+
+  let excludeFields = ['password', 'activationToken']
+  if (!req.user) {
+    excludeFields = excludeFields.concat(['last_login', 'oidcId', 'oidcProvider', 'createdAt', 'updatedAt'])
+  }
+
+  const user = await models.User.findOne({
+    where,
+    attributes: { exclude: excludeFields },
+  })
   if (!user) {
     return res.status(HTTPStatus.NOT_FOUND).send({ errors: ['User does not exist.'] })
   }
+
   return res.status(HTTPStatus.OK).send(user)
 }
 

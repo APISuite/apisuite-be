@@ -126,8 +126,6 @@ router.getAsync('/profile',
  *         $ref: '#/components/responses/Internal'
  */
 router.getAsync('/:id',
-  loggedIn,
-  accessControl(actions.READ, possessions.ANY, resources.PROFILE),
   controllers.user.getById)
 
 /**
