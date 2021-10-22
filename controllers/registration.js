@@ -138,7 +138,6 @@ const completeRegistration = async (req, res) => {
       await models.UserOrganization.create({
         user_id: user.id,
         org_id: organization.id,
-        role_id: user.role_id,
         current_org: true,
       }, { transaction })
     }
