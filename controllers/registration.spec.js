@@ -198,7 +198,6 @@ describe('Registration', () => {
       stubs.org_create.resolves({ id: chance.natural({ min: 1, max: 20 }) })
       stubs.user_create.resolves({
         id: chance.natural({ min: 1, max: 20 }),
-        role_id: 2,
       })
       stubs.user_org_create.resolves()
       stubs.invite_destroy.resolves()
@@ -233,7 +232,6 @@ describe('Registration', () => {
       })
       stubs.user_create.resolves({
         id: chance.natural({ min: 1, max: 20 }),
-        role_id: roleId,
       })
       stubs.user_org_create.resolves()
       stubs.invite_destroy.resolves()
