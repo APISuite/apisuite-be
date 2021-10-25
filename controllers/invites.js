@@ -116,7 +116,6 @@ const signup = async (req, res) => {
       email: invite.email.toLowerCase(),
       password: req.body.password,
       activationToken,
-      role_id: invite.role_id,
     }, { transaction })
 
     await models.UserOrganization.create({
