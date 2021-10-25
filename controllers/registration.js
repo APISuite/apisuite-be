@@ -131,14 +131,13 @@ const completeRegistration = async (req, res) => {
       avatar: req.body.avatar,
       mobile: req.body.mobile,
       activationToken,
-      role_id: wasInvited ? invite.role_id : defaultRole.id,
     }, { transaction })
 
     if (organization.id) {
       await models.UserOrganization.create({
         user_id: user.id,
         org_id: organization.id,
-        role_id: user.role_id,
+        role_id: wasInvited ? invite.role_id : defaultRole.id,
         current_org: true,
       }, { transaction })
     }

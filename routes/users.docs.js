@@ -26,8 +26,6 @@
  *           format: uri
  *         last_login:
  *           type: string
- *         role_id:
- *           type: string
  */
 
 /** @openapi

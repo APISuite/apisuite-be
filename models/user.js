@@ -35,13 +35,6 @@ const user = (sequelize, DataTypes) => {
       type: DataTypes.DATE,
       allowNull: true,
     },
-    role_id: {
-      type: DataTypes.INTEGER,
-      references: {
-        model: 'role',
-        key: 'id',
-      },
-    },
     oidcId: {
       type: DataTypes.STRING,
       allowNull: true,
@@ -57,7 +50,6 @@ const user = (sequelize, DataTypes) => {
   })
 
   User.associate = (models) => {
-    User.belongsTo(models.Role, { foreignKey: 'role_id', as: 'role' })
     User.hasMany(models.RefreshToken)
   }
 
