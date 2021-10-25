@@ -1,5 +1,5 @@
 const appType = (sequelize, DataTypes) => {
-  const AppType = sequelize.define('app_type', {
+  const AppType = sequelize.define('appType', {
     type: {
       type: DataTypes.TEXT,
       allowNull: false,

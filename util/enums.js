@@ -79,8 +79,13 @@ const regex = {
   SNAKE_CASE: /^[a-z](?:[a-z0-9]+_)*[a-z0-9]+$/,
 }
 
+const appTypes = {
+  CLIENT_APP: 'client',
+}
+
 module.exports = {
   apiTypes,
+  appTypes,
   appStates,
   appVisibility,
   contentTargets,

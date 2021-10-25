@@ -11,6 +11,7 @@ const {
   settingTypes,
   subscriptionModels,
   appStates,
+  appTypes,
 } = require('../util/enums')
 const Idp = require('../services/idp')
 const publicAppsController = require('./app.public')
@@ -24,6 +25,8 @@ const appAttributes = {
   exclude: [
     'client_data',
     'enable',
+    'appTypeId',
+    'app_type_id',
   ],
 }
 
@@ -40,7 +43,6 @@ const includes = () => [
   },
   {
     model: models.AppType,
-    as: 'app_type',
     attributes: ['id', 'type', 'createdAt', 'updatedAt'],
   },
 ]
@@ -213,10 +215,13 @@ const updateApp = async (req, res) => {
   try {
     if (req.user.role.name !== roles.ADMIN) req.body.labels = undefined
 
-    const appType = await models.AppType.findByPk(req.body.appTypeId)
-
-    if (!appType) {
-      return res.status(HTTPStatus.BAD_REQUEST).send({ errors: ['Failed to create app. App type does not exists'] })
+    let appTypeId
+    if (req.body.appTypeId) {
+      const appType = await models.AppType.findByPk(req.body.appTypeId)
+      if (!appType) {
+        return res.status(HTTPStatus.BAD_REQUEST).send({ errors: ['Failed to create app. App type does not exists'] })
+      }
+      appTypeId = appType.id
     }
 
     const [rowsUpdated, [updated]] = await models.App.update(
@@ -234,7 +239,7 @@ const updateApp = async (req, res) => {
         websiteUrl: req.body.websiteUrl,
         supportUrl: req.body.supportUrl,
         directUrl: req.body.directUrl,
-        appTypeId: appType.id,
+        appTypeId: appTypeId,
       },
       {
         transaction,
@@ -328,7 +333,14 @@ const createDraftApp = async (req, res) => {
 
     if (req.user.role.name !== roles.ADMIN) req.body.labels = []
 
-    const appType = await models.AppType.findByPk(req.body.appTypeId)
+    let appType
+    if (req.body.appTypeId) {
+      appType = await models.AppType.findByPk(req.body.appTypeId)
+    } else {
+      appType = await models.AppType.findOne({
+        where: { type: appTypes.CLIENT_APP },
+      })
+    }
 
     if (!appType) {
       return res.status(HTTPStatus.BAD_REQUEST).send({ errors: ['Failed to create app. App type does not exists'] })
@@ -365,12 +377,13 @@ const createDraftApp = async (req, res) => {
       await models.AppMetadata.bulkCreate(metadata, { transaction })
     }
 
-    await transaction.commit()
-
     app = await models.App.findByPk(app.id, {
       attributes: appAttributes,
       include: includes(),
+      transaction,
     })
+
+    await transaction.commit()
 
     publishEvent(routingKeys.APP_CREATED, {
       user_id: req.user.id,
