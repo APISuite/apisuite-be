@@ -1,11 +1,17 @@
 const Joi = require('joi')
 const validator = require('./validator')
 
-const apiDocsSchema = Joi.object({
+const apiDocsItemsSchema = Joi.object({
   title: Joi.string().optional(),
   info: Joi.string().optional(),
-  target: Joi.string().valid('product_intro', 'feature', 'use_case', 'highlight').required(),
   image: Joi.string().optional(),
+})
+
+const apiDocsSchema = Joi.object({
+  productIntro: Joi.string().optional(),
+  features: Joi.array().items(apiDocsItemsSchema),
+  useCases: Joi.array().items(apiDocsItemsSchema),
+  highlights: Joi.array().items(apiDocsItemsSchema),
 })
 
 const apiVersionPatchSchema = Joi.object({

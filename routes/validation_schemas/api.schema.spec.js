@@ -42,13 +42,30 @@ describe('API Validations', () => {
       const basePayload = { name: 'apiname', baseUri: 'www.url.io', baseUriSandbox: 'www.url.sb' }
       const testData = [
         { body: basePayload },
-        { body: { ...basePayload, docs: [{ target: 'product_intro' }] } },
-        { body: { ...basePayload, docs: [{ target: 'feature' }] } },
-        { body: { ...basePayload, docs: [{ target: 'use_case' }] } },
-        { body: { ...basePayload, docs: [{ target: 'highlight' }] } },
-        { body: { ...basePayload, docs: [{ title: 'lorem', target: 'product_intro' }] } },
-        { body: { ...basePayload, docs: [{ title: 'lorem', info: 'ipsum', target: 'product_intro' }] } },
-        { body: { ...basePayload, docs: [{ title: 'lorem', info: 'ipsum', target: 'product_intro', image: 'urlurl' }] } },
+        {
+          body:
+            {
+              ...basePayload,
+              docs: [{
+                productIntro: 'qwertyuiop',
+                features: [{
+                  title: 'feat1',
+                  info: 'laksjd',
+                  image: 'https://image.jpg',
+                }],
+                useCases: [{
+                  title: 'feat1',
+                  info: 'laksjd',
+                  image: 'https://image.jpg',
+                }],
+                highlights: [{
+                  title: 'feat1',
+                  info: 'laksjd',
+                  image: 'https://image.jpg',
+                }],
+              }],
+            },
+        },
       ]
 
       testData.forEach((mockReq) => {

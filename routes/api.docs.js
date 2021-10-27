@@ -42,15 +42,18 @@
  *         - rows
  *         - pagination
  *       properties:
- *         title:
- *           type: string
- *         info:
- *           type: string
- *         target:
- *           type: string
- *           enum: [product_intro, feature, use_case, highlight]
- *         image:
- *           type: string
+ *         features:
+ *           type: array
+ *           items:
+ *            $ref: '#/components/schemas/ApiDocsItems'
+ *         useCases:
+ *           type: array
+ *           items:
+ *            $ref: '#/components/schemas/ApiDocsItems'
+ *         highlights:
+ *           type: array
+ *           items:
+ *            $ref: '#/components/schemas/ApiDocsItems'
  *         createdAt:
  *           type: string
  *         updatedAt:
@@ -123,4 +126,18 @@
  *           type: boolean
  *         deleted:
  *           type: boolean
+ */
+
+/** @openapi
+ * components:
+ *   schemas:
+ *     ApiDocsItems:
+ *       type: object
+ *       properties:
+ *         title:
+ *           type: string
+ *         info:
+ *           type: string
+ *         image:
+ *           type: string
  */
