@@ -128,11 +128,6 @@ const addOrg = async (req, res) => {
 
     await transaction.commit()
 
-    publishEvent(routingKeys.ORG_CREATED, {
-      user_id: req.user.id,
-      organization_id: newOrganization.id,
-    })
-
     const organization = await models.Organization.findByPk(newOrganization.id, {
       attributes: { exclude: _exclude },
       include: [{
@@ -242,10 +237,7 @@ const updateOrg = async (req, res) => {
     publishEvent(routingKeys.ORG_UPDATED, {
       user_id: req.user.id,
       organization_id: req.params.id,
-      meta: {
-        id: updated.id,
-        name: updated.name,
-      },
+      meta: updated,
     })
   }
 

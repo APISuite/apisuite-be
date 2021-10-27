@@ -61,7 +61,8 @@ const organization = (sequelize, DataTypes) => {
 
   Organization.afterCreate((org, options) => {
     publishEvent(routingKeys.ORG_CREATED, {
-      id: org.id,
+      organization_id: org.id,
+      meta: org,
     })
   })
 
