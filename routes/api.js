@@ -32,10 +32,12 @@ const validations = require('./validation_schemas/api.schema')
  *         in: query
  *         schema:
  *           type: string
- *           default: published
+ *           default: name
  *           enum:
+ *             - name
  *             - created
  *             - updated
+ *             - published
  *       - name: order
  *         description: Publication sorting order
  *         in: query
