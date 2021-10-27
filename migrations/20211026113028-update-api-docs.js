@@ -5,10 +5,9 @@ module.exports = {
   up: async (queryInterface) => {
     const transaction = await queryInterface.sequelize.transaction()
     try {
-      await queryInterface.sequelize.query('CREATE TABLE public.api_docs_bck (id int ,docs text);')
-
       const apiDocs = await models.Api.findAll({
         attributes: ['id', 'docs'],
+        transaction,
       })
 
       for (let i = 0; i < apiDocs.length; i++) {
