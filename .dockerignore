@@ -1,3 +1,7 @@
-node_modules
-.compose-utils
-.github
+node_modules/
+.compose-utils/
+.github/
+.ssh/
+.git/
+.npm/
+Dockerfile
