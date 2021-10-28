@@ -5,7 +5,7 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     const transaction = await queryInterface.sequelize.transaction()
     try {
-      queryInterface.addColumn('apis', 'api_docs', {
+      await queryInterface.addColumn('apis', 'api_docs', {
         type: Sequelize.JSON,
         defaultValue: false,
         allowNull: true,
