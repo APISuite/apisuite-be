@@ -10,7 +10,6 @@ const { createAPIHandler } = require('./api-helper')
 
 const getAll = async (req, res) => {
   const filters = {}
-
   if (req.query.type) {
     filters.type = {
       [Op.overlap]: Array.isArray(req.query.type) ? req.query.type : [req.query.type],

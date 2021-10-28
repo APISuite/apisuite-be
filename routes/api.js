@@ -32,10 +32,12 @@ const validations = require('./validation_schemas/api.schema')
  *         in: query
  *         schema:
  *           type: string
- *           default: published
+ *           default: name
  *           enum:
+ *             - name
  *             - created
  *             - updated
+ *             - published
  *       - name: order
  *         description: Publication sorting order
  *         in: query
@@ -132,7 +134,7 @@ router.getAsync('/:id',
  *                 type: string
  *               baseUriSandbox:
  *                 type: string
- *               docs:
+ *               apiDocs:
  *                  type: array
  *                  items:
  *                    $ref: '#/components/schemas/APIdoc'
