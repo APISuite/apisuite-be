@@ -97,7 +97,6 @@ describe('setup', () => {
         name: 'abcde',
         website: 'abcde.org',
         vat: '123456789',
-        org_code: uuidv4(),
       },
     },
   }

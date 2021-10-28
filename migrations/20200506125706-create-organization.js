@@ -33,11 +33,6 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true,
       },
-      org_code: {
-        type: Sequelize.STRING,
-        allowNull: true,
-        unique: true,
-      },
       created_at: {
         type: Sequelize.DATE,
         allowNull: false,
@@ -49,7 +44,7 @@ module.exports = {
     })
   },
 
-  down: (queryInterface, Sequelize) => {
+  down: (queryInterface) => {
     return queryInterface.dropTable('organization')
   },
 }

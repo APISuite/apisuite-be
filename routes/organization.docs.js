@@ -18,8 +18,6 @@
  *         logo:
  *           type: string
  *           format: uri
- *         org_code:
- *           type: string
  *         app_count:
  *           type: number
  *         tosUrl:

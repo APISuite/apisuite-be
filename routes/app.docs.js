@@ -275,13 +275,10 @@
  *       type: object
  *       required:
  *         - success
- *         - org_code
  *         - message
  *       properties:
  *         success:
  *           type: boolean
- *         org_code:
- *           type: string
  *         message:
  *           type: string
 */
