@@ -7,7 +7,7 @@ const validations = require('./validation_schemas/api.schema')
 
 /**
  * @openapi
- * /apis:
+ * /apis/:
  *   get:
  *     description: Get list of available APIs, sorted by update time (desc).
  *     tags: [API]
@@ -24,9 +24,13 @@ const validations = require('./validation_schemas/api.schema')
  *           type: string
  *       - name: type
  *         description: The type(s) of API Product for filtering
- *         in: query
  *         schema:
  *           type: string
+ *           default: local
+ *           enum:
+ *             - local
+ *             - cloud
+ *         in: query
  *       - name: sort_by
  *         description: Sorting field
  *         in: query

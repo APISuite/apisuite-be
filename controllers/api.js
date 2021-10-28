@@ -13,7 +13,7 @@ const getAll = async (req, res) => {
 
   if (req.query.type) {
     filters.type = {
-      [Op.overlap]: Array.isArray(req.query.type) ? req.query.type : [req.query.type],
+      [Op.in]: Array.isArray(req.query.type) ? req.query.type : [req.query.type],
     }
   }
 
@@ -25,7 +25,7 @@ const getAll = async (req, res) => {
       [Op.or]:
         [
           { name: { [Op.iLike]: matchSearch } },
-          sequelize.literal('?.?::TEXT ILIKE ?'),
+          sequelize.literal('"apis"."type"::TEXT ILIKE ?'),
         ],
     }
   }
@@ -73,7 +73,8 @@ const getAll = async (req, res) => {
           exclude: ['spec'],
         },
       }],
-      replacements: ['apis', 'type', matchSearch],
+      raw: true,
+      replacements: [matchSearch],
       order,
     }
 
