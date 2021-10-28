@@ -111,7 +111,6 @@ const completeRegistration = async (req, res) => {
       organization = await models.Organization.create({
         name: registration.organizationName,
         websiteUrl: registration.organizationWebsite,
-        org_code: uuidv4(),
       }, { transaction })
     }
 

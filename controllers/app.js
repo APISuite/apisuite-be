@@ -578,10 +578,8 @@ const isSubscribedTo = async (req, res) => {
             where: sequelize.literal('\'' + route + '\' ~ route'),
           }],
         }],
-      }, {
-        model: models.Organization,
-        attributes: ['org_code'],
-      }],
+      },
+      ],
     })
 
     if (!app) {
@@ -595,7 +593,6 @@ const isSubscribedTo = async (req, res) => {
     return res.status(HTTPStatus.OK).json({
       success: true,
       message: `App is subscribed to API for route ${req.body.path}`,
-      org_code: app.organization.org_code,
     })
   } catch (err) {
     log.error(err, '[IS SUBSCRIBED TO]')

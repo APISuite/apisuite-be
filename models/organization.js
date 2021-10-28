@@ -19,11 +19,6 @@ const organization = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true,
     },
-    org_code: {
-      type: DataTypes.STRING,
-      allowNull: true,
-      unique: true,
-    },
     tosUrl: {
       type: DataTypes.STRING,
       allowNull: true,
@@ -85,7 +80,7 @@ const organization = (sequelize, DataTypes) => {
     const res = await Promise.all([
       Organization.count(),
       sequelize.query(`
-          SELECT a.id, a.name, a.description, a.vat, a.logo, a.org_code, a.created_at, a.updated_at, a.tos_url, a.privacy_url, a.youtube_url, a.website_url, a.support_url, a.tax_exempt, b.address
+          SELECT a.id, a.name, a.description, a.vat, a.logo, a.created_at, a.updated_at, a.tos_url, a.privacy_url, a.youtube_url, a.website_url, a.support_url, a.tax_exempt, b.address
           FROM organization as a
           JOIN (
             SELECT COUNT(*) AS app_count, organization.id AS org_id

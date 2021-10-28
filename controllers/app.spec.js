@@ -150,13 +150,11 @@ describe('Apps', () => {
       })
       const mockApp = {
         subscriptions: [{}],
-        organization: { org_code: 'somecode' },
       }
       stubs.app_findOne.resolves(mockApp)
 
       await isSubscribedTo(req, res)
       sinon.assert.calledWith(res.status, HTTPStatus.OK)
-      sinon.assert.calledWith(res.json, sinon.match.has('org_code', mockApp.organization.org_code))
     })
 
     it('should return 500 when an unexpected error occurs', async () => {

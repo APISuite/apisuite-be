@@ -23,7 +23,6 @@ const setup = async (req, res) => {
       name: req.body.organization.name,
       websiteUrl: req.body.organization.website,
       vat: req.body.organization.vat,
-      org_code: uuidv4(),
     }, { transaction })
 
     await sequelize.query('INSERT INTO owner_organization (organization_id) VALUES (?);', {

@@ -33,6 +33,11 @@ module.exports = {
           model: 'role',
           key: 'id',
         },
+        org_code: {
+          type: Sequelize.STRING,
+          allowNull: true,
+          unique: true,
+        },
         onDelete: 'cascade',
         onUpdate: 'cascade',
       },

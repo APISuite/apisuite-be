@@ -1,6 +1,5 @@
 const HTTPStatus = require('http-status-codes')
 const { Op } = require('sequelize')
-const { v4: uuidv4 } = require('uuid')
 const log = require('../util/logger')
 const { models, sequelize } = require('../models')
 const { roles } = require('../util/enums')
@@ -92,7 +91,6 @@ const addOrg = async (req, res) => {
       vat: req.body.vat,
       terms: req.body.terms,
       logo: req.body.logo,
-      org_code: uuidv4(),
       tosUrl: req.body.tosUrl,
       privacyUrl: req.body.privacyUrl,
       youtubeUrl: req.body.youtubeUrl,
