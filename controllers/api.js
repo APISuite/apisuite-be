@@ -73,7 +73,6 @@ const getAll = async (req, res) => {
           exclude: ['spec'],
         },
       }],
-      raw: true,
       replacements: [matchSearch],
       order,
     }
