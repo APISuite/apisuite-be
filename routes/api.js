@@ -134,7 +134,7 @@ router.getAsync('/:id',
  *                 type: string
  *               baseUriSandbox:
  *                 type: string
- *               docs:
+ *               apiDocs:
  *                  type: array
  *                  items:
  *                    $ref: '#/components/schemas/APIdoc'

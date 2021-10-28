@@ -19,6 +19,10 @@ const api = (sequelize, DataTypes) => {
       type: DataTypes.JSON,
       allowNull: true,
     },
+    apiDocs: {
+      type: DataTypes.JSON,
+      allowNull: true,
+    },
     publishedAt: {
       type: DataTypes.DATE,
       allowNull: true,

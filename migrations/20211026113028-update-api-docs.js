@@ -2,9 +2,15 @@
 const { models } = require('../models')
 
 module.exports = {
-  up: async (queryInterface) => {
+  up: async (queryInterface, Sequelize) => {
     const transaction = await queryInterface.sequelize.transaction()
     try {
+      queryInterface.addColumn('apis', 'api_docs', {
+        type: Sequelize.JSON,
+        defaultValue: false,
+        allowNull: true,
+      }, { transaction })
+
       const apiDocs = await models.Api.findAll({
         attributes: ['id', 'docs'],
         transaction,
@@ -56,7 +62,7 @@ module.exports = {
         }
 
         await models.Api.update(
-          { docs: apiDocsObj },
+          { apiDocs: apiDocsObj },
           {
             where: { id: apiDocs[i].dataValues.id },
             transaction,

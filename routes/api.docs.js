@@ -20,6 +20,10 @@
  *         docs:
  *            type: array
  *            items:
+ *              $ref: '#/components/schemas/APIdocLegacy'
+ *         apiDocs:
+ *            type: array
+ *            items:
  *              $ref: '#/components/schemas/APIdoc'
  *         apiVersions:
  *            type: array
@@ -139,5 +143,30 @@
  *         info:
  *           type: string
  *         image:
+ *           type: string
+ */
+
+/**
+ * @openapi
+ * components:
+ *   schemas:
+ *     APIdocLegacy:
+ *       type: object
+ *       required:
+ *         - rows
+ *         - pagination
+ *       properties:
+ *         title:
+ *           type: string
+ *         info:
+ *           type: string
+ *         target:
+ *           type: string
+ *           enum: [product_intro, feature, use_case, highlight]
+ *         image:
+ *           type: string
+ *         createdAt:
+ *           type: string
+ *         updatedAt:
  *           type: string
  */
