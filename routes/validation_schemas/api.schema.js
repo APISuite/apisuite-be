@@ -41,6 +41,7 @@ const apiPaginationSchema = Joi.object({
   ).optional(),
   type: Joi.alternatives().try(
     Joi.string().valid('local', 'cloud'),
+    Joi.array().min(1).items(Joi.string().valid('local', 'cloud')),
   ).optional(),
   page: Joi.number().min(1).optional(),
   pageSize: Joi.number().min(1).optional(),
