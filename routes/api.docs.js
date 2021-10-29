@@ -58,10 +58,6 @@
  *           type: array
  *           items:
  *            $ref: '#/components/schemas/ApiDocsItems'
- *         createdAt:
- *           type: string
- *         updatedAt:
- *           type: string
  */
 
 /**
@@ -164,9 +160,5 @@
  *           type: string
  *           enum: [product_intro, feature, use_case, highlight]
  *         image:
- *           type: string
- *         createdAt:
- *           type: string
- *         updatedAt:
  *           type: string
  */
