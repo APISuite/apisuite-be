@@ -25,6 +25,7 @@ const createAPIHandler = async (apiData) => {
       baseUri: apiData.baseUri,
       baseUriSandbox: apiData.baseUriSandbox,
       docs: apiData.docs,
+      apiDocs: apiData.apiDocs,
       type: apiData.type,
     }, { transaction })
 

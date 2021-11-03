@@ -18,10 +18,7 @@ describe('API Validations', () => {
         { body: { name: 'apiname', baseUri: ['str', 'str'] } },
         { body: { name: 'apiname', baseUri: 'www.url.io', baseUriSandbox: {} } },
         { body: { ...basePayload, docs: { invalid: 1 } } },
-        { body: { ...basePayload, docs: [{ title: 1234134 }] } },
-        { body: { ...basePayload, docs: { title: 'titlestring', info: 1234 } } },
-        { body: { ...basePayload, docs: [{ title: 'titlestring', info: 'infoinfo', target: 'outoftouch' }] } },
-        { body: { ...basePayload, docs: { title: 'titlestring', info: 'infoinfo', target: 'outoftouch', image: 1234 } } },
+        { body: { ...basePayload, apiDocs: [{ title: 1234134 }] } },
       ]
 
       testData.forEach((mockReq) => {
@@ -46,7 +43,8 @@ describe('API Validations', () => {
           body:
             {
               ...basePayload,
-              docs: [{
+              docs: [],
+              apiDocs: {
                 productIntro: 'qwertyuiop',
                 features: [{
                   title: 'feat1',
@@ -63,7 +61,7 @@ describe('API Validations', () => {
                   info: 'laksjd',
                   image: 'https://image.jpg',
                 }],
-              }],
+              },
             },
         },
       ]

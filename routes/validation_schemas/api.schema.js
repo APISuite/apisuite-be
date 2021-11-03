@@ -8,10 +8,10 @@ const apiDocsItemsSchema = Joi.object({
 })
 
 const apiDocsSchema = Joi.object({
-  productIntro: Joi.string().optional(),
-  features: Joi.array().items(apiDocsItemsSchema),
-  useCases: Joi.array().items(apiDocsItemsSchema),
-  highlights: Joi.array().items(apiDocsItemsSchema),
+  productIntro: Joi.string().required(),
+  features: Joi.array().items(apiDocsItemsSchema).optional(),
+  useCases: Joi.array().items(apiDocsItemsSchema).optional(),
+  highlights: Joi.array().items(apiDocsItemsSchema).optional(),
 })
 
 const apiVersionPatchSchema = Joi.object({
@@ -25,7 +25,8 @@ const APISchema = Joi.object({
   name: Joi.string().required(),
   baseUri: Joi.string().optional(),
   baseUriSandbox: Joi.string().optional(),
-  docs: Joi.array().items(apiDocsSchema).optional(),
+  docs: Joi.array().optional(),
+  apiDocs: apiDocsSchema.optional(),
   versions: Joi.array().items(apiVersionPatchSchema).optional(),
 })
 
