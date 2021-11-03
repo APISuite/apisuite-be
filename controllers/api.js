@@ -329,6 +329,17 @@ const setPublished = (published) => {
   }
 }
 
+const deleteAPIversion = async (req, res) => {
+  await models.ApiVersion.destroy({
+    where: {
+      id: req.params.id,
+      apiId: req.params.apiId,
+    },
+  })
+
+  return res.sendStatus(HTTPStatus.NO_CONTENT)
+}
+
 module.exports = {
   getAll,
   getById,
@@ -339,4 +350,5 @@ module.exports = {
   getVersionById,
   updateAPIversion,
   setPublished,
+  deleteAPIversion,
 }

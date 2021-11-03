@@ -138,10 +138,12 @@ router.getAsync('/:id',
  *                 type: string
  *               baseUriSandbox:
  *                 type: string
- *               apiDocs:
+ *               docs:
  *                  type: array
  *                  items:
- *                    $ref: '#/components/schemas/APIdoc'
+ *                    $ref: '#/components/schemas/APIdocLegacy'
+ *               apiDocs:
+ *                  $ref: '#/components/schemas/APIdoc'
  *     security:
  *       - cookieAuth: []
  *     responses:
@@ -176,7 +178,7 @@ router.postAsync('/',
  *         schema:
  *           type: number
  *     requestBody:
- *       description: New API data.
+ *       description: API data.
  *       required: true
  *       content:
  *         application/json:
@@ -188,7 +190,9 @@ router.postAsync('/',
  *               docs:
  *                  type: array
  *                  items:
- *                    $ref: '#/components/schemas/APIdoc'
+ *                    $ref: '#/components/schemas/APIdocLegacy'
+ *               apiDocs:
+ *                  $ref: '#/components/schemas/APIdoc'
  *               versions:
  *                  type: array
  *                  items:
@@ -441,5 +445,41 @@ router.patchAsync('/:apiId/versions/:id',
   loggedIn,
   accessControl(actions.UPDATE, possessions.ANY, resources.API),
   controllers.api.updateAPIversion)
+
+/**
+ * @openapi
+ * /apis/{apiId}/versions/{id}:
+ *   delete:
+ *     description: Delete an API version.
+ *     tags: [API]
+ *     parameters:
+ *       - name: apiId
+ *         description: The API id.
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: number
+ *       - name: id
+ *         description: The API version id.
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: number
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       204:
+ *         description: API version deleted successfully
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ *       500:
+ *         $ref: '#/components/responses/Internal'
+ */
+router.deleteAsync('/:apiId/versions/:id',
+  loggedIn,
+  accessControl(actions.DELETE, possessions.ANY, resources.API),
+  controllers.api.deleteAPIversion)
 
 module.exports = router

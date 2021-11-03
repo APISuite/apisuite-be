@@ -43,9 +43,10 @@
  *     APIdoc:
  *       type: object
  *       required:
- *         - rows
- *         - pagination
+ *         - productIntro
  *       properties:
+ *         productIntro:
+ *           type: string
  *         features:
  *           type: array
  *           items:
@@ -148,9 +149,6 @@
  *   schemas:
  *     APIdocLegacy:
  *       type: object
- *       required:
- *         - rows
- *         - pagination
  *       properties:
  *         title:
  *           type: string
