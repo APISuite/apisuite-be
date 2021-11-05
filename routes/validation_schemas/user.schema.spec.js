@@ -66,10 +66,10 @@ describe('User Validations', () => {
         { body: { email: null } },
         { body: { email: '' } },
         { body: { email: 'imnotanemail.com' } },
-        { body: { email: chance.email(), name: 1234 } },
-        { body: { email: chance.email(), password: null } },
-        { body: { email: chance.email(), name: null, password: 76253 } },
-        { body: { email: chance.email(), name: chance.string(), password: 'invalidpassword' } },
+        { body: { email: 'someemail@fake.pp', name: 1234 } },
+        { body: { email: 'someemail@fake.pp', password: null } },
+        { body: { email: 'someemail@fake.pp', name: null, password: 76253 } },
+        { body: { email: 'someemail@fake.pp', name: 'some name', password: 'invalidpassword' } },
       ]
 
       testData.forEach((mockReq) => {
