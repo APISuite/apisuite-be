@@ -40,6 +40,18 @@
  *           description: Only available to admins
  *         address:
  *           $ref: "#/components/schemas/address"
+ *
+ *     CreateOrganization:
+ *       allOf:
+ *         - $ref: "#/components/schemas/address"
+ *         - type: object
+ *           properties:
+ *             options:
+ *               type: object
+ *               properties:
+ *                 selfAssignNewOrganization:
+ *                   type: boolean
+ *                   default: true
  */
 
 /**
