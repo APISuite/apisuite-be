@@ -76,15 +76,6 @@ const addOrg = async (req, res) => {
       return res.status(HTTPStatus.BAD_REQUEST).send({ errors: ['Organization already exists.'] })
     }
 
-    const defaultRole = await models.Role.findOne({
-      where: { name: roles.ORGANIZATION_OWNER },
-      transaction,
-    })
-    if (!defaultRole) {
-      await transaction.rollback()
-      throw new Error('missing organizationOwner role')
-    }
-
     let newOrg = {
       name: req.body.name,
       description: req.body.description,
@@ -113,16 +104,28 @@ const addOrg = async (req, res) => {
         transaction,
       })
 
-    const userOrgs = await models.UserOrganization.count({
-      where: { user_id: req.user.id },
-    }, { transaction })
+    const { selfAssignNewOrganization } = req.body.options || {}
+    if (selfAssignNewOrganization === undefined || selfAssignNewOrganization) {
+      const defaultRole = await models.Role.findOne({
+        where: { name: roles.ORGANIZATION_OWNER },
+        transaction,
+      })
+      if (!defaultRole) {
+        await transaction.rollback()
+        throw new Error('missing organizationOwner role')
+      }
 
-    await models.UserOrganization.create({
-      user_id: req.user.id,
-      org_id: newOrganization.id,
-      role_id: defaultRole.id,
-      current_org: !userOrgs,
-    }, { transaction })
+      const userOrgs = await models.UserOrganization.count({
+        where: { user_id: req.user.id },
+      }, { transaction })
+
+      await models.UserOrganization.create({
+        user_id: req.user.id,
+        org_id: newOrganization.id,
+        role_id: defaultRole.id,
+        current_org: !userOrgs,
+      }, { transaction })
+    }
 
     await transaction.commit()
 

@@ -187,7 +187,7 @@ router.getAsync('/:orgId',
  *       content:
  *         application/json:
  *           schema:
- *             $ref: "#/components/schemas/Organization"
+ *             $ref: "#/components/schemas/CreateOrganization"
  *     security:
  *       - cookieAuth: []
  *     responses:

@@ -26,6 +26,12 @@ const organizationSchema = (create) => {
     }).optional(),
   }
 
+  if (create) {
+    baseSchema.options = Joi.object({
+      selfAssignNewOrganization: Joi.boolean().optional(),
+    }).optional()
+  }
+
   baseSchema.name = create
     ? Joi.string().required()
     : Joi.string().optional()
