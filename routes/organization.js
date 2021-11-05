@@ -397,7 +397,7 @@ router.getAsync('/:id/users',
 router.postAsync('/:id/users',
   loggedIn,
   validateInviteBody,
-  accessControl(actions.UPDATE, possessions.OWN, resources.ORGANIZATION, { idCarrier: 'params', idField: 'id' }),
+  accessControl(actions.UPDATE, possessions.OWN, resources.ORGANIZATION, { idCarrier: 'params', idField: 'id', adminOverride: true }),
   controllers.user.inviteUserToOrganization)
 
 /**
