@@ -85,6 +85,12 @@ const getAll = async (req, res) => {
       pageSize: req.query.pageSize,
       options,
     })
+
+    for (const keys in apis.rows) {
+      if (apis.rows[keys].docs == null) apis.rows[keys].docs = [{}]
+      if (apis.rows[keys].apiDocs === false || apis.rows[keys].apiDocs === null) apis.rows[keys].apiDocs = [{}]
+    }
+
     return res.status(HTTPStatus.OK).send(apis)
   } catch (error) {
     log.error(error, '[API getAll]')
@@ -116,6 +122,10 @@ const getById = async (req, res) => {
     if (!api) {
       return res.status(HTTPStatus.NOT_FOUND).send({ errors: ['API with inputed id does not exist.'] })
     }
+
+    if (api.docs == null) api.docs = [{}]
+    if (api.apiDocs === false || api.apiDocs === null) api.apiDocs = [{}]
+
     return res.status(HTTPStatus.OK).send(api)
   } catch (error) {
     log.error(error, '[GET API BY ID]')
