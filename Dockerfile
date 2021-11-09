@@ -6,11 +6,7 @@ WORKDIR /usr/src/app
 COPY package*.json /usr/src/app/
 COPY . /usr/src/app/
 
-RUN apk update \
-    && apk --no-cache add --virtual build-dependencies build-base python \
-    && npm install --only=prod \
-    && npm rebuild bcrypt --build-from-source \
-    && apk del build-dependencies
+RUN npm install --only=prod
 
 EXPOSE 6001
 
