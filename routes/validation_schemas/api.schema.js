@@ -12,7 +12,7 @@ const apiDocsSchema = Joi.object({
   features: Joi.array().items(apiDocsItemsSchema).optional(),
   useCases: Joi.array().items(apiDocsItemsSchema).optional(),
   highlights: Joi.array().items(apiDocsItemsSchema).optional(),
-})
+}).allow({})
 
 const apiVersionPatchSchema = Joi.object({
   id: Joi.number().required(),
@@ -23,7 +23,7 @@ const apiVersionPatchSchema = Joi.object({
 
 const APISchema = Joi.object({
   name: Joi.string().required(),
-  baseUri: Joi.string().optional(),
+  baseUri: Joi.string().optional().allow(null, ''),
   baseUriSandbox: Joi.string().optional(),
   docs: Joi.array().optional(),
   apiDocs: apiDocsSchema.optional(),
