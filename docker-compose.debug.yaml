@@ -59,9 +59,9 @@ services:
       serve all --dangerous-force-http
     environment:
       - URLS_SELF_ISSUER=${HYDRA_SERVER_URLS_SELF_ISSUER:-http://apisuite-hydra-server:4444}
-      - URLS_CONSENT=${HYDRA_SERVER_URLS_CONSENT:-http://127.0.0.1:3001/auth/consent}
-      - URLS_LOGIN=${HYDRA_SERVER_URLS_LOGIN:-http://127.0.0.1:3001/auth/login}
-      - URLS_LOGOUT=${HYDRA_SERVER_URLS_LOGOUT:-http://127.0.0.1:3001/auth/logout}
+      - URLS_CONSENT=${HYDRA_SERVER_URLS_CONSENT:-http://127.0.0.1:6001/auth/consent}
+      - URLS_LOGIN=${HYDRA_SERVER_URLS_LOGIN:-http://127.0.0.1:6001/auth/login}
+      - URLS_LOGOUT=${HYDRA_SERVER_URLS_LOGOUT:-http://127.0.0.1:6001/auth/logout}
       - DSN=${DSN}
       - SECRETS_SYSTEM=${SECRETS_SYSTEM}
       - OIDC_SUBJECT_TYPES_SUPPORTED=public,pairwise
@@ -129,6 +129,16 @@ services:
       timeout: 10s
       retries: 10
     restart: on-failure
+  keydb:
+    image: eqalpha/keydb:x86_64_v5.3.3
+    container_name: keydb
+    command: keydb-server /etc/keydb/redis.conf --server-threads 2
+    volumes:
+      - ./.compose-utils/keydb/redis.conf:/etc/keydb/redis.conf
+      - ./.compose-utils/keydb/data:/data
+    ports:
+      - 6379:6379
+    restart: unless-stopped
 
 networks:
   default:

@@ -2,9 +2,9 @@ const Joi = require('joi')
 const validator = require('./validator')
 
 const apiDocsItemsSchema = Joi.object({
-  title: Joi.string().optional(),
-  info: Joi.string().optional(),
-  image: Joi.string().optional(),
+  title: Joi.string().optional().allow(''),
+  info: Joi.string().optional().allow(''),
+  image: Joi.string().optional().allow(''),
 })
 
 const apiDocsSchema = Joi.object({
