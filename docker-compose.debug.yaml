@@ -129,16 +129,6 @@ services:
       timeout: 10s
       retries: 10
     restart: on-failure
-  keydb:
-    image: eqalpha/keydb:x86_64_v5.3.3
-    container_name: keydb
-    command: keydb-server /etc/keydb/redis.conf --server-threads 2
-    volumes:
-      - ./.compose-utils/keydb/redis.conf:/etc/keydb/redis.conf
-      - ./.compose-utils/keydb/data:/data
-    ports:
-      - 6379:6379
-    restart: unless-stopped
 
 networks:
   default:
