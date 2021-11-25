@@ -89,7 +89,7 @@ const organization = (sequelize, DataTypes) => {
             JOIN app ON organization.id = app.org_id
             WHERE enable = TRUE
             GROUP BY organization.id
-          ) app_counts ON organization.id = app_counts.org_id
+          ) app_counts ON org.id = app_counts.org_id
           LEFT JOIN address as add ON org.address_id = add.id
           LIMIT ?
           OFFSET ?
