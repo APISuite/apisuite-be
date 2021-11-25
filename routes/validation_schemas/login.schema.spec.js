@@ -15,8 +15,8 @@ describe('Login Validations', () => {
         { body: { email: null } },
         { body: { email: '' } },
         { body: { email: 'imnotanemail.com' } },
-        { body: { email: chance.email(), password: null } },
-        { body: { email: chance.email(), password: 999 } },
+        { body: { email: chance.email({ domain: 'example.com' }), password: null } },
+        { body: { email: chance.email({ domain: 'example.com' }), password: 999 } },
       ]
 
       testData.forEach((mockReq) => {
@@ -35,7 +35,7 @@ describe('Login Validations', () => {
 
     describe('test valid payloads', () => {
       const testData = [
-        { body: { email: chance.email(), password: chance.string() } },
+        { body: { email: chance.email({ domain: 'example.com' }), password: chance.string() } },
       ]
 
       testData.forEach((mockReq) => {

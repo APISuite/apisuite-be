@@ -21,9 +21,9 @@ describe('Registration Validations', () => {
         { body: { email: null } },
         { body: { email: '' } },
         { body: { email: 'imnotanemail.com' } },
-        { body: { email: chance.email(), name: null } },
-        { body: { email: chance.email(), name: 999 } },
-        { body: { email: chance.email(), name: chance.string(), token: {} } },
+        { body: { email: chance.email({ domain: 'example.com' }), name: null } },
+        { body: { email: chance.email({ domain: 'example.com' }), name: 999 } },
+        { body: { email: chance.email({ domain: 'example.com' }), name: chance.string(), token: {} } },
       ]
 
       testData.forEach((mockReq) => {
@@ -42,8 +42,8 @@ describe('Registration Validations', () => {
 
     describe('test valid payloads', () => {
       const testData = [
-        { body: { email: chance.email(), name: chance.string() } },
-        { body: { email: chance.email(), name: chance.string(), token: chance.string() } },
+        { body: { email: chance.email({ domain: 'example.com' }), name: chance.string() } },
+        { body: { email: chance.email({ domain: 'example.com' }), name: chance.string(), token: chance.string() } },
       ]
 
       testData.forEach((mockReq) => {

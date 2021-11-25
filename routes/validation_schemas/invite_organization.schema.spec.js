@@ -15,8 +15,8 @@ describe('Organization invite Validations', () => {
         { body: { email: null } },
         { body: { email: '' } },
         { body: { email: 'imnotanemail.com' } },
-        { body: { email: chance.email(), role_id: null } },
-        { body: { email: chance.email(), role_id: 999 } },
+        { body: { email: chance.email({ domain: 'example.com' }), role_id: null } },
+        { body: { email: chance.email({ domain: 'example.com' }), role_id: 999 } },
       ]
 
       testData.forEach((mockReq) => {
@@ -35,7 +35,7 @@ describe('Organization invite Validations', () => {
 
     describe('test valid payloads', () => {
       const testData = [
-        { body: { email: chance.email(), role_id: '1' } },
+        { body: { email: chance.email({ domain: 'example.com' }), role_id: '1' } },
       ]
 
       testData.forEach((mockReq) => {
