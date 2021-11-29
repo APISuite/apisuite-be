@@ -13,6 +13,7 @@ const keys = {
   APP_REQUESTED: 'api.app.requested',
   ORG_CREATED: 'api.organization.created',
   ORG_UPDATED: 'api.organization.updated',
+  ORG_DELETED: 'api.organization.deleted',
   ORG_USER_ROLE: 'api.organization.userRoleChanged',
   ORG_USER_INVITED: 'api.organization.userInvited',
   ORG_ACTIVITY: 'api.organization.activity',

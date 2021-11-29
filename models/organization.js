@@ -61,6 +61,13 @@ const organization = (sequelize, DataTypes) => {
     })
   })
 
+  Organization.afterDestroy((org, options) => {
+    publishEvent(routingKeys.ORG_DELETED, {
+      organization_id: org.id,
+      meta: org,
+    })
+  })
+
   Organization.associate = (models) => {
     Organization.belongsTo(models.Address, { foreignKey: 'addressId' })
     Organization.hasMany(models.App, { foreignKey: 'org_id' })
