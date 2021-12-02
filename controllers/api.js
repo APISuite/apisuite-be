@@ -1,12 +1,14 @@
 const fs = require('fs').promises
 const HTTPStatus = require('http-status-codes')
 const { Op } = require('sequelize')
+const { v4: uuidv4 } = require('uuid')
 const log = require('../util/logger')
 const { models, sequelize } = require('../models')
 const swaggerUtil = require('../util/swagger_util')
 const Gateway = require('../services/gateway')
 const { apiTypes } = require('../util/enums')
 const { createAPIHandler } = require('./api-helper')
+const Storage = require('../services/storage')
 
 const getAll = async (req, res) => {
   const filters = {}
@@ -68,9 +70,6 @@ const getAll = async (req, res) => {
       distinct: true,
       include: [{
         model: models.ApiVersion,
-        attributes: {
-          exclude: ['spec'],
-        },
       }],
       replacements: [matchSearch],
       order,
@@ -241,7 +240,9 @@ const createAPIversion = async (req, res) => {
     return res.status(HTTPStatus.BAD_REQUEST).send({ errors: ['File was not uploaded.'] })
   }
 
-  const validationRes = await swaggerUtil.validateSwagger(req.formdata.files.file.path)
+  const specFile = req.formdata.files.file.path
+
+  const validationRes = await swaggerUtil.validateSwagger(specFile)
   if (validationRes.errors.length) {
     log.info(validationRes.errors, '[CREATE API version valitationRes ERR]')
     return res.status(HTTPStatus.BAD_REQUEST).send({ errors: [...validationRes.errors] })
@@ -254,14 +255,17 @@ const createAPIversion = async (req, res) => {
     return res.status(HTTPStatus.NOT_FOUND).send({ errors: ['API not found'] })
   }
 
-  const jsonFile = await fs.readFile(req.formdata.files.file.path)
-  const parsedAPI = JSON.parse(jsonFile)
+  const storageClient = Storage.getStorageClient()
+  const uploaded = await storageClient.saveFile(specFile, `api-spec-${uuidv4()}`)
+  if (uploaded.error) {
+    return res.status(HTTPStatus.INTERNAL_SERVER_ERROR).send({ errors: ['Failed to save file'] })
+  }
 
   const apiVersion = await models.ApiVersion.create({
     title: validationRes.api.info.title,
     version: validationRes.api.info.version,
     apiId: api.dataValues.id,
-    spec: parsedAPI,
+    specFile: uploaded.objectURL,
   })
 
   return res.status(HTTPStatus.CREATED).send(apiVersion)

@@ -84,7 +84,7 @@ const setup = async (req, res) => {
       version: petstore.info.version,
       live: true,
       apiId: api.id,
-      spec: petstore,
+      specFile: 'https://petstore.swagger.io/v2/swagger.json',
     }, { transaction })
 
     const invitationData = {

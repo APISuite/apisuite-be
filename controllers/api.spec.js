@@ -8,6 +8,7 @@ const Api = models.Api
 const ApiVersion = models.ApiVersion
 const swaggerUtil = require('../util/swagger_util')
 const Gateway = require('../services/gateway')
+const Storage = require('../services/storage')
 const {
   getAll,
   getById,
@@ -297,6 +298,7 @@ describe('APIs', () => {
         api_findByPk: sinon.stub(Api, 'findByPk'),
         apiVersion_create: sinon.stub(ApiVersion, 'create'),
         validateSwagger: sinon.stub(swaggerUtil, 'validateSwagger'),
+        getStorageClient: sinon.stub(Storage, 'getStorageClient'),
       }
     })
 
@@ -339,6 +341,30 @@ describe('APIs', () => {
       helpers.calledWithErrors(res.send)
     })
 
+    it('should return 500 when storage fails to save the file', async () => {
+      const req = mockRequest(mockReq)
+      const res = mockResponse()
+      stubs.validateSwagger.resolves({
+        errors: [],
+        api: {
+          info: {
+            title: 'pets',
+            version: '1234',
+          },
+        },
+      })
+      const mockData = { id: 1, ...mockReq.body }
+      stubs.api_findByPk.resolves({ dataValues: { id: 1 } })
+      stubs.apiVersion_create.resolves(mockData)
+      stubs.getStorageClient.returns({
+        saveFile: sinon.stub().resolves({ error: 'failed' }),
+      })
+
+      await createAPIversion(req, res)
+      sinon.assert.calledWith(res.status, HTTPStatus.INTERNAL_SERVER_ERROR)
+      helpers.calledWithErrors(res.send)
+    })
+
     it('should return 201 and return the new entity', async () => {
       const req = mockRequest(mockReq)
       const res = mockResponse()
@@ -354,6 +380,9 @@ describe('APIs', () => {
       const mockData = { id: 1, ...mockReq.body }
       stubs.api_findByPk.resolves({ dataValues: { id: 1 } })
       stubs.apiVersion_create.resolves(mockData)
+      stubs.getStorageClient.returns({
+        saveFile: sinon.stub().resolves({ error: null }),
+      })
 
       await createAPIversion(req, res)
       sinon.assert.calledWith(res.status, HTTPStatus.CREATED)
