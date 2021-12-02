@@ -1,4 +1,3 @@
-const fs = require('fs').promises
 const HTTPStatus = require('http-status-codes')
 const { Op } = require('sequelize')
 const { v4: uuidv4 } = require('uuid')
