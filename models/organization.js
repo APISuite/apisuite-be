@@ -80,16 +80,17 @@ const organization = (sequelize, DataTypes) => {
     const res = await Promise.all([
       Organization.count(),
       sequelize.query(`
-          SELECT a.id, a.name, a.description, a.vat, a.logo, a.created_at, a.updated_at, a.tos_url, a.privacy_url, a.youtube_url, a.website_url, a.support_url, a.tax_exempt, b.address
-          FROM organization as a
+          SELECT org.id, org.name, org.description, org.vat, org.logo, org.created_at, org.updated_at, org.tos_url, 
+            org.privacy_url, org.youtube_url, org.website_url, org.support_url, org.tax_exempt, add.address
+          FROM organization as org
           JOIN (
             SELECT COUNT(*) AS app_count, organization.id AS org_id
             FROM organization
             JOIN app ON organization.id = app.org_id
             WHERE enable = TRUE
             GROUP BY organization.id
-          ) app_counts ON organization.id = app_counts.org_id
-          LEFT JOIN public.address as b ON a.address_id = id
+          ) app_counts ON org.id = app_counts.org_id
+          LEFT JOIN address as add ON org.address_id = add.id
           LIMIT ?
           OFFSET ?
         `, {

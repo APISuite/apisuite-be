@@ -88,7 +88,7 @@ describe('User Validations', () => {
 
     describe('test valid payloads', () => {
       const testData = [
-        { body: { email: chance.email(), name: chance.string(), password: 'Sup3rPassw0rd!@$#' } },
+        { body: { email: chance.email({ domain: 'example.com' }), name: chance.string(), password: 'Sup3rPassw0rd!@$#' } },
       ]
 
       testData.forEach((mockReq) => {
@@ -197,8 +197,8 @@ describe('User Validations', () => {
         { body: { } },
         { body: { email: 3423462 } },
         { body: { email: chance.string() } },
-        { body: { email: chance.email(), organization: { } } },
-        { body: { email: chance.email(), organization: { name: 123434 } } },
+        { body: { email: chance.email({ domain: 'example.com' }), organization: { } } },
+        { body: { email: chance.email({ domain: 'example.com' }), organization: { name: 123434 } } },
       ]
 
       testData.forEach((mockReq) => {
@@ -217,10 +217,10 @@ describe('User Validations', () => {
 
     describe('test valid payloads', () => {
       const testData = [
-        { body: { email: chance.email(), organization: { name: 'acme' } } },
+        { body: { email: chance.email({ domain: 'example.com' }), organization: { name: 'acme' } } },
         {
           body: {
-            email: chance.email(),
+            email: chance.email({ domain: 'example.com' }),
             organization: {
               name: 'acme',
             },
@@ -228,7 +228,7 @@ describe('User Validations', () => {
         },
         {
           body: {
-            email: chance.email(),
+            email: chance.email({ domain: 'example.com' }),
             organization: {
               name: 'acme',
               website: chance.url(),

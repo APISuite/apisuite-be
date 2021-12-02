@@ -168,6 +168,10 @@ const deleteOrg = async (req, res) => {
 
     await transaction.commit()
 
+    publishEvent(routingKeys.ORG_DELETED, {
+      organization_id: req.params.orgId,
+    })
+
     return res.sendStatus(HTTPStatus.NO_CONTENT)
   } catch (error) {
     if (transaction) await transaction.rollback()

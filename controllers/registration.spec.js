@@ -39,7 +39,7 @@ describe('Registration', () => {
     const mockReq = {
       body: {
         name: chance.name(),
-        email: chance.email(),
+        email: chance.email({ domain: 'example.com' }),
       },
       user: { org: { id: 100 } },
     }
@@ -188,7 +188,7 @@ describe('Registration', () => {
       stubs.registration_findByPk.resolves({
         id: chance.natural({ min: 1, max: 20 }),
         name: chance.name(),
-        email: chance.email(),
+        email: chance.email({ domain: 'example.com' }),
         organizationName: chance.company(),
         organizationWebsite: chance.url(),
         createdAt: Date.now(),
@@ -213,7 +213,7 @@ describe('Registration', () => {
     it('should return 200 if the registration is complete [invite]', async () => {
       const req = mockRequest(mockReq)
       const res = mockResponse()
-      const userEmail = chance.email()
+      const userEmail = chance.email({ domain: 'example.com' })
       const roleId = parseInt(chance.string({ length: 1, pool: '123' }))
       stubs.registration_findByPk.resolves({
         id: chance.natural({ min: 1, max: 20 }),
@@ -268,7 +268,7 @@ describe('Registration', () => {
       stubs.registration_findByPk.resolves({
         id: chance.natural({ min: 1, max: 20 }),
         name: chance.name(),
-        email: chance.email(),
+        email: chance.email({ domain: 'example.com' }),
         organizationName: chance.company(),
         organizationWebsite: chance.url(),
         createdAt: Date.now(),
@@ -353,7 +353,7 @@ describe('Registration', () => {
       const req = mockRequest(mockReq)
       const res = mockResponse()
       stubs.invite_findByConfirmationToken.resolves({
-        email: chance.email(),
+        email: chance.email({ domain: 'example.com' }),
       })
 
       await validateInvitation(req, res)

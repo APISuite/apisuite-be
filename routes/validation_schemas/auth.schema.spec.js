@@ -41,7 +41,7 @@ describe('Auth Validations', () => {
 
     describe('test valid payloads', () => {
       const testData = [
-        { body: { email: chance.email() } },
+        { body: { email: chance.email({ domain: 'example.com' }) } },
       ]
 
       testData.forEach((mockReq) => {
