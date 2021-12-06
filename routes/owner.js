@@ -42,8 +42,6 @@ router.getAsync('/',
  *               email:
  *                 type: string
  *                 format: email
- *               organization_name:
- *                 type: string
  *               organization:
  *                  $ref: '#/components/schemas/OrganizationSetup'
  *               settings:

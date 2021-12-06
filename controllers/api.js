@@ -264,6 +264,11 @@ const createAPIversion = async (req, res) => {
     title: validationRes.api.info.title,
     version: validationRes.api.info.version,
     apiId: api.dataValues.id,
+    spec: {
+      info: validationRes.api.info,
+      tags: validationRes.api.tags,
+      externalDocs: validationRes.api.externalDocs,
+    },
     specFile: uploaded.objectURL,
   })
 

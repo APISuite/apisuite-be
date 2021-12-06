@@ -96,6 +96,8 @@
  *           type: string
  *         version:
  *           type: string
+ *         spec:
+ *           type: object
  *         specFile:
  *           type: string
  *         live:
