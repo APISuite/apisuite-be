@@ -16,6 +16,10 @@ const apiVersion = (sequelize, DataTypes) => {
       type: DataTypes.JSON,
       allowNull: true,
     },
+    specFile: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     live: {
       type: DataTypes.BOOLEAN,
       allowNull: false,

@@ -1,5 +1,4 @@
 const HTTPStatus = require('http-status-codes')
-const path = require('path')
 const log = require('../util/logger')
 const SwaggerParser = require('@apidevtools/swagger-parser')
 const { v4: uuidv4 } = require('uuid')
@@ -64,18 +63,14 @@ const setup = async (req, res) => {
       confirmation_token: uuidv4(),
     }, { transaction })
 
-    const petstore = await SwaggerParser.validate(path.join(__dirname, '../util/petstore3.json'))
+    const petstore = await SwaggerParser.validate('https://petstore.swagger.io/v2/swagger.json')
 
     const api = await models.Api.create({
       name: petstore.info.title,
       baseUri: 'https://example.petstore.io/',
-      docs: [
-        {
-          title: petstore.info.title,
-          info: petstore.info.description,
-          target: enums.contentTargets.PRODUCT_INTRO,
-        },
-      ],
+      apiDocs: {
+        productIntro: petstore.info.title,
+      },
       publishedAt: new Date(),
     }, { transaction })
 
@@ -84,7 +79,12 @@ const setup = async (req, res) => {
       version: petstore.info.version,
       live: true,
       apiId: api.id,
-      spec: petstore,
+      spec: {
+        info: petstore.info,
+        tags: petstore.tags,
+        externalDocs: petstore.externalDocs,
+      },
+      specFile: 'https://petstore.swagger.io/v2/swagger.json',
     }, { transaction })
 
     const invitationData = {

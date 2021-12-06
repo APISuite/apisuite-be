@@ -98,6 +98,8 @@
  *           type: string
  *         spec:
  *           type: object
+ *         specFile:
+ *           type: string
  *         live:
  *           type: boolean
  *         deprecated:
