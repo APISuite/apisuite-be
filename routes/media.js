@@ -111,7 +111,6 @@ router.postAsync('/:orgId',
 router.deleteAsync('/:orgId',
   loggedIn,
   accessControl(actions.READ, possessions.OWN, resources.ORGANIZATION, { idCarrier: 'params', idField: 'orgId' }),
-  fileParser,
   controllers.media.deleteMedia)
 module.exports = router
 
