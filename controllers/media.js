@@ -57,61 +57,72 @@ const uploadMedia = async (req, res) => {
   }
 
   const transaction = await sequelize.transaction()
-  for (let j = 0; j < saveResults.length; j++) {
-    const sr = saveResults[j]
-    if (sr.objectURL && sr.objectURL.length) {
-      const file = pathParser(sr.objectURL, 7)
-      response.savedObjects.push({
+  try {
+    for (let j = 0; j < saveResults.length; j++) {
+      const sr = saveResults[j]
+      if (sr.objectURL && sr.objectURL.length) {
+        const file = pathParser(sr.objectURL, 7)
+        response.savedObjects.push({
+          file: files[j].name,
+          url: sr.objectURL,
+        })
+        await models.Media.create({
+          file: file,
+          url: sr.objectURL,
+          orgId: req.params.orgId,
+        }, transaction)
+        continue
+      }
+
+      response.errors.push({
         file: files[j].name,
-        url: sr.objectURL,
+        error: 'failed to save image',
       })
-      await models.Media.create({
-        file: file,
-        url: sr.objectURL,
-        orgId: req.params.orgId,
-      }, transaction)
-      continue
     }
 
-    response.errors.push({
-      file: files[j].name,
-      error: 'failed to save image',
-    })
+    await transaction.commit()
+
+    if (!response.errors.length) delete response.errors
+    return res.status(HTTPStatus.OK).send(response)
+  } catch (error) {
+    await transaction.rollback()
+    log.error(error, '[UPLOAD MEDIA]')
+    return res.status(HTTPStatus.INTERNAL_SERVER_ERROR).send({ errors: ['Failed to upload media objects.'] })
   }
-
-  await transaction.commit()
-
-  if (!response.errors.length) delete response.errors
-  return res.status(HTTPStatus.OK).send(response)
 }
 
 const deleteMedia = async (req, res) => {
   const transaction = await sequelize.transaction()
+  try {
+    const file = pathParser(req.query.mediaURL, 7)
+    const mediaSearch = await models.Media.findByPk(file, { transaction })
 
-  const file = pathParser(req.query.mediaURL, 7)
-  const mediaSearch = await models.Media.findByPk(file, { transaction })
+    if (!mediaSearch) {
+      await transaction.rollback()
+      return res.status(HTTPStatus.NOT_FOUND).send({ errors: ['Image not found'] })
+    }
 
-  if (!mediaSearch) {
-    if (transaction) await transaction.rollback()
-    return res.status(HTTPStatus.NOT_FOUND).send({ errors: ['Image not found'] })
+    const path = pathParser(req.query.mediaURL, 0)
+
+    await models.Media.destroy({
+      where: {
+        file: file,
+        orgId: req.params.orgId,
+      },
+      transaction,
+    })
+
+    const storageClient = Storage.getStorageClient()
+    await storageClient.deleteFile(path)
+
+    await transaction.commit()
+
+    return res.sendStatus(HTTPStatus.NO_CONTENT)
+  } catch (error) {
+    await transaction.rollback()
+    log.error(error, '[DELETE MEDIA]')
+    return res.status(HTTPStatus.INTERNAL_SERVER_ERROR).send({ errors: ['Failed to delete media object.'] })
   }
-
-  const path = pathParser(req.query.mediaURL, 0)
-
-  await models.Media.destroy({
-    where: {
-      file: file,
-      orgId: req.params.orgId,
-    },
-    transaction,
-  })
-
-  const storageClient = Storage.getStorageClient()
-  await storageClient.deleteFile(path)
-
-  await transaction.commit()
-
-  return res.sendStatus(HTTPStatus.NO_CONTENT)
 }
 
 module.exports = {
