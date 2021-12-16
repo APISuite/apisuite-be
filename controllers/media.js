@@ -88,7 +88,7 @@ const uploadMedia = async (req, res) => {
 const deleteMedia = async (req, res) => {
   const transaction = await sequelize.transaction()
 
-  const file = pathParser(req.query.mediaUrl, 7)
+  const file = pathParser(req.query.mediaURL, 7)
   const mediaSearch = await models.Media.findByPk(file, { transaction })
 
   if (!mediaSearch) {
@@ -96,7 +96,7 @@ const deleteMedia = async (req, res) => {
     return res.status(HTTPStatus.NOT_FOUND).send({ errors: ['Image not found'] })
   }
 
-  const path = pathParser(req.query.mediaUrl, 0)
+  const path = pathParser(req.query.mediaURL, 0)
 
   await models.Media.destroy({
     where: {
