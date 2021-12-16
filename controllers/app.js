@@ -113,6 +113,13 @@ const listApps = async (req, res) => {
     })
   }
 
+  if (req.params.id) {
+    publishEvent(routingKeys.ORG_APPS_LISTED, {
+      user_id: req.user.id,
+      organization_id: req.params.id,
+    })
+  }
+
   return res.status(HTTPStatus.OK).send(apps)
 }
 
@@ -149,6 +156,14 @@ const getApp = async (req, res) => {
 
   if (app.state !== appStates.APPROVED) {
     app.subscriptions = []
+  }
+
+  if (req.params.id) {
+    publishEvent(routingKeys.ORG_APPS_READ, {
+      user_id: req.user.id,
+      app_id: req.params.appId,
+      organization_id: req.params.id,
+    })
   }
 
   return res.status(HTTPStatus.OK).send(app)
@@ -200,6 +215,14 @@ const deleteApp = async (req, res) => {
       app_id: req.params.appId,
       organization_id: orgId,
     })
+
+    if (req.params.id) {
+      publishEvent(routingKeys.ORG_APPS_DELETED, {
+        user_id: req.user.id,
+        app_id: req.params.appId,
+        organization_id: req.params.id,
+      })
+    }
 
     return res.sendStatus(HTTPStatus.NO_CONTENT)
   } catch (err) {
@@ -294,23 +317,34 @@ const updateApp = async (req, res) => {
 
     await transaction.commit()
 
+    const appEventMeta = {
+      id: updated.id,
+      name: updated.name,
+      description: updated.description,
+      shortDescription: updated.shortDescription,
+      logo: updated.logo,
+      visibility: updated.visibility,
+      state: updated.state,
+      labels: updated.labels,
+      org: req.user.organizations.find((o) => o.id === Number(orgId)),
+    }
+
     publishEvent(routingKeys.APP_UPDATED, {
       user_id: req.user.id,
       app_id: req.params.appId,
       organization_id: orgId,
       app_type_id: updated.appTypeId,
-      meta: {
-        id: updated.id,
-        name: updated.name,
-        description: updated.description,
-        shortDescription: updated.shortDescription,
-        logo: updated.logo,
-        visibility: updated.visibility,
-        state: updated.state,
-        labels: updated.labels,
-        org: req.user.organizations.find((o) => o.id === Number(orgId)),
-      },
+      meta: appEventMeta,
     })
+
+    if (req.params.id) {
+      publishEvent(routingKeys.ORG_APPS_UPDATED, {
+        user_id: req.user.id,
+        app_id: req.params.appId,
+        organization_id: req.params.id,
+        meta: appEventMeta,
+      })
+    }
 
     const app = await models.App.findByPk(updated.id, {
       attributes: appAttributes,
@@ -385,23 +419,34 @@ const createDraftApp = async (req, res) => {
 
     await transaction.commit()
 
+    const appEventMeta = {
+      id: app.id,
+      name: app.name,
+      description: app.description,
+      shortDescription: app.shortDescription,
+      logo: app.logo,
+      visibility: app.visibility,
+      state: app.state,
+      labels: app.labels,
+      org: req.user.organizations.find((o) => o.id === Number(orgId)),
+    }
+
     publishEvent(routingKeys.APP_CREATED, {
       user_id: req.user.id,
       app_id: app.id,
       organization_id: orgId,
       app_type_id: app.appTypeId,
-      meta: {
-        id: app.id,
-        name: app.name,
-        description: app.description,
-        shortDescription: app.shortDescription,
-        logo: app.logo,
-        visibility: app.visibility,
-        state: app.state,
-        labels: app.labels,
-        org: req.user.organizations.find((o) => o.id === Number(orgId)),
-      },
+      meta: appEventMeta,
     })
+
+    if (req.params.id) {
+      publishEvent(routingKeys.ORG_APPS_CREATED, {
+        user_id: req.user.id,
+        app_id: req.params.appId,
+        organization_id: req.params.id,
+        meta: appEventMeta,
+      })
+    }
 
     return res.status(HTTPStatus.CREATED).send(app)
   } catch (err) {
@@ -646,21 +691,32 @@ const patchApp = async (req, res) => {
       include: includes(),
     })
 
+    const appEventMeta = {
+      id: updated.id,
+      name: updated.name,
+      description: updated.description,
+      shortDescription: updated.shortDescription,
+      logo: updated.logo,
+      visibility: updated.visibility,
+      state: updated.state,
+      labels: app.labels,
+    }
+
     publishEvent(routingKeys.APP_UPDATED, {
       user_id: req.user.id,
       app_id: req.params.appId,
       organization_id: req.params.id,
-      meta: {
-        id: updated.id,
-        name: updated.name,
-        description: updated.description,
-        shortDescription: updated.shortDescription,
-        logo: updated.logo,
-        visibility: updated.visibility,
-        state: updated.state,
-        labels: app.labels,
-      },
+      meta: appEventMeta,
     })
+
+    if (req.params.id) {
+      publishEvent(routingKeys.ORG_APPS_UPDATED, {
+        user_id: req.user.id,
+        app_id: req.params.appId,
+        organization_id: req.params.id,
+        meta: appEventMeta,
+      })
+    }
 
     return res.status(HTTPStatus.OK).send(app)
   } catch (err) {
