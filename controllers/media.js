@@ -70,7 +70,7 @@ const uploadMedia = async (req, res) => {
           file: file,
           url: sr.objectURL,
           orgId: req.params.orgId,
-        }, transaction)
+        }, { transaction })
         continue
       }
 
