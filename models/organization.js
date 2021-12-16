@@ -54,12 +54,10 @@ const organization = (sequelize, DataTypes) => {
     freezeTableName: true,
   })
 
-  Organization.afterBulkCreate((orgs, options) => {
-    orgs.forEach((org) => {
-      publishEvent(routingKeys.ORG_CREATED, {
-        organization_id: org.id,
-        meta: org,
-      })
+  Organization.afterCreate((org) => {
+    publishEvent(routingKeys.ORG_CREATED, {
+      organization_id: org.id,
+      meta: org,
     })
   })
 
