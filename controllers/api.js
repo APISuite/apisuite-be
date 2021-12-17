@@ -74,8 +74,8 @@ const getAll = async (req, res) => {
       order,
     }
 
-    if (res.locals.isAdmin) {
-      delete options.where
+    if (!res.locals.isAdmin) {
+      options.where.publishedAt = { [Op.not]: null }
     }
 
     const apis = await models.Api.findAllPaginated({
