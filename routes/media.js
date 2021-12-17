@@ -1,9 +1,10 @@
+const express = require('express')
 const { decorateRouter } = require('@awaitjs/express')
 const router = decorateRouter(require('express').Router({ mergeParams: true }))
 const controllers = require('../controllers')
 const { actions, possessions, resources } = require('../util/enums')
 const { accessControl, loggedIn, fileParser } = require('../middleware')
-const express = require('express')
+const validations = require('./validation_schemas/media.schema')
 
 /**
  * @openapi
@@ -110,6 +111,7 @@ router.postAsync('/:orgId',
  */
 router.deleteAsync('/:orgId',
   loggedIn,
+  validations.validateDeleteQuery,
   accessControl(actions.READ, possessions.OWN, resources.ORGANIZATION, { idCarrier: 'params', idField: 'orgId' }),
   controllers.media.deleteMedia)
 module.exports = router
