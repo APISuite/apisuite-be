@@ -13,7 +13,7 @@ const createAPIHandler = async (apiData) => {
     })
 
     if (apiFound) {
-      log.info(`API "${apiData.name}" already exists`)
+      await transaction.rollback()
       return {
         status: HTTPStatus.BAD_REQUEST,
         errors: ['API name already exists.'],
