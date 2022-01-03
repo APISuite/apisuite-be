@@ -27,7 +27,7 @@ morgan.token('body', (req, res) => {
 })
 
 const app = express()
-app.disable('X-Powered-By')
+app.disable('x-powered-by')
 
 app.use(middleware.internalError)
 app.use(cors(config.get('cors')))
