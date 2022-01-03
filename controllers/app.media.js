@@ -1,9 +1,17 @@
 const HTTPStatus = require('http-status-codes')
+const FileType = require('file-type')
 const fs = require('fs').promises
 const log = require('../util/logger')
 const { v4: uuidv4 } = require('uuid')
 const { models } = require('../models')
 const Storage = require('../services/storage')
+
+const validImageExts = new Set([
+  'jpg',
+  'png',
+  'gif',
+  'webp',
+])
 
 const uploadMedia = async (req, res) => {
   const orgId = req.params.id || req.user.org.id
@@ -15,8 +23,10 @@ const uploadMedia = async (req, res) => {
   const badTypes = []
   for (const key in req.formdata.files) {
     const file = req.formdata.files[key]
-    if (file.type.split('/')[0] !== 'image') {
+    const type = await FileType.fromFile(file.path)
+    if (!type || !validImageExts.has(type.ext)) {
       badTypes.push(file.name)
+      continue
     }
     files.push(file)
   }
