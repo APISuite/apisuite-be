@@ -62,15 +62,17 @@ const listPublicApps = async (req, res, next) => {
   }
 
   let search = {}
+  const replacements = []
   if (req.query.search && typeof req.query.search === 'string') {
     const matchSearch = `%${req.query.search}%`
     search = {
       [Op.or]: [
         { name: { [Op.iLike]: matchSearch } },
         { '$organization.name$': { [Op.iLike]: matchSearch } },
-        sequelize.literal(`EXISTS (SELECT * FROM unnest(labels) AS label WHERE label ILIKE '${matchSearch}')`),
+        sequelize.literal('EXISTS (SELECT * FROM unnest(labels) AS label WHERE label ILIKE ?)'),
       ],
     }
+    replacements.push(matchSearch)
   }
 
   let order = []
@@ -103,6 +105,7 @@ const listPublicApps = async (req, res, next) => {
       attributes: publicAppOrgAttributes,
     }],
     attributes: publicAppAttributes,
+    replacements,
     order,
   }
 
