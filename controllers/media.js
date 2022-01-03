@@ -1,4 +1,5 @@
 const HTTPStatus = require('http-status-codes')
+const FileType = require('file-type')
 const fs = require('fs').promises
 const log = require('../util/logger')
 const { v4: uuidv4 } = require('uuid')
@@ -12,6 +13,13 @@ function pathParser (mediaUrl, offset) {
   return mediaUrl.substr(mediaUrl.indexOf('/media') + offset, mediaUrl.length)
 }
 
+const validImageExts = new Set([
+  'jpg',
+  'png',
+  'gif',
+  'webp',
+])
+
 const uploadMedia = async (req, res) => {
   if (!req.formdata || !req.formdata.files) {
     return res.status(HTTPStatus.BAD_REQUEST).send({ errors: ['no files uploaded'] })
@@ -22,8 +30,10 @@ const uploadMedia = async (req, res) => {
   for (const key in req.formdata.files) {
     if (key === '') return res.status(HTTPStatus.BAD_REQUEST).send({ errors: ['Add key for each file of the request'] })
     const file = req.formdata.files[key]
-    if (file.type.split('/')[0] !== 'image') {
+    const type = await FileType.fromFile(file.path)
+    if (!type || !validImageExts.has(type.ext)) {
       badTypes.push(file.name)
+      continue
     }
     files.push(file)
   }

@@ -14,6 +14,9 @@ module.exports = async (req, res, next) => {
   await new Promise((resolve, reject) => {
     form.parse(req, (err, fields, files) => {
       if (err) {
+        if (err.message && err.message.startsWith('maxFileSize exceeded')) {
+          err.status = 413
+        }
         return reject(err)
       }
       req.formdata = { fields, files }
