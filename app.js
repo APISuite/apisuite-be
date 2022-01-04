@@ -1,5 +1,12 @@
 require('dotenv/config')
 const config = require('./config')
+;(() => {
+  const secret = config.get('auth.accessTokenSecret')
+  if (!secret) throw new Error('missing APISUITE_ACCESS_TOKEN_SECRET variable')
+
+  if (Buffer.byteLength(secret, 'hex') < 32) throw new Error('APISUITE_ACCESS_TOKEN_SECRET key too short (min. 256 bits)')
+})()
+
 const cors = require('cors')
 const express = require('express')
 const cookieParser = require('cookie-parser')

@@ -81,9 +81,9 @@ const schema = {
       env: 'APISUITE_ACCESS_TOKEN_TTL',
     },
     accessTokenSecret: {
-      doc: 'Access token signing secret',
+      doc: 'Access token signing secret. Minimum 256 bit hex string.',
       format: String,
-      default: 'zadrv_*Q_z@6BO|Igc/,ikX]O_7q`,Gjeye7rSE{XAUw>8{2~RO_fHZ7BVH{Q)}',
+      default: '',
       env: 'APISUITE_ACCESS_TOKEN_SECRET',
     },
     refreshTokenTTL: {
