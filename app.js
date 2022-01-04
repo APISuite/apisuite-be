@@ -27,6 +27,7 @@ morgan.token('body', (req, res) => {
     '/auth/login',
     '/registration/security',
     '/users/password',
+    '/users/recover',
   ]
   if (noLogRoutes.includes(req.originalUrl)) return
   if (req.originalUrl.split('/').pop() === 'signup') return
