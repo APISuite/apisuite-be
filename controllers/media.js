@@ -30,9 +30,9 @@ const uploadMedia = async (req, res) => {
   for (const key in req.formdata.files) {
     if (key === '') return res.status(HTTPStatus.BAD_REQUEST).send({ errors: ['Add key for each file of the request'] })
     const file = req.formdata.files[key]
-    const type = await FileType.fromFile(file.path)
+    const type = await FileType.fromFile(file.filepath)
     if (!type || !validImageExts.has(type.ext)) {
-      badTypes.push(file.name)
+      badTypes.push(file.originalFilename)
       continue
     }
     files.push(file)
@@ -49,13 +49,13 @@ const uploadMedia = async (req, res) => {
 
   const storageClient = Storage.getStorageClient()
   const savePromises = files.map((f) => {
-    const extension = f.name.split('.').pop()
-    return storageClient.saveFile(f.path, `media-${req.params.orgId}-${uuidv4()}.${extension}`)
+    const extension = f.originalFilename.split('.').pop()
+    return storageClient.saveFile(f.filepath, `media-${req.params.orgId}-${uuidv4()}.${extension}`)
   })
   const saveResults = await Promise.all(savePromises)
 
   try {
-    await Promise.all(files.map((f) => fs.unlink(f.path)))
+    await Promise.all(files.map((f) => fs.unlink(f.filepath)))
   } catch (err) {
     log.error(err, 'uploadMedia: failed to remove temporary files')
     return res.status(HTTPStatus.INTERNAL_SERVER_ERROR).send('uploadMedia: failed to remove temporary files')
@@ -73,7 +73,7 @@ const uploadMedia = async (req, res) => {
       if (sr.objectURL && sr.objectURL.length) {
         const file = pathParser(sr.objectURL, 7)
         response.savedObjects.push({
-          file: files[j].name,
+          file: files[j].originalFilename,
           url: sr.objectURL,
         })
         await models.Media.create({
@@ -85,7 +85,7 @@ const uploadMedia = async (req, res) => {
       }
 
       response.errors.push({
-        file: files[j].name,
+        file: files[j].originalFilename,
         error: 'failed to save image',
       })
     }
