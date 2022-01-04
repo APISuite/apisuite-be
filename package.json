@@ -1,6 +1,6 @@
 {
   "name": "apisuite-be",
-  "version": "3.7.1",
+  "version": "3.7.2",
   "description": "APISuite backend core API",
   "main": "app.js",
   "scripts": {
