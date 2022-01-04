@@ -173,19 +173,36 @@ describe('Organization', () => {
 
   describe('changeUserRole', () => {
     let stubs = {}
+    const fakeTxn = {
+      commit: sinon.spy(async () => undefined),
+      rollback: sinon.spy(async () => undefined),
+      _reset: function () {
+        this.commit.resetHistory()
+        this.rollback.resetHistory()
+      },
+    }
 
     beforeEach(() => {
       stubs = {
         role_findByPk: sinon.stub(Role, 'findByPk'),
         userOrganization_update: sinon.stub(UserOrganization, 'update').resolves(),
+        userOrganization_findOne: sinon.stub(UserOrganization, 'findOne'),
+        transaction: sinon.stub(sequelize, 'transaction').resolves(fakeTxn),
       }
     })
 
     afterEach(() => {
+      fakeTxn._reset()
       sinon.restore()
     })
 
     it('should return 204 when role update is successful', async () => {
+      stubs.userOrganization_findOne.resolves({
+        get: () => ({
+          id: 666,
+          Role: { level: 30 },
+        }),
+      })
       stubs.role_findByPk.resolves({
         id: 10,
         level: 20,
@@ -198,7 +215,7 @@ describe('Organization', () => {
         },
         user: {
           id: 1,
-          organizations: [{ id: 1, role: { name: roles.ORGANIZATION_OWNER } }],
+          organizations: [{ id: 1, role: { name: roles.ORGANIZATION_OWNER, level: 10 } }],
         },
       }
       const req = mockRequest(mockReq)
@@ -209,6 +226,12 @@ describe('Organization', () => {
     })
 
     it('should return 403 when the user tries to change own role', async () => {
+      stubs.userOrganization_findOne.resolves({
+        get: () => ({
+          id: 666,
+          Role: { level: 30 },
+        }),
+      })
       const mockReq = {
         params: {
           id: 1,
@@ -249,6 +272,12 @@ describe('Organization', () => {
     })
 
     it('should return 404 when the user tries to assign an unexisting role', async () => {
+      stubs.userOrganization_findOne.resolves({
+        get: () => ({
+          id: 666,
+          Role: { level: 30 },
+        }),
+      })
       stubs.role_findByPk.resolves(null)
       const mockReq = {
         params: {
@@ -258,7 +287,7 @@ describe('Organization', () => {
         },
         user: {
           id: 1,
-          organizations: [{ id: 1, role: { name: roles.ORGANIZATION_OWNER, level: 200 } }],
+          organizations: [{ id: 1, role: { name: roles.ORGANIZATION_OWNER, level: 20 } }],
         },
       }
       const req = mockRequest(mockReq)
@@ -270,6 +299,36 @@ describe('Organization', () => {
     })
 
     it('should return 403 when the user tries to assign a role with higher hierarchy level', async () => {
+      stubs.role_findByPk.resolves({
+        id: 10,
+        level: 1,
+      })
+      const mockReq = {
+        params: {
+          id: 1,
+          userId: 666,
+          roleId: 10,
+        },
+        user: {
+          id: 1,
+          organizations: [{ id: 10, role: { name: roles.ORGANIZATION_OWNER, level: 200 } }],
+        },
+      }
+      const req = mockRequest(mockReq)
+      const res = mockResponse()
+
+      await changeUserRole(req, res)
+      sinon.assert.calledWith(res.status, HTTPStatus.FORBIDDEN)
+      helpers.calledWithErrors(res.send)
+    })
+
+    it('should return 403 when the user tries to change the role of a user with higher role level', async () => {
+      stubs.userOrganization_findOne.resolves({
+        get: () => ({
+          id: 666,
+          Role: { level: 1 },
+        }),
+      })
       stubs.role_findByPk.resolves({
         id: 10,
         level: 1,

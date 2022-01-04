@@ -458,35 +458,65 @@ const changeUserRole = async (req, res) => {
   const userId = Number(req.params.userId)
   const roleId = Number(req.params.roleId)
 
+  const reqUserOrg = req.user.organizations.find((o) => o.id === orgId)
+  if (!reqUserOrg) {
+    return res.status(HTTPStatus.FORBIDDEN).send({ errors: ['Not allowed'] })
+  }
+
   if (userId === req.user.id) {
     return res.status(HTTPStatus.FORBIDDEN).send({ errors: ['Not allowed'] })
   }
 
-  const userOrg = req.user.organizations.find((o) => o.id === orgId)
-  if (!userOrg) {
-    return res.status(HTTPStatus.FORBIDDEN).send({ errors: ['Not allowed'] })
-  }
-
-  const targetRole = await models.Role.findByPk(roleId)
-  if (!targetRole) {
-    return res.status(HTTPStatus.NOT_FOUND).send({ errors: ['Role not found'] })
-  }
-
-  if (targetRole.level < userOrg.role.level) {
-    return res.status(HTTPStatus.FORBIDDEN).send({ errors: ['Not allowed'] })
-  }
-
-  await models.UserOrganization.update(
-    { role_id: targetRole.id },
-    {
+  const transaction = await sequelize.transaction()
+  try {
+    let targetUser = await models.UserOrganization.findOne({
       where: {
-        user_id: userId,
         org_id: orgId,
+        user_id: userId,
       },
-    },
-  )
+      include: [{
+        model: models.Role,
+        as: 'Role',
+        attributes: ['id', 'level'],
+      }],
+      transaction,
+    })
 
-  return res.sendStatus(HTTPStatus.NO_CONTENT)
+    targetUser = targetUser.get({ plain: true })
+
+    if (targetUser.Role.level < reqUserOrg.role.level) {
+      await transaction.rollback()
+      return res.status(HTTPStatus.FORBIDDEN).send({ errors: ['Not allowed'] })
+    }
+
+    const targetRole = await models.Role.findByPk(roleId, { transaction })
+    if (!targetRole) {
+      await transaction.rollback()
+      return res.status(HTTPStatus.NOT_FOUND).send({ errors: ['Role not found'] })
+    }
+
+    if (targetRole.level < reqUserOrg.role.level) {
+      await transaction.rollback()
+      return res.status(HTTPStatus.FORBIDDEN).send({ errors: ['Not allowed'] })
+    }
+
+    await models.UserOrganization.update(
+      { role_id: targetRole.id },
+      {
+        where: {
+          user_id: userId,
+          org_id: orgId,
+        },
+        transaction,
+      },
+    )
+
+    await transaction.commit()
+    return res.sendStatus(HTTPStatus.NO_CONTENT)
+  } catch (error) {
+    if (transaction) await transaction.rollback()
+    return res.status(HTTPStatus.INTERNAL_SERVER_ERROR).send({ errors: ['Failed to change user role.'] })
+  }
 }
 
 module.exports = {
