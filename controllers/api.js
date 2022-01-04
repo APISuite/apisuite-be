@@ -239,7 +239,7 @@ const createAPIversion = async (req, res) => {
     return res.status(HTTPStatus.BAD_REQUEST).send({ errors: ['File was not uploaded.'] })
   }
 
-  const specFile = req.formdata.files.file.path
+  const specFile = req.formdata.files.file.filepath
 
   const validationRes = await swaggerUtil.validateSwagger(specFile)
   if (validationRes.errors.length) {
