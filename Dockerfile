@@ -10,5 +10,7 @@ RUN npm install --only=prod
 
 EXPOSE 6001
 
+USER node
+
 CMD ["node", "app.js"]
 
