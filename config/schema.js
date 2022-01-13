@@ -122,6 +122,18 @@ const schema = {
       default: 'strict',
       env: 'APISUITE_AUTH_COOKIE_SAME_SITE',
     },
+    metricsBasicAuthUser: {
+      doc: 'Prometheus metrics endpoint basic auth user',
+      format: String,
+      default: '',
+      env: 'METRICS_AUTH_USER',
+    },
+    metricsBasicAuthPassword: {
+      doc: 'Prometheus metrics endpoint basic auth password',
+      format: String,
+      default: '',
+      env: 'METRICS_AUTH_PASSWORD',
+    },
   },
   db: {
     host: {

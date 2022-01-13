@@ -10,6 +10,7 @@ const config = require('./config')
 const cors = require('cors')
 const express = require('express')
 const cookieParser = require('cookie-parser')
+const basicAuth = require('express-basic-auth')
 const morgan = require('morgan')
 const routes = require('./routes')
 const { models } = require('./models')
@@ -43,6 +44,11 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser())
 app.use(morgan(':method :url :status - :body'))
+
+app.use('/metrics', basicAuth({
+  users: { [config.get('auth.metricsBasicAuthUser')]: config.get('auth.metricsBasicAuthPassword') },
+  challenge: true,
+}))
 app.use(promBundle({ includeMethod: true }))
 
 // Auth middleware
