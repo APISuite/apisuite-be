@@ -38,14 +38,8 @@ const getAll = async (req, res) => {
 }
 
 const getById = async (req, res) => {
-  const _exclude = [...exclude]
-
-  if (!res.locals.isAdmin) {
-    _exclude.push('taxExempt')
-  }
-
   const org = await models.Organization.findByPk(req.params.orgId, {
-    attributes: { exclude: _exclude },
+    attributes: { exclude },
     include: [{
       model: models.Address,
       attributes: {
