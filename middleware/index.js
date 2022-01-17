@@ -6,6 +6,7 @@ const accessControl = require('./access-control')
 const loggedIn = require('./logged-in')
 const refreshToken = require('./refresh-token')
 const fileParser = require('./file-parser')
+const recaptcha = require('./recaptcha')
 
 module.exports = {
   auth,
@@ -16,4 +17,5 @@ module.exports = {
   loggedIn,
   refreshToken,
   fileParser,
+  recaptcha,
 }

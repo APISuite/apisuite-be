@@ -21,6 +21,7 @@ const recoverPasswordExtraValidator = (body) => {
 const loginSchema = Joi.object({
   email: emailSchema,
   password: Joi.string().required(),
+  recaptchaToken: Joi.string().optional(),
 })
 
 const providerSchema = Joi.object({

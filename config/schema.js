@@ -17,6 +17,12 @@ const schema = {
     default: 'http://localhost:3001',
     env: 'APISUITE_APP_URL',
   },
+  recaptchaKey: {
+    doc: 'Google reCAPTCHA key (ignored if empty)',
+    format: String,
+    default: '',
+    env: 'RECAPTCHA_KEY',
+  },
   cors: {
     origin: {
       doc: 'Access-Control-Allow-Origin',

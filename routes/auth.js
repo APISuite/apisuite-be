@@ -2,7 +2,7 @@ const { decorateRouter } = require('@awaitjs/express')
 const router = decorateRouter(require('express').Router())
 const controllers = require('../controllers')
 const validations = require('./validation_schemas/auth.schema')
-const { loggedIn, refreshToken } = require('../middleware')
+const { loggedIn, refreshToken, recaptcha } = require('../middleware')
 
 /**
  * @openapi
@@ -31,6 +31,7 @@ const { loggedIn, refreshToken } = require('../middleware')
  */
 router.postAsync('/login',
   validations.validateLoginBody,
+  recaptcha,
   controllers.auth.login)
 
 /**
