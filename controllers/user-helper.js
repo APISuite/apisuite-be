@@ -5,6 +5,7 @@ const getUserProfile = async (id) => {
   const profile = {
     user: {},
     orgs_member: [],
+    organizations: [],
     current_org: {},
   }
 
@@ -52,6 +53,11 @@ const getUserProfile = async (id) => {
       name: org.dataValues.Organization.dataValues.name,
     }
     profile.orgs_member.push(orgsMember)
+    profile.organizations.push({
+      id: org.dataValues.Organization.dataValues.id,
+      name: org.dataValues.Organization.dataValues.name,
+      role: org.dataValues.Role.dataValues,
+    })
   }
 
   const idp = await Idp.getIdP()

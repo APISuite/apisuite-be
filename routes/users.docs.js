@@ -108,6 +108,24 @@
  *                 type: number
  *               name:
  *                 type: string
+ *        organizations:
+ *           type: array
+ *           items:
+ *             type: object
+ *             properties:
+ *               id:
+ *                 type: number
+ *               name:
+ *                 type: string
+ *               role:
+ *                 type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: number
+ *                       name:
+ *                         type: string
  *         current_org:
  *           type: object
  *           deprecated: true
