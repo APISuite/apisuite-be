@@ -1,7 +1,7 @@
 const { decorateRouter } = require('@awaitjs/express')
 const router = decorateRouter(require('express').Router())
 const controllers = require('../controllers')
-const { accessControl, loggedIn, fileParser } = require('../middleware')
+const { accessControl, loggedIn, fileParser, recaptcha } = require('../middleware')
 const { actions, possessions, resources } = require('../util/enums')
 const { validateForgotPasswordBody, validateRecoverPasswordBody } = require('./validation_schemas/auth.schema')
 const { validateInviteBody } = require('./validation_schemas/invite_organization.schema')
@@ -37,6 +37,8 @@ router.use('/api-tokens', apiTokensRouter)
  *               new_password:
  *                 type: string
  *                 format: password
+ *               recaptchaToken:
+ *                  type: string
  *     security:
  *       - cookieAuth: []
  *     responses:
@@ -59,6 +61,7 @@ router.use('/api-tokens', apiTokensRouter)
 router.putAsync('/password',
   loggedIn,
   validateChangePasswordBody,
+  recaptcha,
   accessControl(actions.UPDATE, possessions.OWN, resources.PROFILE),
   controllers.user.changePassword)
 
@@ -167,6 +170,8 @@ router.deleteAsync('/',
  *               email:
  *                 type: string
  *                 format: email
+ *               recaptchaToken:
+ *                 type: string
  *     responses:
  *       200:
  *         description: Recovery email result.
@@ -184,6 +189,7 @@ router.deleteAsync('/',
  */
 router.postAsync('/forgot',
   validateForgotPasswordBody,
+  recaptcha,
   controllers.auth.forgotPassword)
 
 /**

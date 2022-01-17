@@ -13,4 +13,6 @@
  *           type: string
  *         password:
  *           type: string
+ *         recaptchaToken:
+ *           type: string
  */
