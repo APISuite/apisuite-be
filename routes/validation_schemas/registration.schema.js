@@ -28,10 +28,24 @@ const securityDetailsBodyExtraValidator = (body) => {
   return { errors: res.errors }
 }
 
+const registerSchema = Joi.object({
+  user: Joi.object({
+    email: Joi.string().email().required(),
+    name: Joi.string().required().required(),
+    password: Joi.string().required(),
+  }).required(),
+  organization: Joi.object({
+    name: Joi.string().required(),
+    website: Joi.string().optional().allow('', null),
+  }).required(),
+  recaptchaToken: Joi.string().optional(),
+})
+
 module.exports = {
   validateUserDetailsBody: validator(userDetailsSchema),
   validateOrganizationDetailsBody: validator(organizationDetailsSchema),
   validateSecurityDetailsBody: validator(securityDetailsSchema, 'body', securityDetailsBodyExtraValidator),
   validateUserConfirmBody: validator(userConfirmSchema),
   validateUserRegistrationInvitationBody: validator(userConfirmSchema),
+  validateRegisterBody: validator(registerSchema),
 }

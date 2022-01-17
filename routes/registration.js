@@ -1,14 +1,81 @@
 const { decorateRouter } = require('@awaitjs/express')
 const router = decorateRouter(require('express').Router())
 const controllers = require('../controllers')
-
+const { recaptcha } = require('../middleware')
 const {
   validateUserDetailsBody,
   validateOrganizationDetailsBody,
   validateSecurityDetailsBody,
   validateUserConfirmBody,
   validateUserRegistrationInvitationBody,
+  validateRegisterBody,
 } = require('./validation_schemas/registration.schema')
+
+/**
+ * @openapi
+ * /registration:
+ *   post:
+ *     description: Register as new user.
+ *     tags: [Registration]
+ *     requestBody:
+ *       description: User registration
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             required:
+ *               - user
+ *               - organization
+ *             type: object
+ *             properties:
+ *               recaptchaToken:
+ *                 type: string
+ *               user:
+ *                  type: object
+ *                  required:
+ *                    - name
+ *                    - email
+ *                    - password
+ *                  properties:
+ *                    name:
+ *                      type: string
+ *                    email:
+ *                      type: string
+ *                      format: email
+ *                    password:
+ *                      type: string
+ *               organization:
+ *                   type: object
+ *                   required:
+ *                     - name
+ *                     - website
+ *                   properties:
+ *                     name:
+ *                       type: string
+ *                     website:
+ *                       type: string
+ *                       format: uri
+ *     security:
+ *       - Bearer: []
+ *     responses:
+ *       201:
+ *         description: Successful registration
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ */
+router.postAsync(
+  '/',
+  validateRegisterBody,
+  recaptcha,
+  controllers.registration.register,
+)
 
 /**
  * @openapi
@@ -58,6 +125,7 @@ router.postAsync(
  * @openapi
  * /registration/user:
  *   post:
+ *     deprecated: true
  *     description: Register user details.
  *     tags: [Registration]
  *     requestBody:
@@ -97,6 +165,7 @@ router.postAsync(
  * @openapi
  * /registration/organization:
  *   post:
+ *     deprecated: true
  *     description: Register organization details.
  *     tags: [Registration]
  *     requestBody:
@@ -130,6 +199,7 @@ router.postAsync(
  * @openapi
  * /registration/security:
  *   post:
+ *     deprecated: true
  *     description: Register security details.
  *     tags: [Registration]
  *     requestBody:
