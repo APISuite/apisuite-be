@@ -1,12 +1,8 @@
 const HTTPStatus = require('http-status-codes')
 const { models } = require('../models')
-const { Op } = require('sequelize')
 
 const list = async (req, res) => {
   const roles = await models.Role.findAll({
-    where: {
-      level: { [Op.gte]: req.user.role.level },
-    },
     attributes: ['name', 'id'],
   })
 
