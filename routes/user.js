@@ -62,7 +62,6 @@ router.putAsync('/password',
   loggedIn,
   validateChangePasswordBody,
   recaptcha,
-  accessControl(actions.UPDATE, possessions.OWN, resources.PROFILE),
   controllers.user.changePassword)
 
 /**
