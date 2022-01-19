@@ -10,6 +10,7 @@ const userSchema = Joi.object({
 const userChangePasswordSchema = Joi.object({
   old_password: Joi.string().required(),
   new_password: Joi.string().required(),
+  recaptchaToken: Joi.string().optional(),
 })
 
 const userSetupSchema = Joi.object({

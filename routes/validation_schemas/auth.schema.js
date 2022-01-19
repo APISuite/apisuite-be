@@ -6,6 +6,7 @@ const emailSchema = Joi.string().email().required()
 
 const forgotPasswordSchema = Joi.object({
   email: emailSchema,
+  recaptchaToken: Joi.string().optional(),
 })
 
 const recoverPasswordSchema = Joi.object({
