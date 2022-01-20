@@ -55,18 +55,9 @@ const {
  *                     website:
  *                       type: string
  *                       format: uri
- *     security:
- *       - Bearer: []
  *     responses:
- *       201:
+ *       204:
  *         description: Successful registration
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
  *       400:
  *         $ref: '#/components/responses/BadRequest'
  */
