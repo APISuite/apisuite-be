@@ -254,8 +254,6 @@ router.postAsync(
  *               token:
  *                 type: string
  *                 format: uuid
- *     security:
- *       - Bearer: []
  *     responses:
  *       200:
  *         description: The invited user data.
