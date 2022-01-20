@@ -42,12 +42,15 @@ router.getAsync('/',
  *     security:
  *       - cookieAuth: []
  *     requestBody:
- *       description: app type
+ *       description: App type
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             type: string
+ *             type: object
+ *             properties:
+ *               type:
+ *                 type: string
  *     responses:
  *       201:
  *         description: App Type
