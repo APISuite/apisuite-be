@@ -207,13 +207,9 @@ const validateInvitation = async (req, res) => {
 const register = async (req, res) => {
   const transaction = await sequelize.transaction()
   try {
-    const [userFound, orgFound, defaultRole] = await Promise.all([
+    const [userFound, defaultRole] = await Promise.all([
       await models.User.findOne({
         where: { email: req.body.user.email.toLowerCase() },
-        transaction,
-      }),
-      await models.Organization.findOne({
-        where: { name: req.body.organization.name },
         transaction,
       }),
       await models.Role.findOne({
@@ -226,17 +222,24 @@ const register = async (req, res) => {
       await transaction.rollback()
       return res.sendStatus(HTTPStatus.NO_CONTENT)
     }
-    if (orgFound) {
-      await transaction.rollback()
-      return res.status(HTTPStatus.BAD_REQUEST).send({ errors: 'organization name already taken' })
-    }
-
     if (!defaultRole) throw new Error('missing organizationOwner role')
 
-    const org = await models.Organization.create({
-      name: req.body.organization.name,
-      websiteUrl: req.body.organization.website,
-    }, { transaction })
+    let newOrganization
+    if (req.body.organization) {
+      const orgFound = await models.Organization.findOne({
+        where: { name: req.body.organization },
+        transaction,
+      })
+      if (orgFound) {
+        await transaction.rollback()
+        return res.status(HTTPStatus.BAD_REQUEST).send({ errors: 'organization name already taken' })
+      }
+
+      newOrganization = await models.Organization.create({
+        name: req.body.organization.name,
+        websiteUrl: req.body.organization.website,
+      }, { transaction })
+    }
 
     const user = await models.User.create({
       name: req.body.user.name,
@@ -245,12 +248,14 @@ const register = async (req, res) => {
       activationToken: uuidv4(),
     }, { transaction })
 
-    await models.UserOrganization.create({
-      user_id: user.id,
-      org_id: org.id,
-      role_id: defaultRole.id,
-      current_org: true,
-    }, { transaction })
+    if (newOrganization) {
+      await models.UserOrganization.create({
+        user_id: user.id,
+        org_id: newOrganization.id,
+        role_id: defaultRole.id,
+        current_org: true,
+      }, { transaction })
+    }
 
     await transaction.commit()
 

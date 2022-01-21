@@ -25,7 +25,6 @@ const {
  *           schema:
  *             required:
  *               - user
- *               - organization
  *             type: object
  *             properties:
  *               recaptchaToken:
@@ -45,16 +44,7 @@ const {
  *                    password:
  *                      type: string
  *               organization:
- *                   type: object
- *                   required:
- *                     - name
- *                     - website
- *                   properties:
- *                     name:
- *                       type: string
- *                     website:
- *                       type: string
- *                       format: uri
+ *                   type: string
  *     responses:
  *       204:
  *         description: Successful registration

@@ -34,10 +34,7 @@ const registerSchema = Joi.object({
     name: Joi.string().required().required(),
     password: Joi.string().required(),
   }).required(),
-  organization: Joi.object({
-    name: Joi.string().required(),
-    website: Joi.string().optional().allow('', null),
-  }).required(),
+  organization: Joi.string().optional(),
   recaptchaToken: Joi.string().optional(),
 })
 
