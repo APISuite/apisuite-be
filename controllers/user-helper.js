@@ -33,7 +33,7 @@ const getUserProfile = async (id) => {
     include: [{
       model: models.Role,
       as: 'Role',
-      attributes: ['name', 'id'],
+      attributes: ['name', 'id', 'level'],
     }, {
       model: models.Organization,
       as: 'Organization',

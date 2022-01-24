@@ -118,14 +118,15 @@
  *                name:
  *                  type: string
  *                role:
- *                  type: array
- *                  items:
- *                    type: object
- *                    properties:
- *                      id:
- *                        type: number
- *                      name:
- *                        type: string
+ *                  type: object
+ *                  properties:
+ *                    id:
+ *                      type: number
+ *                    name:
+ *                      type: string
+ *                   level:
+ *                      type: number
+ *                      description: Role's hierarchy position. Lower value = higher position.
  *         current_org:
  *           type: object
  *           deprecated: true
