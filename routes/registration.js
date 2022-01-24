@@ -3,9 +3,6 @@ const router = decorateRouter(require('express').Router())
 const controllers = require('../controllers')
 const { recaptcha } = require('../middleware')
 const {
-  validateUserDetailsBody,
-  validateOrganizationDetailsBody,
-  validateSecurityDetailsBody,
   validateUserConfirmBody,
   validateUserRegistrationInvitationBody,
   validateRegisterBody,
@@ -100,129 +97,6 @@ router.postAsync(
   '/confirm',
   validateUserConfirmBody,
   controllers.registration.confirmRegistration,
-)
-
-/**
- * @openapi
- * /registration/user:
- *   post:
- *     deprecated: true
- *     description: Register user details.
- *     tags: [Registration]
- *     requestBody:
- *       description: Registration user details
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/UserDetails'
- *     security:
- *       - Bearer: []
- *     responses:
- *       200:
- *         description: The registration token
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 token:
- *                   type: string
- *                   format: uuid
- *       400:
- *         $ref: '#/components/responses/BadRequest'
- *       409:
- *         $ref: '#/components/responses/Conflict'
- *       500:
- *         $ref: '#/components/responses/Internal'
- */
-router.postAsync(
-  '/user',
-  validateUserDetailsBody,
-  controllers.registration.setUserDetails,
-)
-
-/**
- * @openapi
- * /registration/organization:
- *   post:
- *     deprecated: true
- *     description: Register organization details.
- *     tags: [Registration]
- *     requestBody:
- *       description: Registration organization details
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/OrganizationDetails'
- *     security:
- *       - Bearer: []
- *     responses:
- *       200:
- *         description: Successful registration
- *       400:
- *         $ref: '#/components/responses/BadRequest'
- *       401:
- *         $ref: '#/components/responses/Unauthorized'
- *       409:
- *         $ref: '#/components/responses/Conflict'
- *       500:
- *         $ref: '#/components/responses/Internal'
- */
-router.postAsync(
-  '/organization',
-  validateOrganizationDetailsBody,
-  controllers.registration.setOrganizationDetails,
-)
-
-/**
- * @openapi
- * /registration/security:
- *   post:
- *     deprecated: true
- *     description: Register security details.
- *     tags: [Registration]
- *     requestBody:
- *       description: Registration security details
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             required:
- *               - password
- *               - registrationToken
- *             type: object
- *             properties:
- *               password:
- *                 type: string
- *                 format: password
- *               registrationToken:
- *                 type: string
- *                 format: uuid
- *     security:
- *       - Bearer: []
- *     responses:
- *       201:
- *         description: Successful registration
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *       400:
- *         $ref: '#/components/responses/BadRequest'
- *       401:
- *         $ref: '#/components/responses/Unauthorized'
- *       500:
- *         $ref: '#/components/responses/Internal'
- */
-router.postAsync(
-  '/security',
-  validateSecurityDetailsBody,
-  controllers.registration.completeRegistration,
 )
 
 /**
