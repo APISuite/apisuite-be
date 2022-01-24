@@ -18,7 +18,7 @@ const appMetadata = Joi.object({
 })
 
 const appSchema = Joi.object({
-  name: Joi.string().required(),
+  name: Joi.string().max(255).required(),
   description: Joi.string().optional().allow(null, ''),
   shortDescription: Joi.string().max(60).optional().allow(null, ''),
   redirectUrl: Joi.string().uri({ scheme: ['http', 'https'] }).optional(),

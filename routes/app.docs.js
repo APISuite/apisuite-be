@@ -152,8 +152,10 @@
  *       properties:
  *         name:
  *           type: string
+ *           maxLength: 255
  *         shortDescription:
  *           type: string
+ *          maxLength: 60
  *         description:
  *           type: string
  *         visibility:
