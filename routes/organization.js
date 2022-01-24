@@ -5,7 +5,6 @@ const controllers = require('../controllers')
 const { accessControl, loggedIn } = require('../middleware')
 const {
   validateOrgBody,
-  validateAssignUserBody,
   validateOrganizationUpdateBody,
 } = require('./validation_schemas/organization.schema')
 const { validateInviteBody } = require('./validation_schemas/invite_organization.schema')
@@ -280,42 +279,6 @@ router.deleteAsync('/:orgId',
   loggedIn,
   accessControl(actions.DELETE, possessions.OWN, resources.ORGANIZATION, { idCarrier: 'params', idField: 'orgId' }),
   controllers.organization.deleteOrg)
-
-/**
- * @openapi
- * /organizations/assign:
- *   post:
- *     deprecated: true
- *     description: Add user to organization.
- *     tags: [Organization]
- *     requestBody:
- *       description: User organization association
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: "#/components/schemas/UserOrganization"
- *     security:
- *       - cookieAuth: []
- *     responses:
- *       200:
- *         description: The user organization relation
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/UserOrganization'
- *       400:
- *         $ref: '#/components/responses/BadRequest'
- *       401:
- *         $ref: '#/components/responses/Unauthorized'
- *       500:
- *         $ref: '#/components/responses/Internal'
- */
-router.postAsync('/assign',
-  loggedIn,
-  validateAssignUserBody,
-  accessControl(actions.UPDATE, possessions.OWN, resources.ORGANIZATION, { idCarrier: 'body', idField: 'org_id' }),
-  controllers.organization.assignUserToOrg)
 
 /**
  * @openapi

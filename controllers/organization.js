@@ -255,62 +255,6 @@ const updateOrg = async (req, res) => {
   return res.status(HTTPStatus.OK).send(organization)
 }
 
-const assignUserToOrg = async (req, res) => {
-  try {
-    const userId = req.body.user_id
-    const orgId = req.body.org_id
-    let roleId = null
-
-    if (typeof req.body.role_id === 'undefined' || req.body.role_id === '') {
-      roleId = req.user.role.id
-    } else {
-      roleId = req.body.role_id
-    }
-
-    let org = await models.UserOrganization.findOne(
-      {
-        where: {
-          user_id: userId,
-          org_id: orgId,
-        },
-      },
-    )
-
-    if (org) {
-      org = await models.UserOrganization.update(
-        {
-          role_id: roleId,
-        },
-        {
-          where: {
-            user_id: userId,
-            org_id: orgId,
-          },
-        },
-      )
-    } else {
-      org = await models.UserOrganization.create(
-        {
-          user_id: userId,
-          org_id: orgId,
-          role_id: roleId,
-        },
-      )
-    }
-
-    publishEvent(routingKeys.ORG_USER_ROLE, {
-      user_id: req.user.id,
-      organization_id: orgId,
-      log: `User ${req.body.user_id} was assigned the role ${roleId} on organization ${orgId}`,
-    })
-
-    return res.status(HTTPStatus.OK).send(org)
-  } catch (error) {
-    log.error(error, '[ASSIGN USER TO ORGANIZATION]')
-    return res.status(HTTPStatus.INTERNAL_SERVER_ERROR).send({ errors: ['Failed to assign user to the organization.'] })
-  }
-}
-
 const getAllMembers = async (req, res) => {
   const members = await models.UserOrganization.findMembers(req.params.id, models)
 
@@ -519,7 +463,6 @@ module.exports = {
   addOrg,
   deleteOrg,
   updateOrg,
-  assignUserToOrg,
   getAllMembers,
   getPendingInvites,
   listPublishers,

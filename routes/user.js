@@ -1,10 +1,8 @@
 const { decorateRouter } = require('@awaitjs/express')
 const router = decorateRouter(require('express').Router())
 const controllers = require('../controllers')
-const { accessControl, loggedIn, fileParser, recaptcha } = require('../middleware')
-const { actions, possessions, resources } = require('../util/enums')
+const { loggedIn, fileParser, recaptcha } = require('../middleware')
 const { validateForgotPasswordBody, validateRecoverPasswordBody } = require('./validation_schemas/auth.schema')
-const { validateInviteBody } = require('./validation_schemas/invite_organization.schema')
 const apiTokensRouter = require('./user.api-tokens')
 const {
   validateProfileUpdateBody,
@@ -236,51 +234,6 @@ router.postAsync('/forgot',
 router.postAsync('/recover',
   validateRecoverPasswordBody,
   controllers.auth.recoverPassword)
-
-/**
- * @openapi
- * /users/invite:
- *   post:
- *     deprecated: true
- *     description: Invite user.
- *     tags: [User]
- *     requestBody:
- *       description: Invitation data.
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - email
- *               - role_id
- *             properties:
- *               email:
- *                 type: string
- *                 format: email
- *               role_id:
- *                 type: number
- *     security:
- *       - cookieAuth: []
- *     responses:
- *       200:
- *         description: Invite.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Invite'
- *       400:
- *         $ref: '#/components/responses/BadRequest'
- *       401:
- *         $ref: '#/components/responses/Unauthorized'
- *       500:
- *         $ref: '#/components/responses/Internal'
- */
-router.postAsync('/invite',
-  loggedIn,
-  validateInviteBody,
-  accessControl(actions.UPDATE, possessions.OWN, resources.ORGANIZATION),
-  controllers.user.inviteUserToOrganization)
 
 /**
  * @openapi

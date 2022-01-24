@@ -1,13 +1,6 @@
 const validator = require('./validator')
 const Joi = require('joi')
 
-const organizationAssignUserBodySchema = Joi.object({
-  user_id: Joi.string().required(),
-  org_id: Joi.string().required(),
-}).options({
-  allowUnknown: true,
-})
-
 const organizationSchema = (create) => {
   const baseSchema = {
     description: Joi.string().optional().allow(null, ''),
@@ -42,5 +35,4 @@ const organizationSchema = (create) => {
 module.exports = {
   validateOrganizationUpdateBody: validator(organizationSchema(false)),
   validateOrgBody: validator(organizationSchema(true)),
-  validateAssignUserBody: validator(organizationAssignUserBodySchema),
 }
