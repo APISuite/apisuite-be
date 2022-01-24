@@ -166,7 +166,7 @@ router.postAsync('/oidc/:provider/token',
  * /auth/introspect:
  *   get:
  *     description: Introspect and validate auth cookie
- *     tags: [Role]
+ *     tags: [Auth]
  *     security:
  *       - cookieAuth: []
  *     responses:
