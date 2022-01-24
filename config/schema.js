@@ -17,11 +17,19 @@ const schema = {
     default: 'http://localhost:3001',
     env: 'APISUITE_APP_URL',
   },
-  recaptchaKey: {
-    doc: 'Google reCAPTCHA key (ignored if empty)',
-    format: String,
-    default: '',
-    env: 'RECAPTCHA_KEY',
+  recaptcha: {
+    key: {
+      doc: 'Google reCAPTCHA key (ignored if empty)',
+      format: String,
+      default: '',
+      env: 'RECAPTCHA_KEY',
+    },
+    threshold: {
+      doc: 'Google reCAPTCHA score threshold (inferior scores should be blocked)',
+      format: Number,
+      default: 0.5,
+      env: 'RECAPTCHA_SCORE_THRESHOLD',
+    },
   },
   cors: {
     origin: {
