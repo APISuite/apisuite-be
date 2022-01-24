@@ -3,7 +3,7 @@ const router = decorateRouter(require('express').Router({ mergeParams: true }))
 const { actions, possessions, resources } = require('../util/enums')
 const { accessControl, loggedIn } = require('../middleware')
 const controllers = require('../controllers')
-const appMediaRoutes = require('./app.media')
+const appMediaRoutes = require('./organization.app.media')
 const {
   validateAppPatchBody,
   validateAppBody,
