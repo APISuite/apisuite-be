@@ -124,7 +124,7 @@
  *                      type: number
  *                    name:
  *                      type: string
- *                   level:
+ *                    level:
  *                      type: number
  *                      description: Role's hierarchy position. Lower value = higher position.
  *         current_org:
