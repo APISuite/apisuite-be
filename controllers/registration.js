@@ -105,7 +105,7 @@ const register = async (req, res) => {
   } catch (err) {
     if (transaction) await transaction.rollback()
     log.error(err, '[DELETE APP]')
-    return res.status(HTTPStatus.INTERNAL_SERVER_ERROR).send({ success: false, errors: ['Failed to delete app.'] })
+    return res.status(HTTPStatus.INTERNAL_SERVER_ERROR).send({ success: false, errors: ['Failed to register user'] })
   }
 }
 
