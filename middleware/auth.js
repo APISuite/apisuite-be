@@ -43,54 +43,62 @@ const getTokenUserByID = async (userID) => {
 }
 
 const cookieAuth = async (req, res, next) => {
-  if (req.cookies.access_token) {
-    const token = jwt.validateAccessToken(req.cookies.access_token)
-    if (!token.valid) {
-      return res.status(HTTPStatus.UNAUTHORIZED).json({ errors: ['The account is not active, token must have expired. Please login to obtain a new one'] })
+  try {
+    if (req.cookies.access_token) {
+      const token = jwt.validateAccessToken(req.cookies.access_token)
+      if (!token.valid) {
+        return res.status(HTTPStatus.UNAUTHORIZED).json({ errors: ['The account is not active, token must have expired. Please login to obtain a new one'] })
+      }
+
+      const user = await getTokenUserByID(token.payload.sub)
+      if (!user) {
+        return res.status(HTTPStatus.UNAUTHORIZED).json({ errors: ['User not found'] })
+      }
+
+      res.locals.loggedInUser = user
+      res.locals.isAdmin = res.locals.loggedInUser &&
+        res.locals.loggedInUser.role &&
+        res.locals.loggedInUser.role.name === roles.ADMIN
     }
 
-    const user = await getTokenUserByID(token.payload.sub)
-    if (!user) {
-      return res.status(HTTPStatus.UNAUTHORIZED).json({ errors: ['User not found'] })
-    }
-
-    res.locals.loggedInUser = user
-    res.locals.isAdmin = res.locals.loggedInUser &&
-      res.locals.loggedInUser.role &&
-      res.locals.loggedInUser.role.name === roles.ADMIN
+    next()
+  } catch (err) {
+    return res.status(HTTPStatus.UNAUTHORIZED).json({ errors: ['invalid token'] })
   }
-
-  next()
 }
 
 const apiTokenAuth = async (req, res, next) => {
-  if (req.headers.authorization) {
-    const parsedToken = req.headers.authorization.substring(7)
+  try {
+    if (req.headers.authorization) {
+      const parsedToken = req.headers.authorization.substring(7)
 
-    let [tokenId, ...tokenValue] = parsedToken.split('_')
-    tokenValue = tokenValue.join('_')
+      let [tokenId, ...tokenValue] = parsedToken.split('_')
+      tokenValue = tokenValue.join('_')
 
-    const apiToken = await models.APIToken.findByPk(tokenId)
-    if (!apiToken) {
-      return res.status(HTTPStatus.UNAUTHORIZED).json({ errors: ['invalid token'] })
+      const apiToken = await models.APIToken.findByPk(tokenId)
+      if (!apiToken) {
+        return res.status(HTTPStatus.UNAUTHORIZED).json({ errors: ['invalid token'] })
+      }
+
+      if (!apiToken.checkToken(tokenValue)) {
+        return res.status(HTTPStatus.UNAUTHORIZED).json({ errors: ['invalid token'] })
+      }
+
+      const user = await getTokenUserByID(apiToken.userId)
+      if (!user) {
+        return res.status(HTTPStatus.UNAUTHORIZED).json({ errors: ['User not found'] })
+      }
+
+      res.locals.loggedInUser = user
+      res.locals.isAdmin = res.locals.loggedInUser &&
+        res.locals.loggedInUser.role &&
+        res.locals.loggedInUser.role.name === roles.ADMIN
     }
 
-    if (!apiToken.checkToken(tokenValue)) {
-      return res.status(HTTPStatus.UNAUTHORIZED).json({ errors: ['invalid token'] })
-    }
-
-    const user = await getTokenUserByID(apiToken.userId)
-    if (!user) {
-      return res.status(HTTPStatus.UNAUTHORIZED).json({ errors: ['User not found'] })
-    }
-
-    res.locals.loggedInUser = user
-    res.locals.isAdmin = res.locals.loggedInUser &&
-      res.locals.loggedInUser.role &&
-      res.locals.loggedInUser.role.name === roles.ADMIN
+    next()
+  } catch (err) {
+    return res.status(HTTPStatus.UNAUTHORIZED).json({ errors: ['invalid token'] })
   }
-
-  next()
 }
 
 module.exports = {
