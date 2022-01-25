@@ -69,8 +69,7 @@ const register = async (req, res) => {
       }
 
       newOrganization = await models.Organization.create({
-        name: req.body.organization.name,
-        websiteUrl: req.body.organization.website,
+        name: req.body.organization,
       }, { transaction })
     }
 
