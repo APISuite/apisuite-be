@@ -43,6 +43,10 @@ const user = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true,
     },
+    lastPasswordChange: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
   }, {
     timestamps: true,
     underscored: true,

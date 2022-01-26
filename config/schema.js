@@ -31,6 +31,12 @@ const schema = {
       env: 'RECAPTCHA_SCORE_THRESHOLD',
     },
   },
+  passwordChangeInterval: {
+    doc: 'Time between allowed password changes (hours)',
+    format: Number,
+    default: 24,
+    env: 'ALLOWED_PASSWORD_CHANGES',
+  },
   cors: {
     origin: {
       doc: 'Access-Control-Allow-Origin',

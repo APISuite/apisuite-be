@@ -2,6 +2,7 @@ const HTTPStatus = require('http-status-codes')
 const bcrypt = require('bcrypt')
 const log = require('../util/logger')
 const enums = require('../util/enums')
+const config = require('../config')
 const { v4: uuidv4 } = require('uuid')
 const emailService = require('../services/email')
 const { models, sequelize } = require('../models')
@@ -41,20 +42,28 @@ const getById = async (req, res) => {
 }
 
 const changePassword = async (req, res) => {
-  const user = await models.User.findByPk(
-    req.user.id,
-  )
-
-  const passwordMatch = await checkPassword(req.body.old_password, user.password)
-
-  if (passwordMatch.error) {
-    return res.status(HTTPStatus.BAD_REQUEST).send({ errors: [passwordMatch.error] })
-  }
-
-  let transaction
+  const pwdChangesInterval = config.get('passwordChangeInterval')
+  const transaction = await sequelize.transaction()
   try {
-    transaction = await sequelize.transaction()
+    const user = await models.User.findByPk(req.user.id, { transaction })
+
+    const threshold = new Date()
+    threshold.setHours(threshold.getHours() - pwdChangesInterval)
+    if (user.lastPasswordChange && user.lastPasswordChange > threshold) {
+      await transaction.rollback()
+      return res.status(HTTPStatus.BAD_REQUEST).send({
+        errors: [`Only 1 password change per ${pwdChangesInterval} hours is allowed`],
+      })
+    }
+
+    const passwordMatch = await checkPassword(req.body.old_password, user.password)
+    if (passwordMatch.error) {
+      await transaction.rollback()
+      return res.status(HTTPStatus.BAD_REQUEST).send({ errors: [passwordMatch.error] })
+    }
+
     user.password = req.body.new_password
+    user.lastPasswordChange = new Date()
     await user.save({ transaction })
     await transaction.commit()
 
