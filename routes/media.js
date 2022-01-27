@@ -117,3 +117,5 @@ router.deleteAsync('/:orgId',
 module.exports = router
 
 router.use('/', express.static('media'))
+
+module.exports = router
