@@ -3,7 +3,7 @@ const { models } = require('../models')
 
 const list = async (req, res) => {
   const roles = await models.Role.findAll({
-    attributes: ['name', 'id'],
+    attributes: ['name', 'id', 'level'],
   })
 
   return res.status(HTTPStatus.OK).send(roles)
