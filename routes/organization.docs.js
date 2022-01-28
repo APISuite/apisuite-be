@@ -125,6 +125,8 @@
  *                 type: string
  *               id:
  *                 type: number
+ *               level:
+ *                 type: number
  *           createdAt:
  *             type: string
  *           updatedAt:
