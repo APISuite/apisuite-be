@@ -70,6 +70,9 @@ const setup = async (req, res) => {
       baseUri: 'https://example.petstore.io/',
       apiDocs: {
         productIntro: petstore.info.title,
+        features: [],
+        useCases: [],
+        highlights: [],
       },
       publishedAt: new Date(),
     }, { transaction })
@@ -94,7 +97,10 @@ const setup = async (req, res) => {
     }
 
     const ownerOrg = await models.Organization.getOwnerOrganization()
-    await emailService.sendInviteNewUserToOrg(invitationData, { logo: ownerOrg?.logo })
+    await emailService.sendInviteNewUserToOrg(invitationData, {
+      logo: ownerOrg?.logo,
+      noReject: true,
+    })
 
     await transaction.commit()
 

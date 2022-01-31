@@ -119,11 +119,13 @@ const sendInviteToOrg = async (message, options) => {
  * @param {String} message.token Invitation token
  * @param {Object} options Options object
  * @param {String} options.logo Organization logo URL
+ * @param {Boolean} options.noReject Show/hide reject option on UI (default to false)
  */
 const sendInviteNewUserToOrg = async (message, options) => {
+  options.noReject = options.noReject || false
   const source = getTemplateContent('confirm_invite')
   const template = handlebars.compile(source.toString())
-  const link = new url.URL(`/auth/invitation?token=${message.token}`, config.get('appURL'))
+  const link = new url.URL(`/auth/invitation?token=${message.token}&noReject=${options.noReject}`, config.get('appURL'))
 
   const html = template({
     logo: options.logo || DEFAULT_LOGO,
