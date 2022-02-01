@@ -122,11 +122,15 @@ const login = async (req, res) => {
     const profile = await getUserProfile(user.id)
     const cookieConfigs = getCookieConfigs()
 
-    return res
+    res
       .status(HTTPStatus.OK)
       .cookie('access_token', accessToken, cookieConfigs.accessToken)
       .cookie('refresh_token', refreshToken.token, cookieConfigs.refreshToken)
       .send(profile)
+
+    publishEvent(routingKeys.AUTH_LOGIN, {
+      user_id: user.id,
+    })
   } catch (err) {
     await transaction.rollback()
     log.error(err, '[AUTH LOGIN]')
@@ -170,11 +174,15 @@ const refresh = async (req, res) => {
 
     const cookieConfigs = getCookieConfigs()
 
-    return res
+    res
       .status(HTTPStatus.OK)
       .cookie('access_token', accessToken, cookieConfigs.accessToken)
       .cookie('refresh_token', refreshToken.token, cookieConfigs.refreshToken)
       .send()
+
+    publishEvent(routingKeys.AUTH_LOGIN, {
+      user_id: tokenEntity.userId,
+    })
   } catch (err) {
     await transaction.rollback()
     log.error(err, '[AUTH REFRESH]')
@@ -299,11 +307,15 @@ const oidcToken = async (req, res) => {
     const profile = await getUserProfile(user.id)
     const cookieConfigs = getCookieConfigs()
 
-    return res
+    res
       .status(HTTPStatus.OK)
       .cookie('access_token', accessToken, cookieConfigs.accessToken)
       .cookie('refresh_token', refreshToken.token, cookieConfigs.refreshToken)
       .send(profile)
+
+    publishEvent(routingKeys.AUTH_LOGIN, {
+      user_id: user.id,
+    })
   } catch (err) {
     await transaction.rollback()
     log.error(err, '[AUTH LOGIN]')

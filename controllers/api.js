@@ -7,6 +7,7 @@ const swaggerUtil = require('../util/swagger_util')
 const Gateway = require('../services/gateway')
 const { apiTypes } = require('../util/enums')
 const { createAPIHandler } = require('./api-helper')
+const { publishEvent, routingKeys } = require('../services/msg-broker')
 const Storage = require('../services/storage')
 
 const getAll = async (req, res) => {
@@ -329,7 +330,9 @@ const setPublished = (published) => {
         return res.status(HTTPStatus.NOT_FOUND).send({ errors: ['API not found'] })
       }
 
-      return res.sendStatus(HTTPStatus.NO_CONTENT)
+      res.sendStatus(HTTPStatus.NO_CONTENT)
+
+      publishEvent(published ? routingKeys.API_PUBLISHED : routingKeys.API_UNPUBLISHED, {})
     } catch (err) {
       log.error(err, '[UPDATE API]')
       return res.status(HTTPStatus.INTERNAL_SERVER_ERROR).send({ errors: ['Failed to update the API'] })

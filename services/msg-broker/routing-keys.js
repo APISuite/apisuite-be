@@ -26,6 +26,9 @@ const keys = {
   USER_CREATED: 'api.user.created',
   USER_PASSWORD: 'api.user.password',
   USER_DELETED: 'api.user.deleted',
+  AUTH_LOGIN: 'api.auth.login',
+  API_PUBLISHED: 'api.api.published',
+  API_UNPUBLISHED: 'api.api.unpublished',
 }
 
 module.exports = keys

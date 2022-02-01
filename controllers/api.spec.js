@@ -9,6 +9,7 @@ const ApiVersion = models.ApiVersion
 const swaggerUtil = require('../util/swagger_util')
 const Gateway = require('../services/gateway')
 const Storage = require('../services/storage')
+const msgBroker = require('../services/msg-broker')
 const {
   getAll,
   getById,
@@ -453,6 +454,7 @@ describe('APIs', () => {
     beforeEach(() => {
       stubs = {
         update: sinon.stub(Api, 'update'),
+        publishEvent: sinon.stub(msgBroker, 'publishEvent').resolves(),
       }
     })
 
@@ -499,6 +501,7 @@ describe('APIs', () => {
     beforeEach(() => {
       stubs = {
         update: sinon.stub(Api, 'update'),
+        publishEvent: sinon.stub(msgBroker, 'publishEvent').resolves(),
       }
     })
 
