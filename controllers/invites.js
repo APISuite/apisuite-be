@@ -2,8 +2,6 @@ const HTTPStatus = require('http-status-codes')
 const { models, sequelize } = require('../models')
 const log = require('../util/logger')
 const { Op } = require('sequelize')
-const { v4: uuidv4 } = require('uuid')
-const emailService = require('../services/email')
 const { publishEvent, routingKeys } = require('../services/msg-broker')
 
 const get = async (req, res) => {
@@ -110,12 +108,10 @@ const signup = async (req, res) => {
       return res.status(HTTPStatus.NOT_FOUND).send({ errors: ['Invite not found'] })
     }
 
-    const activationToken = uuidv4()
     const user = await models.User.create({
       name: req.body.name,
       email: invite.email.toLowerCase(),
       password: req.body.password,
-      activationToken,
     }, { transaction })
 
     await models.UserOrganization.create({
@@ -136,12 +132,6 @@ const signup = async (req, res) => {
     publishEvent(routingKeys.USER_CREATED, {
       user_id: user.id,
     })
-
-    const ownerOrg = await models.Organization.getOwnerOrganization()
-    await emailService.sendRegisterConfirmation({
-      email: user.email,
-      token: activationToken,
-    }, { logo: ownerOrg?.logo })
   } catch (err) {
     await transaction.rollback()
     log.error(err, '[INVITE SIGNUP]')
