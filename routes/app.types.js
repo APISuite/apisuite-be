@@ -69,4 +69,41 @@ router.postAsync('/',
   accessControl(actions.UPDATE, possessions.ANY, resources.SETTINGS),
   controllers.appTypes.post)
 
+/**
+ * @openapi
+ * /apps/types/:
+ *   post:
+ *     summary: Delete an app type
+ *     tags: [App]
+ *     security:
+ *       - cookieAuth: []
+ *     requestBody:
+ *       description: App type
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               type:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: App Type
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Type'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ */
+
+router.postAsync('/',
+  loggedIn,
+  validateAppTypeBody,
+  accessControl(actions.UPDATE, possessions.ANY, resources.SETTINGS),
+  controllers.appTypes.deleteType)
+
 module.exports = router
