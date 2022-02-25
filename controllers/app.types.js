@@ -20,7 +20,23 @@ const post = async (req, res) => {
   return res.status(HTTPStatus.CREATED).send(createdAppType)
 }
 
+const deleteType = async (req, res) => {
+  const deleteAppType = await models.AppType.destroy({
+    where: {
+      type: req.body.type,
+    },
+  })
+
+  if (!deleteAppType) {
+    log.error('[DELETE APP TYPE]')
+    return res.status(HTTPStatus.INTERNAL_SERVER_ERROR).send({ errors: ['Failed to Delete App Type'] })
+  }
+
+  return res.sendStatus(HTTPStatus.NO_CONTENT)
+}
+
 module.exports = {
   get,
   post,
+  deleteType,
 }
