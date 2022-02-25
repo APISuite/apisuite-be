@@ -104,6 +104,6 @@ router.postAsync('/',
   loggedIn,
   validateAppTypeBody,
   accessControl(actions.UPDATE, possessions.ANY, resources.SETTINGS),
-  controllers.appTypes.deleteType())
+  controllers.appTypes.deleteType)
 
 module.exports = router
