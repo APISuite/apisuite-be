@@ -21,7 +21,7 @@ const appSchema = Joi.object({
   name: Joi.string().max(255).required(),
   description: Joi.string().optional().allow(null, ''),
   shortDescription: Joi.string().max(60).optional().allow(null, ''),
-  redirectUrl: Joi.string().uri({ scheme: ['http', 'https'] }).optional(),
+  redirectUrl: Joi.string().uri({ scheme: ['http', 'https'] }).allow(null, '').optional(),
   visibility: Joi.string().valid('public', 'private').optional(),
   logo: Joi.string().optional().allow(null, ''),
   labels: Joi.array().items(Joi.string()).optional(),
