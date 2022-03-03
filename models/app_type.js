@@ -4,6 +4,9 @@ const appType = (sequelize, DataTypes) => {
       type: DataTypes.TEXT,
       allowNull: false,
     },
+    enabled: {
+      type: DataTypes.BOOLEAN,
+    },
   }, {
     tableName: 'app_types',
     timestamps: true,

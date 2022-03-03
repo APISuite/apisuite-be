@@ -1,5 +1,5 @@
 const HTTPStatus = require('http-status-codes')
-const { models } = require('../models')
+const { models, sequelize } = require('../models')
 const log = require('../util/logger')
 
 const get = async (req, res) => {
@@ -20,6 +20,29 @@ const post = async (req, res) => {
   return res.status(HTTPStatus.CREATED).send(createdAppType)
 }
 
+const postStatus = async (req, res) => {
+  const transaction = await sequelize.transaction()
+  const data = await models.AppType.findByPk(req.body.type, {
+    transaction,
+  })
+  if (data.id) {
+    const [rowsUpdated, [updated]] = await models.AppType.update({ enabled: req.body.enabled }, {
+      returning: true,
+      where: {
+        id: data.id,
+      },
+      transaction,
+    })
+    if (!rowsUpdated) {
+      await transaction.rollback()
+      return res.status(HTTPStatus.NOT_FOUND).send({ errors: ['App Type not found'] })
+    }
+    await transaction.commit()
+    return res.status(HTTPStatus.OK).send(updated)
+  }
+  return res.status(HTTPStatus.NOT_FOUND).send({ errors: ['App Type not found'] })
+}
+
 const deleteType = async (req, res) => {
   await models.AppType.destroy({
     where: {
@@ -34,4 +57,5 @@ module.exports = {
   get,
   post,
   deleteType,
+  postStatus,
 }
