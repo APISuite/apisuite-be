@@ -300,4 +300,19 @@
  *           type: string
  *         updatedAt:
  *           type: string
+ *         enabled:
+ *           type: boolean
+ */
+
+/**
+ * @openapi
+ * components:
+ *   schemas:
+ *     TypeStatus:
+ *       type: object
+ *       properties:
+ *         type:
+ *           type: number
+ *         enabled:
+ *           type: boolean
  */

@@ -13,7 +13,9 @@ const {
 const {
   validateAppTypeBody,
 } = require('./validation_schemas/app.types')
-
+const {
+  validateAppTypeStatusBody,
+} = require('./validation_schemas/app.types.status')
 /**
  * @openapi
  * /apps/types/:
@@ -105,5 +107,44 @@ router.postAsync('/',
   validateAppTypeBody,
   accessControl(actions.UPDATE, possessions.ANY, resources.SETTINGS),
   controllers.appTypes.deleteType)
+
+/**
+ * @openapi
+ * /apps/types/status/:
+ *   post:
+ *     summary: sets enabled status of an app type
+ *     tags: [App]
+ *     security:
+ *       - cookieAuth: []
+ *     requestBody:
+ *       description: App type
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               type:
+ *                 type: string
+ *               status:
+ *                 type: boolean
+ *     responses:
+ *       201:
+ *         description: App Type Status
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/TypeStatus'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ */
+
+router.postAsync('/status/',
+  loggedIn,
+  validateAppTypeStatusBody,
+  accessControl(actions.UPDATE, possessions.ANY, resources.SETTINGS),
+  controllers.appTypes.postStatus)
 
 module.exports = router
