@@ -29,7 +29,18 @@ const publicAppOrgAttributes = [
   'supportUrl',
 ]
 
-const listPublicApps = async (req, res, next) => {
+const includes = () => [
+  {
+    model: models.Organization,
+    attributes: publicAppOrgAttributes,
+  },
+  {
+    model: models.AppType,
+    attributes: ['id', 'type', 'createdAt', 'updatedAt'],
+  },
+]
+
+const listPublicApps = async (req, res) => {
   const filters = {
     visibility: 'public',
     enable: true,
@@ -100,10 +111,7 @@ const listPublicApps = async (req, res, next) => {
 
   const queryOptions = {
     where: { ...filters, ...search },
-    include: [{
-      model: models.Organization,
-      attributes: publicAppOrgAttributes,
-    }],
+    include: includes(),
     attributes: publicAppAttributes,
     replacements,
     order,
@@ -155,11 +163,8 @@ const publicAppDetails = async (req, res) => {
       visibility: 'public',
       enable: true,
     },
-    include: [{
-      model: models.Organization,
-      attributes: publicAppOrgAttributes,
-    }],
-    attributes: publicAppAttributes,
+
+    include: includes(),
   })
 
   if (!app) {
