@@ -91,10 +91,6 @@
  *                type: string
  *              client:
  *                type: string
- *              createdAt:
- *                type: string
- *              updatedAt:
- *                type: string
  *
  *
  *     AppV2:

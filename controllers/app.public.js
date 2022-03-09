@@ -36,7 +36,7 @@ const includes = () => [
   },
   {
     model: models.AppType,
-    attributes: ['id', 'type', 'createdAt', 'updatedAt'],
+    attributes: ['id', 'type'],
   },
 ]
 
