@@ -84,6 +84,13 @@
  *             supportUrl:
  *               type: string
  *               format: uri
+ *          appType:
+ *            type: object
+ *            properties:
+ *              id:
+ *                type: string
+ *              client:
+ *                type: string
  *
  *
  *     AppV2:
