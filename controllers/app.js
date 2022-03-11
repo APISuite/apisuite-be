@@ -333,7 +333,7 @@ const updateApp = async (req, res) => {
       user_id: req.user.id,
       app_id: req.params.appId,
       organization_id: orgId,
-      app_type_id: updated.appTypeId,
+      app_type_id: updated.app_type_id,
       meta: appEventMeta,
     })
 
@@ -435,7 +435,7 @@ const createDraftApp = async (req, res) => {
       user_id: req.user.id,
       app_id: app.id,
       organization_id: orgId,
-      app_type_id: app.appTypeId,
+      app_type_id: app.appType.id,
       meta: appEventMeta,
     })
 
