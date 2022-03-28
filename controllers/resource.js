@@ -3,7 +3,7 @@ const FileType = require('file-type')
 const fs = require('fs').promises
 const log = require('../util/logger')
 const { v4: uuidv4 } = require('uuid')
-const requestProxy = require('express-request-proxy');
+const requestProxy = require('express-request-proxy')
 
 const {
   models,

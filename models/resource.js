@@ -43,7 +43,6 @@ const resource = (sequelize, DataTypes) => {
     } else {
       return null
     }
-
   }
   return Resource
 }
