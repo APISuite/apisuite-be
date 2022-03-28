@@ -72,6 +72,7 @@ app.use('/translations', routes.translations)
 app.use('/users', routes.user)
 app.use('/pages', routes.page)
 app.use('/media', routes.media)
+app.use('/resources', routes.resource)
 app.use(middleware.error)
 
 // serve api documentation

@@ -42,6 +42,7 @@ const models = {
   SettingsStoreFronts: importModel('./settings_storefronts'),
   Address: importModel('./address'),
   Media: importModel('./media'),
+  Resource: importModel('./resource'),
 }
 
 Object.keys(models).forEach(key => {
