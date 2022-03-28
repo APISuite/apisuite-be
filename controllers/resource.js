@@ -57,8 +57,8 @@ const uploadResources = async (req, res) => {
     return res.status(HTTPStatus.OK).send(response)
   } catch (error) {
     await transaction.rollback()
-    log.error(error, '[UPLOAD MEDIA]')
-    return res.status(HTTPStatus.INTERNAL_SERVER_ERROR).send({ errors: ['Failed to upload media objects.'] })
+    log.error(error, '[UPLOAD RESOURCE]')
+    return res.status(HTTPStatus.INTERNAL_SERVER_ERROR).send({ errors: ['Failed to upload resource objects.'] })
   }
 }
 
