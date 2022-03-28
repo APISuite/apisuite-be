@@ -23,7 +23,6 @@ const uploadResources = async (req, res) => {
   }
   const response = {
     savedObjects: [],
-    errors: [],
   }
   const saveResults = result.payload.saveResults
   const files = result.payload.files
@@ -42,18 +41,15 @@ const uploadResources = async (req, res) => {
         }
         response.savedObjects.push(dataObject)
         await models.Resource.create(dataObject, { transaction })
-        continue
+      } else {
+        if (!response.errors) response.errors = []
+        response.errors.push({
+          file: files[j].originalFilename,
+          error: 'failed to save image',
+        })
       }
-
-      response.errors.push({
-        file: files[j].originalFilename,
-        error: 'failed to save image',
-      })
     }
-
     await transaction.commit()
-
-    if (!response.errors.length) delete response.errors
     return res.status(HTTPStatus.OK).send(response)
   } catch (error) {
     await transaction.rollback()
