@@ -1,6 +1,6 @@
 const HTTPStatus = require('http-status-codes')
 const log = require('../util/logger')
-const saveFiles = require('./media')
+const media = require('./media')
 const requestProxy = require('express-request-proxy')
 
 const {
@@ -17,7 +17,7 @@ const uploadResources = async (req, res) => {
     return res.status(HTTPStatus.BAD_REQUEST).send({ errors: ['no files uploaded'] })
   }
   const organization = await models.Organization.getOwnerOrganization()
-  const result = await saveFiles(organization.id, req.formdata.files)
+  const result = await media.saveFiles(organization.id, req.formdata.files)
   if (result.httpCode !== HTTPStatus.OK) {
     return res.status(result.httpCode).send(result.payload)
   }
