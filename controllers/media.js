@@ -20,16 +20,12 @@ const validImageExts = new Set([
   'webp',
 ])
 
-const uploadMedia = async (req, res) => {
-  if (!req.formdata || !req.formdata.files) {
-    return res.status(HTTPStatus.BAD_REQUEST).send({ errors: ['no files uploaded'] })
-  }
-
+const saveFiles = async (orgId, uploadedFiles) => {
   const files = []
   const badTypes = []
-  for (const key in req.formdata.files) {
-    if (key === '') return res.status(HTTPStatus.BAD_REQUEST).send({ errors: ['Add key for each file of the request'] })
-    const file = req.formdata.files[key]
+  for (const key in uploadedFiles) {
+    if (key === '') return { httpCode: HTTPStatus.BAD_REQUEST, payload: { errors: ['Add key for each file of the request'] } }
+    const file = uploadedFiles[key]
     const type = await FileType.fromFile(file.filepath)
     if (!type || !validImageExts.has(type.ext)) {
       badTypes.push(file.originalFilename)
@@ -39,27 +35,50 @@ const uploadMedia = async (req, res) => {
   }
 
   if (badTypes.length) {
-    return res.status(HTTPStatus.BAD_REQUEST).send({
-      errors: badTypes.map((f) => ({
-        file: f,
-        error: 'invalid type (image expected)',
-      })),
-    })
+    return {
+      httpCode: HTTPStatus.BAD_REQUEST,
+      payload: {
+        errors: badTypes.map((f) => ({
+          file: f,
+          error: 'invalid type (image expected)',
+        })),
+      },
+    }
   }
 
   const storageClient = Storage.getStorageClient()
   const savePromises = files.map((f) => {
     const extension = f.originalFilename.split('.').pop()
-    return storageClient.saveFile(f.filepath, `media-${req.params.orgId}-${uuidv4()}.${extension}`)
+    return storageClient.saveFile(f.filepath, `resources-${orgId}-${uuidv4()}.${extension}`)
   })
   const saveResults = await Promise.all(savePromises)
 
   try {
     await Promise.all(files.map((f) => fs.unlink(f.filepath)))
   } catch (err) {
-    log.error(err, 'uploadMedia: failed to remove temporary files')
-    return res.status(HTTPStatus.INTERNAL_SERVER_ERROR).send('uploadMedia: failed to remove temporary files')
+    log.error(err, 'uploadFile: failed to remove temporary files')
+    return {
+      httpCode: HTTPStatus.INTERNAL_SERVER_ERROR,
+      payload: 'uploadFile: failed to remove temporary files',
+    }
   }
+  return {
+    httpCode: HTTPStatus.OK,
+    payload: { saveResults: saveResults, files: files },
+  }
+}
+
+const uploadMedia = async (req, res) => {
+  if (!req.formdata || !req.formdata.files) {
+    return res.status(HTTPStatus.BAD_REQUEST).send({ errors: ['no files uploaded'] })
+  }
+  const result = await saveFiles(req.params.orgId, req.formdata.files)
+
+  if (result.httpCode !== HTTPStatus.OK) {
+    return res.status(result.httpCode).send(result.payload)
+  }
+  const saveResults = result.payload.saveResults
+  const files = result.payload.files
 
   const response = {
     savedObjects: [],
@@ -138,4 +157,5 @@ const deleteMedia = async (req, res) => {
 module.exports = {
   uploadMedia,
   deleteMedia,
+  saveFiles,
 }

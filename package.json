@@ -34,6 +34,7 @@
     "express": "4.17.2",
     "express-basic-auth": "^1.2.1",
     "express-prom-bundle": "6.4.1",
+    "express-request-proxy": "2.2.2",
     "file-type": "16.5.3",
     "formidable": "2.0.1",
     "handlebars": "4.7.7",

@@ -13,7 +13,7 @@ const page = require('./page')
 const translations = require('./translations')
 const settingsStorefronts = require('./settings.storefronts')
 const media = require('./media')
-
+const resource = require('./resource')
 module.exports = {
   api,
   app,
@@ -30,4 +30,5 @@ module.exports = {
   page,
   settingsStorefronts,
   media,
+  resource,
 }

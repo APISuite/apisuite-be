@@ -14,6 +14,7 @@ const translations = require('./translations')
 const settingsStorefronts = require('./settings.strorefronts')
 const media = require('./media')
 const appTypes = require('./app.types')
+const resource = require('./resource')
 
 module.exports = {
   api,
@@ -32,4 +33,5 @@ module.exports = {
   settingsStorefronts,
   media,
   appTypes,
+  resource,
 }
