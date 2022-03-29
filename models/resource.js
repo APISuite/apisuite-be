@@ -34,6 +34,9 @@ const resource = (sequelize, DataTypes) => {
         language: language || 'en-US',
       },
       attributes: ['url'],
+      order: [
+        ['created_at', 'DESC'],
+      ],
     })
     if (resources.length) {
       return resources[0]
