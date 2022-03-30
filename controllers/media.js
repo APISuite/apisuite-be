@@ -1,5 +1,5 @@
+const validate = require('validate-image-type')
 const HTTPStatus = require('http-status-codes')
-const FileType = require('file-type')
 const fs = require('fs').promises
 const log = require('../util/logger')
 const { v4: uuidv4 } = require('uuid')
@@ -13,12 +13,13 @@ function pathParser (mediaUrl, offset) {
   return mediaUrl.substr(mediaUrl.indexOf('/media') + offset, mediaUrl.length)
 }
 
-const validImageExts = new Set([
-  'jpg',
-  'png',
-  'gif',
-  'webp',
-])
+const validImageTypes = [
+  'image/jpeg',
+  'image/gif',
+  'image/png',
+  'image/svg+xml',
+  'image/webp',
+]
 
 const saveFiles = async (orgId, uploadedFiles) => {
   const files = []
@@ -26,8 +27,10 @@ const saveFiles = async (orgId, uploadedFiles) => {
   for (const key in uploadedFiles) {
     if (key === '') return { httpCode: HTTPStatus.BAD_REQUEST, payload: { errors: ['Add key for each file of the request'] } }
     const file = uploadedFiles[key]
-    const type = await FileType.fromFile(file.filepath)
-    if (!type || !validImageExts.has(type.ext)) {
+    const result = validate.validateMIMEType(file.filepath, {
+      allowMimeTypes: validImageTypes,
+    })
+    if (!result.ok) {
       badTypes.push(file.originalFilename)
       continue
     }
