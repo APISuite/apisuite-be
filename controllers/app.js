@@ -513,22 +513,7 @@ const requestAccess = async (req, res) => {
     }
   }
 
-  publishEvent(routingKeys.APP_REQUESTED, {
-    user_id: req.user.id,
-    app_id: req.params.appId,
-    organization_id: orgId,
-    meta: {
-      id: app.id,
-      name: app.name,
-      description: app.description,
-      shortDescription: app.shortDescription,
-      logo: app.logo,
-      visibility: app.visibility,
-      state: app.state,
-      labels: app.labels,
-      org: req.user.organizations.find((o) => o.id === Number(orgId)),
-    },
-  })
+  sendAccessEvent(routingKeys.APP_REQUESTED, orgId, req, app)
 
   return res.sendStatus(HTTPStatus.NO_CONTENT)
 }
@@ -585,7 +570,13 @@ const revokeAccess = async (req, res) => {
     }
   }
 
-  publishEvent(routingKeys.APP_REVOKED, {
+  sendAccessEvent(routingKeys.APP_REVOKED, orgId, req, app)
+
+  return res.sendStatus(HTTPStatus.NO_CONTENT)
+}
+
+const sendAccessEvent = (accessEvent, orgId, req, app) => {
+  publishEvent(accessEvent, {
     user_id: req.user.id,
     app_id: req.params.appId,
     organization_id: orgId,
@@ -601,8 +592,6 @@ const revokeAccess = async (req, res) => {
       org: req.user.organizations.find((o) => o.id === Number(orgId)),
     },
   })
-
-  return res.sendStatus(HTTPStatus.NO_CONTENT)
 }
 
 const subscribeToAPI = async (req, res) => {
