@@ -1,6 +1,6 @@
 {
   "name": "apisuite-be",
-  "version": "5.7.1",
+  "version": "5.8.0",
   "description": "APISuite backend core API",
   "main": "app.js",
   "scripts": {
@@ -54,7 +54,8 @@
     "swagger-jsdoc": "6.1.0",
     "swagger2openapi": "7.0.8",
     "url": "0.11.0",
-    "uuid": "8.3.2"
+    "uuid": "8.3.2",
+    "validate-image-type": "^1.1.1"
   },
   "devDependencies": {
     "@semantic-release/git": "^10.0.1",
