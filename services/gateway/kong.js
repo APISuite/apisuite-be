@@ -352,6 +352,15 @@ class Kong extends Gateway {
   }
 
   /**
+   * Unsubscribes to all APIs by subscribing to the global subscription tag.
+   * @param {String} consumerName The consumer name, can be the app name.
+   * @param {Promise<String>} clientId The app client id.
+   */
+  async unsubscribeAll (consumerName, clientId) {
+    return this.unsubscribeAPIs(consumerName, clientId, [this.globalSubscriptionTag])
+  }
+
+  /**
    * Get the subscription id in the gateway.
    * @param {String} consumerName The consumer name.
    * @param {String} subscriptionName The subscription/api name.

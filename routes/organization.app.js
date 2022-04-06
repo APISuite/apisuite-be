@@ -308,6 +308,44 @@ router.postAsync('/:appId/request',
 
 /**
  * @openapi
+ * /organizations/{id}/apps/{appId}/revoke:
+ *   post:
+ *     summary: Revoke access request
+ *     description: Submits an revoke access request for an application
+ *     tags: [App]
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - name: id
+ *         description: The organization id
+ *         required: true
+ *         in: path
+ *         schema:
+ *           type: string
+ *       - name: appId
+ *         description: The application id
+ *         required: true
+ *         in: path
+ *         schema:
+ *           type: string
+ *     responses:
+ *       204:
+ *         description: No Content
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ */
+router.postAsync('/:appId/revoke',
+  loggedIn,
+  accessControl(actions.READ, possessions.OWN, resources.ORGANIZATION, { idCarrier: 'params', idField: 'id' }),
+  accessControl(actions.UPDATE, possessions.OWN, resources.APP, { idCarrier: 'params', idField: 'appId' }),
+  controllers.app.revokeAccess)
+
+/**
+ * @openapi
  * /organizations/{id}/apps/{appId}/subscribe:
  *   put:
  *     summary: Subscribe App to APIs
