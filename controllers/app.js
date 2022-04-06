@@ -533,6 +533,78 @@ const requestAccess = async (req, res) => {
   return res.sendStatus(HTTPStatus.NO_CONTENT)
 }
 
+const revokeAccess = async (req, res) => {
+  const orgId = req.params.id || req.user.org.id
+  const app = await models.App.findOne({
+    where: {
+      id: req.params.appId,
+      org_id: orgId,
+      enable: true,
+    },
+  })
+
+  if (!app) {
+    return res.status(HTTPStatus.NOT_FOUND).send({ errors: ['App not found'] })
+  }
+
+  if (app.state === appStates.DRAFT) {
+    return res.sendStatus(HTTPStatus.NO_CONTENT)
+  }
+
+  const subscriptionModel = await getSubscriptionModel()
+  switch (subscriptionModel) {
+    case subscriptionModels.SIMPLIFIED: {
+      app.state = appStates.DRAFT
+
+      if (config.get('selfRegisterAppOauthClients')) {
+        const idp = await Idp.getIdP()
+        await idp.deleteClient({
+          clientName: app.name,
+          redirectURIs: [app.redirect_url],
+        })
+
+        let gateway
+        try {
+          gateway = await Gateway()
+        } catch (error) {
+          log.error('[requestAccess] => getGateway', error)
+          if (!(error instanceof NoGatewayError)) {
+            return res.status(HTTPStatus.INTERNAL_SERVER_ERROR).send({ errors: ['gateway communication issue'] })
+          }
+        }
+        if (gateway) await gateway.unsubscribeAll(app.id, app.clientId)
+      }
+
+      await app.save()
+      break
+    }
+    case subscriptionModels.DETAILED: {
+      app.state = appStates.DRAFT
+      await app.save()
+      break
+    }
+  }
+
+  publishEvent(routingKeys.APP_REVOKED, {
+    user_id: req.user.id,
+    app_id: req.params.appId,
+    organization_id: orgId,
+    meta: {
+      id: app.id,
+      name: app.name,
+      description: app.description,
+      shortDescription: app.shortDescription,
+      logo: app.logo,
+      visibility: app.visibility,
+      state: app.state,
+      labels: app.labels,
+      org: req.user.organizations.find((o) => o.id === Number(orgId)),
+    },
+  })
+
+  return res.sendStatus(HTTPStatus.NO_CONTENT)
+}
+
 const subscribeToAPI = async (req, res) => {
   const orgId = req.params.id || req.user.org.id
   const subscriptionModel = await getSubscriptionModel()
@@ -730,6 +802,7 @@ module.exports = {
   getApp,
   createDraftApp,
   requestAccess,
+  revokeAccess,
   updateApp,
   deleteApp,
   subscribeToAPI,

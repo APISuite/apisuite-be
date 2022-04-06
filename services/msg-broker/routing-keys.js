@@ -11,6 +11,7 @@ const keys = {
   APP_UPDATED: 'api.app.updated',
   APP_DELETED: 'api.app.deleted',
   APP_REQUESTED: 'api.app.requested',
+  APP_REVOKED: 'api.app.revoked',
   ORG_CREATED: 'api.organization.created',
   ORG_UPDATED: 'api.organization.updated',
   ORG_DELETED: 'api.organization.deleted',
