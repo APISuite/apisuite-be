@@ -4,6 +4,7 @@ const {
 } = require('../models')
 const HTTPStatus = require('http-status-codes')
 const log = require('../util/logger')
+const fetch = require('node-fetch')
 
 const insertPlan = async (req, res) => {
   const transaction = await sequelize.transaction()
@@ -40,7 +41,22 @@ const insertPlan = async (req, res) => {
 const getPlan = async (req, res) => {
   const plan = await models.Plan.findAll({})
 
-  return res.status(HTTPStatus.OK).send({ plan: plan })
+  if (req.params.type === 'blueprints') {
+    const url = new URL('http://127.0.0.1:6008/apps/get').href
+    const options = {
+      method: 'GET',
+      headers: {},
+    }
+
+    const response = await fetch(url, options)
+    const result = await response.json()
+
+    if (result.data.length > plan[0].dataValues.plan.blueprintApps) {
+      return res.status(HTTPStatus.FORBIDDEN).send()
+    }
+  }
+
+  return res.status(HTTPStatus.OK).send()
 }
 
 module.exports = {

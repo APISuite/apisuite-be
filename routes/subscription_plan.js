@@ -36,7 +36,7 @@ router.postAsync('/',
   //newSubscriptionPlan,
   controllers.plan.insertPlan)
 
-router.getAsync('',
+router.getAsync('/:type',
   controllers.plan.getPlan)
 
 module.exports = router
