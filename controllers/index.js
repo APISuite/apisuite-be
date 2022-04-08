@@ -15,6 +15,7 @@ const settingsStorefronts = require('./settings.strorefronts')
 const media = require('./media')
 const appTypes = require('./app.types')
 const resource = require('./resource')
+const plan = require('./subscription_plan')
 
 module.exports = {
   api,
@@ -34,4 +35,5 @@ module.exports = {
   media,
   appTypes,
   resource,
+  plan,
 }
