@@ -42,7 +42,7 @@ const getPlan = async (req, res) => {
   const plan = await models.Plan.findAll({})
 
   if (req.params.type === 'blueprints') {
-    const url = new URL('http://127.0.0.1:6008/apps/get').href
+    const url = new URL('http://127.0.0.1:6010/apps/get').href
     const options = {
       method: 'GET',
       headers: {},
