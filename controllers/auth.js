@@ -14,6 +14,7 @@ const { publishEvent, routingKeys } = require('../services/msg-broker')
 const { getRevokedCookieConfig } = require('../util/cookies')
 const { oidcDiscovery } = require('../util/oidc')
 const { getUserProfile } = require('./user-helper')
+const plan = require('../middleware/plan-control')
 
 const isRecoveryValid = (createdAt) => {
   return new Date(createdAt.getTime() + config.get('passwordRecoveryTTL') * 60 * 1000) >= Date.now()
@@ -405,7 +406,11 @@ const getCookieConfigs = () => {
 }
 
 const introspect = async (req, res) => {
-  if (!req.user.role) req.user.role = { name: 'baseUser' }
+  if (!req.user.role) {
+    req.user.role = { name: 'baseUser' }
+    await plan.planControl(req, res)
+  }
+  await plan.planControl(req, res)
   return res.status(HTTPStatus.OK).send(req.user)
 }
 

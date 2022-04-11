@@ -145,13 +145,13 @@ const schema = {
     metricsBasicAuthUser: {
       doc: 'Prometheus metrics endpoint basic auth user',
       format: String,
-      default: '',
+      default: 'a',
       env: 'METRICS_AUTH_USER',
     },
     metricsBasicAuthPassword: {
       doc: 'Prometheus metrics endpoint basic auth password',
       format: String,
-      default: '',
+      default: 'b',
       env: 'METRICS_AUTH_PASSWORD',
     },
   },
@@ -336,6 +336,12 @@ const schema = {
     format: Boolean,
     default: true,
     env: 'APISUITE_APPS_CREATE_OAUTH_CLIENT',
+  },
+  appConnectorBackEnd: {
+    doc: 'AppConnector URL backend',
+    format: String,
+    default: 'http://127.0.0.1:6008/',
+    env: 'APISUITE_APPCONNECTOR_URL',
   },
 }
 

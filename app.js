@@ -73,6 +73,7 @@ app.use('/users', routes.user)
 app.use('/pages', routes.page)
 app.use('/media', routes.media)
 app.use('/resources', routes.resource)
+app.use('/plan', routes.plan)
 app.use(middleware.error)
 
 // serve api documentation

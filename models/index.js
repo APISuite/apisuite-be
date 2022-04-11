@@ -43,6 +43,7 @@ const models = {
   Address: importModel('./address'),
   Media: importModel('./media'),
   Resource: importModel('./resource'),
+  Plan: importModel('./subscription_plan'),
 }
 
 Object.keys(models).forEach(key => {
