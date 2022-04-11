@@ -1,7 +1,7 @@
 const { decorateRouter } = require('@awaitjs/express')
 const router = decorateRouter(require('express').Router())
 const controllers = require('../controllers')
-const { newSubscriptionPlan } = require('./validation_schemas/subscription_plan')
+const { loggedIn } = require('../middleware')
 
 /**
  * @openapi
@@ -33,10 +33,10 @@ const { newSubscriptionPlan } = require('./validation_schemas/subscription_plan'
  *         $ref: '#/components/responses/NotFound'
  */
 router.postAsync('/',
-  //newSubscriptionPlan,
   controllers.plan.insertPlan)
 
 router.getAsync('/:type',
+  loggedIn,
   controllers.plan.getPlan)
 
 module.exports = router

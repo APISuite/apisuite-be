@@ -5,6 +5,7 @@ const {
 const HTTPStatus = require('http-status-codes')
 const log = require('../util/logger')
 const fetch = require('node-fetch')
+const config = require('../config')
 
 const insertPlan = async (req, res) => {
   const transaction = await sequelize.transaction()
@@ -42,10 +43,13 @@ const getPlan = async (req, res) => {
   const plan = await models.Plan.findAll({})
 
   if (req.params.type === 'blueprints') {
-    const url = new URL('http://127.0.0.1:6010/apps/get').href
+    const url = new URL(config.get('appConnectorBackEnd') + 'apps/get/').href
+
     const options = {
       method: 'GET',
-      headers: {},
+      headers: {
+        cookie: req.headers.cookie,
+      },
     }
 
     const response = await fetch(url, options)

@@ -337,6 +337,12 @@ const schema = {
     default: true,
     env: 'APISUITE_APPS_CREATE_OAUTH_CLIENT',
   },
+  appConnectorBackEnd: {
+    doc: 'AppConnector URL backend',
+    format: String,
+    default: 'http://127.0.0.1:6008/',
+    env: 'APISUITE_APPCONNECTOR_URL',
+  },
 }
 
 module.exports = schema
