@@ -51,12 +51,6 @@ app.use('/metrics', basicAuth({
 }))
 app.use(promBundle({ includeMethod: true }))
 
-//app.use('/plan', basicAuth({
-//  users: { [config.get('auth.metricsBasicAuthUser')]: config.get('auth.metricsBasicAuthPassword') },
-//  challenge: true,
-//}))
-
-
 // Auth middleware
 app.use(middleware.auth.cookieAuth)
 app.use(middleware.auth.apiTokenAuth)
