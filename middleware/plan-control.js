@@ -1,16 +1,11 @@
 const HTTPStatus = require('http-status-codes')
 const {
   models,
-  sequelize,
 } = require('../models')
 
-const planControl = async (req, res, next) => {
-  const transaction = await sequelize.transaction()
-
+const planControl = async (req, res) => {
   try {
-    const plan = await models.Plan.findAll({
-      transaction,
-    })
+    const plan = await models.Plan.findAll()
 
     if (plan.length === 0) {
       res.loggedInUser.type = 'full'
