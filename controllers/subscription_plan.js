@@ -40,27 +40,27 @@ const insertPlan = async (req, res) => {
 }
 
 const getPlan = async (req, res) => {
-  const plan = await models.Plan.findAll({})
-
-  if (req.params.type === 'blueprints') {
-    const url = new URL(config.get('appConnectorBackEnd') + 'apps/get/').href
-
-    const options = {
-      method: 'GET',
-      headers: {
-        cookie: req.headers.cookie,
-      },
+  try {
+    const plan = await models.Plan.findAll()
+    if (req.params.type === 'blueprints') {
+      const url = new URL(config.get('appConnectorBackEnd') + 'apps/get/').href
+      const options = {
+        method: 'GET',
+        headers: {
+          cookie: req.headers.cookie,
+        },
+      }
+      const response = await fetch(url, options)
+      const result = await response.json()
+      if (result.data.length > plan[0].dataValues.plan.blueprintApps) {
+        return res.status(HTTPStatus.FORBIDDEN).send()
+      }
     }
-
-    const response = await fetch(url, options)
-    const result = await response.json()
-
-    if (result.data.length > plan[0].dataValues.plan.blueprintApps) {
-      return res.status(HTTPStatus.FORBIDDEN).send()
-    }
+    return res.status(HTTPStatus.OK).send()
+  } catch (error) {
+    log.error(error, '[GET SUBSCRIPTION PLAN]')
+    return res.status(HTTPStatus.INTERNAL_SERVER_ERROR).send({ errors: ['Failed to Get Subscription Plan'] })
   }
-
-  return res.status(HTTPStatus.OK).send()
 }
 
 module.exports = {
