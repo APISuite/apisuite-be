@@ -35,7 +35,7 @@ const { loggedIn } = require('../middleware')
 router.postAsync('/',
   controllers.plan.insertPlan)
 
-router.getAsync('/:type',
+router.getAsync('/:type/:user_id',
   loggedIn,
   controllers.plan.getPlan)
 
