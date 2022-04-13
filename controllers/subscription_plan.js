@@ -42,6 +42,8 @@ const insertPlan = async (req, res) => {
 const getPlan = async (req, res) => {
   try {
     const plan = await models.Plan.findAll()
+    console.log(plan)
+    console.log(req.params.type)
     if (req.params.type === 'blueprints') {
       const url = new URL(config.get('appConnectorBackEnd') + 'apps/get/').href
       const options = {
@@ -52,6 +54,9 @@ const getPlan = async (req, res) => {
       }
       const response = await fetch(url, options)
       const result = await response.json()
+      console.log(result)
+      console.log(result.data.length)
+      console.log(plan[0].dataValues.plan.blueprintApps)
       if (result.data.length > plan[0].dataValues.plan.blueprintApps) {
         return res.status(HTTPStatus.FORBIDDEN).send()
       }
