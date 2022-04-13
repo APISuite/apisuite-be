@@ -47,7 +47,7 @@ const getPlan = async (req, res) => {
     // eslint-disable-next-line no-console
     console.log(req.params.type)
     if (req.params.type === 'blueprints') {
-      const url = new URL(config.get('appConnectorBackEnd') + 'apps/get/').href
+      const url = new URL(config.get('appConnectorBackEnd') + 'apps/getuserid/' + req.params.user_id).href
       const options = {
         method: 'GET',
         headers: {
