@@ -62,7 +62,7 @@ const getPlan = async (req, res) => {
       console.log(result.data.length)
       // eslint-disable-next-line no-console
       console.log(plan[0].dataValues.plan.blueprintApps)
-      if (result.data.length > plan[0].dataValues.plan.blueprintApps) {
+      if (result.data.length >= plan[0].dataValues.plan.blueprintApps) {
         return res.status(HTTPStatus.FORBIDDEN).send()
       }
     }
