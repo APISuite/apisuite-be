@@ -33,6 +33,7 @@ const appSchema = Joi.object({
   supportUrl: Joi.string().uri({ scheme: ['http', 'https'] }).optional().allow(null, ''),
   directUrl: Joi.string().uri({ scheme: ['http', 'https'] }).optional().allow(null, ''),
   metadata: Joi.array().items(appMetadata).optional().allow(null),
+  images: Joi.array().optional(),
   appTypeId: Joi.number().optional(),
 })
 

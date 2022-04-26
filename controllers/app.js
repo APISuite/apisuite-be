@@ -392,7 +392,7 @@ const createDraftApp = async (req, res) => {
       state: appStates.DRAFT,
       visibility: req.body.visibility,
       labels: req.body.labels || [],
-      images: [],
+      images: req.body.images || [],
       tosUrl: req.body.tosUrl,
       privacyUrl: req.body.privacyUrl,
       youtubeUrl: req.body.youtubeUrl,

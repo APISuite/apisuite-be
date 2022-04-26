@@ -199,6 +199,10 @@
  *           type: array
  *           items:
  *             type: string
+ *         images:
+ *           type: array
+ *           items:
+ *             type: string
  *         metadata:
  *           type: array
  *           items:
