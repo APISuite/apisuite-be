@@ -14,7 +14,7 @@ const translations = require('./translations')
 const settingsStorefronts = require('./settings.storefronts')
 const media = require('./media')
 const resource = require('./resource')
-const plan = require('./subscription_plan')
+const plan = require('./subscription.plan')
 module.exports = {
   api,
   app,

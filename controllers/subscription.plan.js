@@ -39,7 +39,7 @@ const insertPlan = async (req, res) => {
   }
 }
 
-const getPlan = async (req, res) => {
+const getPlanBP = async (req, res) => {
   try {
     const plan = await models.Plan.findAll()
 
@@ -53,18 +53,6 @@ const getPlan = async (req, res) => {
       }
       const response = await fetch(url, options)
       const result = await response.json()
-      // eslint-disable-next-line no-console
-      console.log('result')
-      // eslint-disable-next-line no-console
-      console.log(result)
-      // eslint-disable-next-line no-console
-      console.log('result.data.length')
-      // eslint-disable-next-line no-console
-      console.log(result.data.length)
-      // eslint-disable-next-line no-console
-      console.log('plan[0].dataValues.plan.blueprintApps')
-      // eslint-disable-next-line no-console
-      console.log(plan[0].dataValues.plan.blueprintApps)
       if (result.data.length >= plan[0].dataValues.plan.blueprintApps) {
         return res.status(HTTPStatus.FORBIDDEN).send()
       }
@@ -76,7 +64,21 @@ const getPlan = async (req, res) => {
   }
 }
 
+const getCurrentPlan = async (req, res) => {
+  try {
+    const plan = await models.Plan.findAll()
+
+    const outPlan = { type: plan[0].dataValues.type }
+
+    return res.status(HTTPStatus.OK).send(outPlan)
+  } catch (error) {
+    log.error(error, '[GET CURRENT PLAN TYPE]')
+    return res.status(HTTPStatus.INTERNAL_SERVER_ERROR).send({ errors: ['Failed to Get Current Plan Type'] })
+  }
+}
+
 module.exports = {
   insertPlan,
-  getPlan,
+  getPlanBP,
+  getCurrentPlan,
 }

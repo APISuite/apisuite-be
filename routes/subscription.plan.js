@@ -37,6 +37,10 @@ router.postAsync('/',
 
 router.getAsync('/:type/:user_id',
   loggedIn,
-  controllers.plan.getPlan)
+  controllers.plan.getPlanBP)
+
+router.getAsync('/',
+  loggedIn,
+  controllers.plan.getCurrentPlan)
 
 module.exports = router
