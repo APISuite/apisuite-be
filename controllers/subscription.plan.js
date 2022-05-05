@@ -44,7 +44,7 @@ const getPlanBP = async (req, res) => {
     const plan = await models.Plan.findAll()
 
     if (req.params.type === 'blueprints') {
-      const url = new URL(config.get('appConnectorBackEnd') + 'apps/getuserid/' + req.params.user_id).href
+      const url = new URL(config.get('appConnectorBackEnd') + 'apps/getuserid/' + req.params.user_id + '?blueprint=true').href
       const options = {
         method: 'GET',
         headers: {
