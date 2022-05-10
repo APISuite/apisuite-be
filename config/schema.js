@@ -343,6 +343,12 @@ const schema = {
     default: 'http://127.0.0.1:6008/',
     env: 'APISUITE_APPCONNECTOR_URL',
   },
+  subscribedPlan: {
+    doc: 'Subscription Plan',
+    format: String,
+    default: 'full',
+    env: 'SUBSCRIPTION_PLAN',
+  }
 }
 
 module.exports = schema
