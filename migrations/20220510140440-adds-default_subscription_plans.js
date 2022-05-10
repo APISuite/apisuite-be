@@ -14,7 +14,7 @@ module.exports = {
       for (const record of recordsToAdd) {
         const resourceExists = await models.Plan.findOne({ where: { type: record.type } })
         if (!resourceExists) {
-          await queryInterface.insert(null, 'subscription_plan', record)
+          await models.Plan.create(record, { transaction })
         }
       }
 

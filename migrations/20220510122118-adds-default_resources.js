@@ -7,15 +7,15 @@ module.exports = {
     try {
       const organization = await models.Organization.getOwnerOrganization()
       const recordsToAdd = [
-        { org_id: organization.id, url: `${config.get('apiURL')}/media/space-background.svg`, namespace: 'marketplace.background', language: 'en-US' },
-        { org_id: organization.id, url: `${config.get('apiURL')}/media/marketplace.svg`, namespace: 'marketplace.hero', language: 'en-US' },
-        { org_id: organization.id, url: `${config.get('apiURL')}/media/marketplaceApps.svg`, namespace: 'marketplace.apps', language: 'en-US' },
+        { file: 'space-background.svg', orgId: organization.id, url: `${config.get('apiURL')}/media/space-background.svg`, namespace: 'marketplace.background', language: 'en-US' },
+        { file: 'marketplace.svg', orgId: organization.id, url: `${config.get('apiURL')}/media/marketplace.svg`, namespace: 'marketplace.hero', language: 'en-US' },
+        { file: 'marketplaceApps.svg', orgId: organization.id, url: `${config.get('apiURL')}/media/marketplaceApps.svg`, namespace: 'marketplace.apps', language: 'en-US' },
       ]
 
       for (const record of recordsToAdd) {
         const resourceExists = await models.Resource.findByNamespace(record.org_id, record.namespace, record.language)
         if (!resourceExists) {
-          await queryInterface.insert(null, 'resource', record)
+          await models.Resource.create(record, { transaction })
         }
       }
 
