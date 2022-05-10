@@ -8,6 +8,7 @@ module.exports = {
         { type: 'starter', plan: JSON.stringify({ blueprintApps: 1, marketplace: true, synchronizations: 7200 }) },
         { type: 'portal', plan: JSON.stringify({ blueprintApps: 0, marketplace: false, synchronizations: 7200 }) },
         { type: 'marketplace', plan: JSON.stringify({ blueprintApps: Number.MAX_SAFE_INTEGER, marketplace: true, synchronizations: 86400 }) },
+        { type: 'full', plan: JSON.stringify({ blueprintApps: Number.MAX_SAFE_INTEGER, marketplace: true, synchronizations: Number.MAX_SAFE_INTEGER }) },
       ]
 
       for (const record of recordsToAdd) {
