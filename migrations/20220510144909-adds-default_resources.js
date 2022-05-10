@@ -12,6 +12,7 @@ module.exports = {
         { file: 'marketplaceApps.svg', orgId: organization.id, url: `${config.get('apiURL')}/media/marketplaceApps.svg`, namespace: 'marketplace.apps', language: 'en-US' },
       ]
 
+      // iterates over records
       for (const record of recordsToAdd) {
         const resourceExists = await models.Resource.findByNamespace(record.org_id, record.namespace, record.language)
         if (!resourceExists) {
