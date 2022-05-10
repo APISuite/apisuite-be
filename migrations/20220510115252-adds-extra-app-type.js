@@ -1,5 +1,5 @@
 'use strict'
-
+const { models } = require('../models')
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     const transaction = await queryInterface.sequelize.transaction()
@@ -11,10 +11,10 @@ module.exports = {
         { type: 'expert', enabled: false },
       ]
 
-      for (const recordsToAddElement of recordsToAdd) {
-        const typeExists = await queryInterface.select(null, 'app_types', { where: { type: recordsToAddElement.type } })
+      for (const record of recordsToAdd) {
+        const typeExists = models.AppType.findOne({ where: { type: record.type } })
         if (!typeExists) {
-          await queryInterface.insert(null, 'app_types', recordsToAddElement)
+          await models.AppType.create(record, { transaction })
         }
       }
 
