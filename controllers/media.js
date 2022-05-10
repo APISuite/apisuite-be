@@ -21,7 +21,7 @@ const validImageTypes = [
   'image/webp',
 ]
 
-const saveFiles = async (orgId, uploadedFiles) => {
+const saveFiles = async (prefix, orgId, uploadedFiles) => {
   const files = []
   const badTypes = []
   for (const key in uploadedFiles) {
@@ -52,7 +52,7 @@ const saveFiles = async (orgId, uploadedFiles) => {
   const storageClient = Storage.getStorageClient()
   const savePromises = files.map((f) => {
     const extension = f.originalFilename.split('.').pop()
-    return storageClient.saveFile(f.filepath, `resources-${orgId}-${uuidv4()}.${extension}`)
+    return storageClient.saveFile(f.filepath, `${prefix}-${orgId}-${uuidv4()}.${extension}`)
   })
   const saveResults = await Promise.all(savePromises)
 
@@ -75,7 +75,7 @@ const uploadMedia = async (req, res) => {
   if (!req.formdata || !req.formdata.files) {
     return res.status(HTTPStatus.BAD_REQUEST).send({ errors: ['no files uploaded'] })
   }
-  const result = await saveFiles(req.params.orgId, req.formdata.files)
+  const result = await saveFiles('media', req.params.orgId, req.formdata.files)
 
   if (result.httpCode !== HTTPStatus.OK) {
     return res.status(result.httpCode).send(result.payload)

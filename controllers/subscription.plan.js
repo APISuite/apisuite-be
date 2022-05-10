@@ -11,27 +11,20 @@ const insertPlan = async (req, res) => {
   const transaction = await sequelize.transaction()
 
   try {
-    const plan = await models.Plan.findAll({
+    await models.Plan.findAll({
       transaction,
     })
-
-    if (plan.length === 0) {
-      await models.Plan.create(
-        {
-          type: req.body.type,
-          plan: req.body.plan,
-        },
-        {
-          transaction,
-        },
-      )
-      await transaction.commit()
-      return res.status(HTTPStatus.OK).send(req.body)
-    }
-
-    if (plan.length > 1) {
-      return res.status(HTTPStatus.BAD_REQUEST).send({ errors: 'Instance Already as a Subscription Plan' })
-    }
+    await models.Plan.create(
+      {
+        type: req.body.type,
+        plan: req.body.plan,
+      },
+      {
+        transaction,
+      },
+    )
+    await transaction.commit()
+    return res.status(HTTPStatus.OK).send(req.body)
   } catch (error) {
     if (transaction) await transaction.rollback()
     log.error(error, '[INSERT SUBSCRIPTION PLAN]')
@@ -41,7 +34,7 @@ const insertPlan = async (req, res) => {
 
 const getPlanBP = async (req, res) => {
   try {
-    const plan = await models.Plan.findAll()
+    const plan = await models.Plan.findOne({ where: { type: config.get('subscribedPlan') } })
 
     if (req.params.type === 'blueprints') {
       const url = new URL(config.get('appConnectorBackEnd') + 'apps/getuserid/' + req.params.user_id + '?blueprint=true').href
@@ -53,7 +46,7 @@ const getPlanBP = async (req, res) => {
       }
       const response = await fetch(url, options)
       const result = await response.json()
-      if (result.data.length >= plan[0].dataValues.plan.blueprintApps) {
+      if (result.data.length >= plan.dataValues.plan.blueprintApps) {
         return res.status(HTTPStatus.FORBIDDEN).send()
       }
     }
@@ -66,11 +59,7 @@ const getPlanBP = async (req, res) => {
 
 const getCurrentPlan = async (req, res) => {
   try {
-    const plan = await models.Plan.findAll()
-
-    const outPlan = { type: plan[0].dataValues.type }
-
-    return res.status(HTTPStatus.OK).send(outPlan)
+    return res.status(HTTPStatus.OK).send({ type: config.get('subscribedPlan') })
   } catch (error) {
     log.error(error, '[GET CURRENT PLAN TYPE]')
     return res.status(HTTPStatus.INTERNAL_SERVER_ERROR).send({ errors: ['Failed to Get Current Plan Type'] })
