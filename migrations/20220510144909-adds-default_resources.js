@@ -13,7 +13,7 @@ module.exports = {
       ]
 
       for (const record of recordsToAdd) {
-        const resourceExists = await models.Resource.findByNamespace(record.orgId, record.namespace, record.language)
+        const resourceExists = await models.Resource.findByNamespace(record.org_id, record.namespace, record.language)
         if (!resourceExists) {
           await models.Resource.create(record, { transaction })
         }
