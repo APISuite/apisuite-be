@@ -348,7 +348,7 @@ const schema = {
     format: String,
     default: 'full',
     env: 'SUBSCRIPTION_PLAN',
-  }
+  },
 }
 
 module.exports = schema
