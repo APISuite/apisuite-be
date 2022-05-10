@@ -15,7 +15,7 @@ module.exports = {
       for (const record of recordsToAdd) {
         const resourceExists = await models.Resource.findByNamespace(record.orgId, record.namespace, record.language)
         if (!resourceExists) {
-          await queryInterface.insert(null, 'resources', record)
+          await queryInterface.insert(null, 'resource', record)
         }
       }
 
