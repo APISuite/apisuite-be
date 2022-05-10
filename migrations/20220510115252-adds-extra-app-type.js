@@ -12,7 +12,7 @@ module.exports = {
       ]
 
       for (const recordsToAddElement of recordsToAdd) {
-        const typeExists = await queryInterface.select(null, 'app_types', {where: { type: recordsToAddElement.type } })
+        const typeExists = await queryInterface.select(null, 'app_types', { where: { type: recordsToAddElement.type } })
         if (!typeExists) {
           await queryInterface.insert(null, 'app_types', recordsToAddElement)
         }
