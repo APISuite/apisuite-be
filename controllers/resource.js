@@ -7,6 +7,7 @@ const {
   models,
   sequelize,
 } = require('../models')
+const config = require('../config')
 
 function pathParser (mediaUrl, offset) {
   return mediaUrl.substr(mediaUrl.indexOf('/resources') + offset, mediaUrl.length)
@@ -58,12 +59,21 @@ const uploadResources = async (req, res) => {
   }
 }
 
+const defaultResources = {
+  'marketplace.background': `${config.get('apiURL')}/media/space-background.svg`,
+  'marketplace.hero': `${config.get('apiURL')}/media/marketplace.svg`,
+  'marketplace.apps': `${config.get('apiURL')}/media/marketplaceApps.svg`,
+}
+
 const getResources = async (req, res, next) => {
   try {
     const organization = await models.Organization.getOwnerOrganization()
     const resource = await models.Resource.findByNamespace(organization.id, req.params.namespace, req.query.language)
     if (resource) {
       const proxy = requestProxy({ url: resource.url })
+      proxy(req, res, next)
+    } else if (defaultResources[req.params.namespace]) {
+      const proxy = requestProxy({ url: defaultResources[req.params.namespace] })
       proxy(req, res, next)
     } else {
       return res.status(HTTPStatus.NOT_FOUND).send('resource not found')
