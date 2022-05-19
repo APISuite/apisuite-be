@@ -17,6 +17,12 @@ const controllers = require('../controllers')
  *         in: path
  *         schema:
  *           type: string
+ *       - name: extension
+ *         description: extension of each language (en-US, pt-PT, etc)
+ *         required: true
+ *         in: path
+ *         schema:
+ *           type: string
  *     responses:
  *       200:
  *         description: Translations data
@@ -27,7 +33,7 @@ const controllers = require('../controllers')
  *       404:
  *         $ref: '#/components/responses/NotFound'
  */
-router.getAsync('/:locale',
+router.getAsync('/:locale/:extension',
   controllers.translations.get)
 
 /**
@@ -66,7 +72,7 @@ router.getAsync('/:locale',
  *       404:
  *         $ref: '#/components/responses/NotFound'
  */
-router.putAsync('/:locale',
+router.putAsync('/:locale/:extension',
   loggedIn,
   accessControl(actions.UPDATE, possessions.ANY, resources.SETTINGS),
   controllers.translations.upsert)

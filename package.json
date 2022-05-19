@@ -25,6 +25,7 @@
     "accesscontrol": "2.2.1",
     "amqp-connection-manager": "3.8.1",
     "amqplib": "0.8.0",
+    "aws-sdk": "^2.1136.0",
     "bcrypt": "5.0.1",
     "convict": "6.2.1",
     "cookie-parser": "1.4.6",
