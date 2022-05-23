@@ -62,6 +62,7 @@ const uploadResources = async (req, res) => {
 const defaultResources = {
   'dashboard.background': `${config.get('apiURL')}/media/Background.jpg`,
   'main.background': `${config.get('apiURL')}/media/Background.jpg`,
+  'slider.background': `${config.get('apiURL')}/media/Background2.jpg`,
   'main.carousel1': `${config.get('apiURL')}/media/Home_Slider_1.png`,
   'main.carousel2': `${config.get('apiURL')}/media/Home_Slider_2.png`,
   'main.carousel3': `${config.get('apiURL')}/media/Home_Slider_3.png`,
