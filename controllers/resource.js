@@ -61,15 +61,15 @@ const uploadResources = async (req, res) => {
 
 // TODO refactor this
 const defaultResources = {
-  'dashboard.background': `${config.get('apiURL')}/media/Background.jpg`,
-  'main.background': `${config.get('apiURL')}/media/Background.jpg`,
-  'slider.background': `${config.get('apiURL')}/media/Background2.jpg`,
-  'main.carousel1': `${config.get('apiURL')}/media/Home_Slider_1.png`,
-  'main.carousel2': `${config.get('apiURL')}/media/Home_Slider_2.png`,
-  'main.carousel3': `${config.get('apiURL')}/media/Home_Slider_3.png`,
-  'marketplace.background': `${config.get('apiURL')}/media/Background.jpg`,
-  'marketplace.hero': `${config.get('apiURL')}/media/Marketplace_hero.png`,
-  'marketplace.apps': `${config.get('apiURL')}/media/marketplaceApps.svg`,
+  'dashboard.background': `${config.get('apiURL')}/media/default/Background.jpg`,
+  'main.background': `${config.get('apiURL')}/media/default/Background.jpg`,
+  'slider.background': `${config.get('apiURL')}/media/default/Background2.jpg`,
+  'main.carousel1': `${config.get('apiURL')}/media/default/Home_Slider_1.png`,
+  'main.carousel2': `${config.get('apiURL')}/media/default/Home_Slider_2.png`,
+  'main.carousel3': `${config.get('apiURL')}/media/default/Home_Slider_3.png`,
+  'marketplace.background': `${config.get('apiURL')}/media/default/Background.jpg`,
+  'marketplace.hero': `${config.get('apiURL')}/media/default/Marketplace_hero.png`,
+  'marketplace.apps': `${config.get('apiURL')}/media/default/marketplaceApps.svg`,
 }
 
 const getResources = async (req, res, next) => {
