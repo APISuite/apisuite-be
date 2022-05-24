@@ -82,8 +82,7 @@ const getResources = async (req, res, next) => {
         proxy(req, res, next)
         return
       }
-    }
-    if (defaultResources[req.params.namespace]) {
+    } else if (defaultResources[req.params.namespace]) {
       const proxy = requestProxy({ url: defaultResources[req.params.namespace] })
       proxy(req, res, next)
       return
