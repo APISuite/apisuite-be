@@ -117,5 +117,5 @@ router.deleteAsync('/:orgId',
 module.exports = router
 
 router.use('/', express.static('media'))
-
+router.use('/default/', express.static('default_media'))
 module.exports = router
