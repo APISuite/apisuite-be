@@ -59,6 +59,7 @@ const uploadResources = async (req, res) => {
   }
 }
 
+// TODO refactor this
 const defaultResources = {
   'dashboard.background': `${config.get('apiURL')}/media/Background.jpg`,
   'main.background': `${config.get('apiURL')}/media/Background.jpg`,
