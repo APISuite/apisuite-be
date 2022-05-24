@@ -80,11 +80,12 @@ const getResources = async (req, res, next) => {
       if (resource) {
         const proxy = requestProxy({ url: resource.url })
         proxy(req, res, next)
+        return
       }
-    }
-    if (defaultResources[req.params.namespace]) {
+    } else if (defaultResources[req.params.namespace]) {
       const proxy = requestProxy({ url: defaultResources[req.params.namespace] })
       proxy(req, res, next)
+      return
     } else {
       return res.status(HTTPStatus.NOT_FOUND).send('resource not found')
     }
