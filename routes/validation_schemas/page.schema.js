@@ -12,7 +12,10 @@ const pagePayloadSchema = Joi.object({
     if (!validateLocaleCode(value)) return helpers.message('invalid locale format')
     return true
   }),
-  content: Joi.string().required(),
+  title: Joi.string(),
+  content: Joi.string().optional(),
+  online: Joi.bool(),
+  parent: Joi.string().optional(),
 })
 
 module.exports = {
