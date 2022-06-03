@@ -15,6 +15,12 @@
  *           type: string
  *         content:
  *           type: string
+ *         title:
+ *           type: string
+ *         parent:
+ *           type: string
+ *         online:
+ *           type: boolean
  *         updatedAt:
  *           type: string
  *         createdAt:
@@ -29,14 +35,23 @@
  *           type: string
  *         content:
  *           type: string
- *
+ *         title:
+ *           type: string
+ *         parent:
+ *           type: string
+ *         online:
+ *           type: boolean
  *     SimplePage:
  *       type: object
  *       properties:
+ *         title:
+ *           type: string
  *         id:
  *           type: string
  *         locale:
  *           type: string
+ *         online:
+ *           type: boolean
  *         updatedAt:
  *           type: string
  *         createdAt:

@@ -3,7 +3,7 @@ const { models } = require('../models')
 
 const list = async (req, res) => {
   const pages = await models.Page.findAll({
-    attributes: ['id', 'locale', 'createdAt', 'updatedAt'],
+    attributes: ['id', 'locale', 'title', 'createdAt', 'updatedAt'],
   })
   return res.status(HTTPStatus.OK).send(pages)
 }
@@ -40,6 +40,8 @@ const create = async (req, res) => {
     id: req.body.id,
     locale: req.body.locale,
     content: req.body.content,
+    online: req.body.online,
+    title: req.body.title,
   })
 
   return res.status(HTTPStatus.CREATED).send(page)
@@ -61,6 +63,8 @@ const update = async (req, res) => {
   }
 
   page.content = req.body.content
+  page.title = req.body.title
+  page.online = req.body.online
   page = await page.save({ returning: true })
 
   return res.status(HTTPStatus.OK).send(page)
