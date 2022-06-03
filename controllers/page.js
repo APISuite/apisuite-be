@@ -3,7 +3,7 @@ const { models } = require('../models')
 
 const list = async (req, res) => {
   const pages = await models.Page.findAll({
-    attributes: ['id', 'locale', 'title', 'createdAt', 'updatedAt'],
+    attributes: ['id', 'locale', 'title', 'online', 'createdAt', 'updatedAt'],
   })
   return res.status(HTTPStatus.OK).send(pages)
 }
