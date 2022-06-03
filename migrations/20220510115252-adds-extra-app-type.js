@@ -12,7 +12,7 @@ module.exports = {
       ]
 
       for (const record of recordsToAdd) {
-        const typeExists = models.AppType.findOne({ where: { type: record.type } })
+        const typeExists = await models.AppType.findOne({ where: { type: record.type } })
         if (!typeExists) {
           await models.AppType.create(record, { transaction })
         }
