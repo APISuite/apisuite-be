@@ -13,9 +13,9 @@ const pagePayloadSchema = Joi.object({
     return true
   }),
   title: Joi.string(),
-  content: Joi.string().optional(),
+  content: Joi.string().optional().allow(''),
   online: Joi.bool(),
-  parent: Joi.string().optional(),
+  parent: Joi.string().optional().allow(''),
 })
 
 module.exports = {
