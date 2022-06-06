@@ -3,7 +3,7 @@ const { models } = require('../models')
 
 const list = async (req, res) => {
   const pages = await models.Page.findAll({
-    attributes: ['id', 'locale', 'title', 'createdAt', 'updatedAt'],
+    attributes: ['id', 'locale', 'title', 'online', 'parent', 'createdAt', 'updatedAt'],
   })
   return res.status(HTTPStatus.OK).send(pages)
 }
@@ -65,6 +65,7 @@ const update = async (req, res) => {
   page.content = req.body.content
   page.title = req.body.title
   page.online = req.body.online
+  page.parent = req.body.parent
   page = await page.save({ returning: true })
 
   return res.status(HTTPStatus.OK).send(page)
