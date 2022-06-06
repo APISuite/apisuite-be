@@ -42,6 +42,7 @@ const create = async (req, res) => {
     content: req.body.content,
     online: req.body.online,
     title: req.body.title,
+    parent: req.body.parent,
   })
 
   return res.status(HTTPStatus.CREATED).send(page)
