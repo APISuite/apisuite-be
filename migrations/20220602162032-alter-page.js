@@ -10,7 +10,7 @@ module.exports = {
       }, { transaction })
       await queryInterface.addColumn('pages', 'title', {
         type: Sequelize.TEXT,
-        allowNull: false,
+        allowNull: true,
       }, { transaction })
       await queryInterface.addColumn('pages', 'parent', {
         type: Sequelize.TEXT,
