@@ -6,7 +6,7 @@ WORKDIR /usr/src/app
 COPY package*.json /usr/src/app/
 COPY . /usr/src/app/
 
-RUN npm install --omit=dev
+RUN npm install --omit=dev --legacy-peer-deps
 
 EXPOSE 6001
 
