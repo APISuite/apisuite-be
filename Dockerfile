@@ -6,7 +6,7 @@ WORKDIR /usr/src/app
 COPY package*.json /usr/src/app/
 COPY . /usr/src/app/
 
-RUN npm install --only=prod
+RUN npm install --only=prod --omit=dev
 
 EXPOSE 6001
 
