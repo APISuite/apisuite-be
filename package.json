@@ -1,5 +1,8 @@
 {
   "name": "apisuite-be",
+  "engines": {
+    "node": "14.17.0"
+  },
   "version": "5.17.7",
   "description": "APISuite backend core API",
   "main": "app.js",
