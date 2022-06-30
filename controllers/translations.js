@@ -2,12 +2,21 @@ const HTTPStatus = require('http-status-codes')
 const { models } = require('../models')
 
 const get = async (req, res) => {
-  const tr = await models.Translation.findByLanguageExtension(req.params.locale, req.params.extension)
-  if (!tr) {
-    return res.status(HTTPStatus.NOT_FOUND).send({ errors: ['translation not found'] })
-  }
+  if (req.params.extension) {
+    const tr = await models.Translation.findByLanguageExtension(req.params.locale, req.params.extension)
+    if (!tr) {
+      return res.status(HTTPStatus.NOT_FOUND).send({ errors: ['translation not found'] })
+    }
 
-  return res.status(HTTPStatus.OK).send(tr.translations)
+    return res.status(HTTPStatus.OK).send(tr.translations)
+  } else if (!req.params.extension) {
+    const tr = await models.Translation.findByPk(req.params.locale)
+    if (!tr) {
+      return res.status(HTTPStatus.NOT_FOUND).send({ errors: ['translation not found'] })
+    }
+
+    return res.status(HTTPStatus.OK).send(tr.translations)
+  }
 }
 
 const upsert = async (req, res) => {
