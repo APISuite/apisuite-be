@@ -33,6 +33,38 @@ const controllers = require('../controllers')
  *       404:
  *         $ref: '#/components/responses/NotFound'
  */
+router.getAsync('/:locale/',
+  controllers.translations.get)
+
+/**
+ * @openapi
+ * /translations/{locale}/{extension}:
+ *   get:
+ *     summary: Get translations object for a locale
+ *     tags: [Translations]
+ *     parameters:
+ *       - name: locale
+ *         description: i18n language code (en-US, pt-PT, etc)
+ *         required: true
+ *         in: path
+ *         schema:
+ *           type: string
+ *       - name: extension
+ *         description: extension of each language (en-US, pt-PT, etc)
+ *         required: true
+ *         in: path
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Translations data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ */
 router.getAsync('/:locale/:extension',
   controllers.translations.get)
 
