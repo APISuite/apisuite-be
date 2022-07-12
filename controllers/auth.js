@@ -405,6 +405,24 @@ const getCookieConfigs = () => {
   }
 }
 
+const cognitoLogin = async (req, res) => {
+  // validate jwt token
+  // ping solo web for user profile and org profile
+  // upsert user/org into the apisuite database role being ADMIN
+  // upsert cookie into the current session of the user
+  // return 200
+  return res.status(HTTPStatus.OK).send('')
+}
+
+const cognitoLogout = async (req, res) => {
+  // validate jwt token
+  // ping solo web for user profile and org profile
+  // upsert user/org into the apisuite database
+  // upsert cookie into the current session of the user
+  // return 200
+  return res.status(HTTPStatus.OK).send('')
+}
+
 const introspect = async (req, res) => {
   if (!req.user.role) {
     req.user.role = { name: 'baseUser' }
@@ -423,4 +441,6 @@ module.exports = {
   oidcAuth,
   oidcToken,
   introspect,
+  cognitoLogin,
+  cognitoLogout,
 }
