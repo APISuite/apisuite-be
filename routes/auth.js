@@ -115,6 +115,9 @@ router.getAsync('/oidc/:provider',
   validations.validateAuthFlags,
   controllers.auth.oidcAuth)
 
+router.getAsync('/cognito/grant', controllers.auth.cognitoLogin)
+router.getAsync('/cognito/revoke', controllers.auth.cognitoLogout)
+
 /**
  * @openapi
  * /auth/oidc/{provider}/token:

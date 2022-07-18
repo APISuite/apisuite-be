@@ -11,6 +11,12 @@ const schema = {
     default: 6001,
     env: 'APISUITE_API_PORT',
   },
+  cognitoServer: {
+    doc: 'APISuite app URL',
+    format: String,
+    default: 'http://localhost:3001',
+    env: 'APISUITE_APP_URL',
+  },
   appURL: {
     doc: 'APISuite app URL',
     format: String,
@@ -287,6 +293,12 @@ const schema = {
       format: String,
       default: 'http://localhost:3001/auth/invitation',
       env: 'APISUITE_SSO_INVITE_REDIRECT_URL',
+    },
+    cognitoProfileUrl: {
+      doc: 'Cognito User Profile endpoint',
+      format: String,
+      default: 'https://dev-api.solo-staging.com',
+      env: 'COGNITO_PROFILE_URL',
     },
   },
   storage: {

@@ -1,5 +1,6 @@
 const { v4: uuidv4 } = require('uuid')
 const fetch = require('node-fetch')
+const request = require('request-promise')
 const jsonwebtoken = require('jsonwebtoken')
 const jwksRSA = require('jwks-rsa')
 const HTTPStatus = require('http-status-codes')
@@ -15,6 +16,7 @@ const { getRevokedCookieConfig } = require('../util/cookies')
 const { oidcDiscovery } = require('../util/oidc')
 const { getUserProfile } = require('./user-helper')
 const plan = require('../middleware/plan-control')
+const crypto = require('crypto')
 
 const isRecoveryValid = (createdAt) => {
   return new Date(createdAt.getTime() + config.get('passwordRecoveryTTL') * 60 * 1000) >= Date.now()
@@ -406,21 +408,95 @@ const getCookieConfigs = () => {
 }
 
 const cognitoLogin = async (req, res) => {
-  // validate jwt token
-  // ping solo web for user profile and org profile
-  // upsert user/org into the apisuite database role being ADMIN
-  // upsert cookie into the current session of the user
-  // return 200
-  return res.status(HTTPStatus.OK).send('')
+  const accessToken = req.body.accessToken
+
+  if (!accessToken) {
+    return res.status(HTTPStatus.BAD_REQUEST).send('Missing accessToken')
+  }
+  let transaction = await sequelize.transaction()
+  try {
+    const jar = request.jar()
+    const jarCookie = request.cookie(`access_token=${accessToken}`)
+    jar.setCookie(jarCookie, config.get('sso.cognitoProfileUrl'))
+    let result = await request({ uri: `${config.get('sso.cognitoProfileUrl')}/user/profile`, jar })
+    result = JSON.parse(result)
+
+    let user = await models.User.findByOIDC(result.sub, 'cognito', transaction)
+    if (!user) {
+      user = await models.User.build({
+        oidcProvider: 'cognito',
+        oidcId: result.sub,
+        name: `${result.givenName} ${result.familyName}`,
+        email: result.email,
+      })
+      await user.save({ transaction: transaction })
+    }
+    const adminRole = await models.Role.findOne({ where: { name: 'admin' } })
+    for (const business of result.businessData) {
+      let org = await models.Organization.findOne({ where: { name: business.id } }, transaction)
+      if (org) {
+        let userOrg = await models.UserOrganization.findOne({ where: { org_id: org.id, user_id: user.id } }, transaction)
+        if (!userOrg) {
+          userOrg = await models.UserOrganization.build({
+            org_id: org.id,
+            user_id: user.id,
+            role: adminRole.id,
+            current_org: result.businessData.indexOf(business) === 0,
+          }, transaction)
+          await userOrg.save({ transaction: transaction })
+        }
+      } else {
+        org = await models.Organization.build({
+          name: business.id,
+        })
+        await org.save({ transaction: transaction })
+        await transaction.commit()
+        transaction = await sequelize.transaction()
+        const userOrg = await models.UserOrganization.build({
+          org_id: org.id,
+          user_id: user.id,
+          role: 1,
+          current_org: result.businessData.indexOf(business) === 0,
+        })
+        await userOrg.save({ transaction: transaction })
+      }
+    }
+    publishEvent(routingKeys.AUTH_LOGIN, {
+      user_id: user.id,
+    })
+    let token = await models.APIToken.findOne({ where: { user_id: user.id } }, transaction)
+    if (!token) {
+      const tokenValue = crypto.randomBytes(20).toString('hex')
+      token = await models.APIToken.create({
+        name: user.name,
+        token: tokenValue,
+        userId: user.id,
+      })
+    }
+    await transaction.commit()
+    token.token = `${token.id}_${token.token}`
+
+    return res.status(HTTPStatus.OK).send({ token: token.token })
+  } catch (e) {
+    transaction.rollback()
+    return res.status(HTTPStatus.UNAUTHORIZED).send({ e })
+  }
 }
 
 const cognitoLogout = async (req, res) => {
-  // validate jwt token
-  // ping solo web for user profile and org profile
-  // upsert user/org into the apisuite database
-  // upsert cookie into the current session of the user
-  // return 200
-  return res.status(HTTPStatus.OK).send('')
+  const parsedToken = req.body.token
+  const tokenId = parsedToken.split('_')[0]
+  const apiToken = await models.APIToken.findByPk(tokenId)
+
+  if (apiToken) {
+    await models.APIToken.destroy({
+      where: {
+        id: apiToken.id,
+        userId: apiToken.userId,
+      },
+    })
+  }
+  return res.sendStatus(HTTPStatus.NO_CONTENT)
 }
 
 const introspect = async (req, res) => {
