@@ -440,7 +440,7 @@ const cognitoLogin = async (req, res) => {
           userOrg = await models.UserOrganization.build({
             org_id: org.id,
             user_id: user.id,
-            role: adminRole.id,
+            role_id: adminRole.id,
             current_org: result.businessData.indexOf(business) === 0,
           }, transaction)
           await userOrg.save({ transaction: transaction })
@@ -455,7 +455,7 @@ const cognitoLogin = async (req, res) => {
         const userOrg = await models.UserOrganization.build({
           org_id: org.id,
           user_id: user.id,
-          role: 1,
+          role_id: adminRole.id,
           current_org: result.businessData.indexOf(business) === 0,
         })
         await userOrg.save({ transaction: transaction })
