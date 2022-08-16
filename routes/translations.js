@@ -6,7 +6,7 @@ const controllers = require('../controllers')
 
 /**
  * @openapi
- * /translations/{locale}:
+ * /translations/{locale}/{extension}:
  *   get:
  *     summary: Get translations object for a locale
  *     tags: [Translations]
@@ -18,7 +18,7 @@ const controllers = require('../controllers')
  *         schema:
  *           type: string
  *       - name: extension
- *         description: extension of each language (en-US, pt-PT, etc)
+ *         description: extension of each language (core, etc)
  *         required: true
  *         in: path
  *         schema:
